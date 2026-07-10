@@ -60,7 +60,7 @@ export default function HomePage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            window.location.href = `/login?email=${encodeURIComponent(email)}`;
+            window.location.href = `/signup`;
           }}
           className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto animate-slide-up"
         >
@@ -210,7 +210,7 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link
-                href="/login"
+                href="/signup"
                 className="block text-center border border-gray-200 dark:border-white/10 hover:border-brand-300 dark:hover:border-brand-500 text-gray-700 dark:text-gray-300 font-medium py-3 rounded-xl transition-colors"
               >
                 Get started
@@ -241,7 +241,7 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link
-                href="/login"
+                href="/signup"
                 className="block text-center bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 rounded-xl transition-colors"
               >
                 Start free trial
