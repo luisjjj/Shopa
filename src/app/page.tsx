@@ -39,10 +39,6 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 pt-16 pb-24 text-center">
-        <div className="inline-block bg-brand-100/60 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-semibold px-3 py-1 rounded-full mb-6 animate-fade-in">
-          Built for Nigerian sellers
-        </div>
-
         <h1 className="text-5xl sm:text-7xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.1] mb-6 animate-slide-up">
           Your store. One link.
           <br />
