@@ -113,13 +113,13 @@ const placements = [
 
 export default function FloatingIcons() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-[2]" aria-hidden="true">
       {placements.map((pos, i) => {
         const Icon = icons[i % icons.length];
         return (
           <div
             key={i}
-            className="absolute text-brand-400/[0.07]"
+            className="absolute text-brand-500/[0.09]"
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
