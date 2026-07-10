@@ -90,7 +90,7 @@ export default function OnboardingPage() {
               Pick your store link
             </label>
             <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">shopa.app/</span>
+              <span className="text-gray-400 text-sm mr-1">.shopa-store.name.ng</span>
               <input
                 type="text"
                 value={username}

@@ -1,6 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function getSubdomain(hostname: string): string | null {
+  const base = "shopa-store.name.ng";
+  if (hostname === base || hostname.endsWith("." + base)) {
+    const parts = hostname.replace("." + base, "").split(".");
+    if (parts.length === 1 && parts[0] !== "www" && parts[0] !== "shopa-store") {
+      return parts[0];
+    }
+  }
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -28,6 +39,15 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
+
+  const hostname = request.headers.get("host") || "";
+  const subdomain = getSubdomain(hostname);
+
+  if (subdomain) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${subdomain}`;
+    return NextResponse.rewrite(url);
+  }
 
   const {
     data: { user },
