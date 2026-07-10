@@ -112,15 +112,28 @@ export default function HomePage() {
 
             <div className="grid grid-cols-3 gap-4">
               {[
-                { name: "Tote Bag", price: "₦15,000", color: "bg-amber-100 dark:bg-amber-900/30", Icon: BagIcon },
-                { name: "Crossbody", price: "₦12,000", color: "bg-brand-100 dark:bg-brand-900/30", Icon: ClutchIcon },
-                { name: "Clutch", price: "₦8,000", color: "bg-stone-100 dark:bg-stone-800/50", Icon: WalletIcon },
+                { name: "Tote Bag", price: "₦15,000", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop", Icon: BagIcon, color: "bg-amber-100 dark:bg-amber-900/30" },
+                { name: "Crossbody", price: "₦12,000", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=400&fit=crop", Icon: ClutchIcon, color: "bg-brand-100 dark:bg-brand-900/30" },
+                { name: "Clutch", price: "₦8,000", image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400&h=400&fit=crop", Icon: WalletIcon, color: "bg-stone-100 dark:bg-stone-800/50" },
               ].map((item, i) => (
                 <div key={i} className="text-center">
                   <div
-                    className={`aspect-square ${item.color} rounded-xl mb-2 flex items-center justify-center`}
+                    className={`aspect-square ${item.color} rounded-xl mb-2 overflow-hidden relative`}
                   >
-                    <item.Icon className="text-brand-600 dark:text-brand-400" size={32} />
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                    />
+                    <div className="absolute inset-0 items-center justify-center hidden">
+                      <item.Icon className="text-brand-600 dark:text-brand-400" size={32} />
+                    </div>
                   </div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</p>
                   <p className="text-sm text-brand-600 font-semibold">
