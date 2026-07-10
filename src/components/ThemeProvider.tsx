@@ -13,16 +13,14 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("shopa-theme") as Theme | null;
-    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial = stored || (systemDark ? "dark" : "light");
-    setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
-  }, []);
+export function ThemeProvider({
+  initialTheme,
+  children,
+}: {
+  initialTheme: Theme;
+  children: React.ReactNode;
+}) {
+  const [theme, setTheme] = useState<Theme>(initialTheme);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -31,7 +29,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggle = useCallback(() => {
     setTheme((prev) => {
       const next = prev === "light" ? "dark" : "light";
-      localStorage.setItem("shopa-theme", next);
+      document.cookie = `shopa-theme=${next}; path=/; max-age=31536000`;
+      document.documentElement.classList.toggle("dark", next === "dark");
       return next;
     });
   }, []);

@@ -8,7 +8,7 @@ export default function HomePage() {
   const { theme, toggle } = useTheme();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f0f0f] overflow-hidden relative">
+    <div className="min-h-screen bg-white dark:bg-[#0f0f0f] relative">
       {/* Floating shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="shape-drift absolute top-20 left-[10%] w-64 h-64 rounded-full bg-brand-100/30 dark:bg-brand-900/20 blur-3xl" />

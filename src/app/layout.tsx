@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingIcons from "@/components/FloatingIcons";
@@ -26,12 +27,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const themeCookie = cookieStore.get("shopa-theme")?.value;
+  const initialTheme = themeCookie === "dark" ? "dark" : "light";
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={initialTheme === "dark" ? "dark" : ""}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
+        <ThemeProvider initialTheme={initialTheme}>
           <FloatingIcons />
           {children}
         </ThemeProvider>
