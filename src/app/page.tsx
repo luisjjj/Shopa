@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BagIcon, ClutchIcon, WalletIcon, CheckIcon, XIcon } from "@/components/Icons";
 
 export default function HomePage() {
-  const [email, setEmail] = useState("");
   const { theme, toggle } = useTheme();
 
   return (
@@ -57,28 +55,14 @@ export default function HomePage() {
           every &quot;how much?&quot; DM.
         </p>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            window.location.href = `/signup`;
-          }}
-          className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto animate-slide-up"
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="flex-1 px-5 py-3.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900 outline-none transition-all text-gray-900 dark:text-white placeholder:text-gray-400"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors whitespace-nowrap"
+        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto animate-slide-up">
+          <Link
+            href="/signup"
+            className="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors text-center whitespace-nowrap"
           >
             Create your store
-          </button>
-        </form>
+          </Link>
+        </div>
 
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-4">
           Free to start — 3 product slots. ₦5,000/mo for unlimited.
