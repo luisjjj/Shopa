@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #faf9f7;
+  --foreground: #1a1a1a;
+  --brand: #ed7712;
+  --brand-dark: #de5c08;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Grain overlay for landing page */
+.grain-overlay::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  animation: grain 8s steps(10) infinite;
+}
+
+/* Floating shapes animation */
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(30px, -30px) rotate(5deg); }
+  50% { transform: translate(-20px, 20px) rotate(-3deg); }
+  75% { transform: translate(15px, -10px) rotate(2deg); }
+}
+
+.shape-drift {
+  animation: drift 20s ease-in-out infinite;
+}
+
+.shape-drift-delayed {
+  animation: drift 25s ease-in-out 5s infinite;
+}
+
+.shape-drift-slow {
+  animation: drift 30s ease-in-out 10s infinite;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
