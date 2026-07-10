@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { CheckCircleIcon, XCircleIcon } from "@/components/Icons";
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
@@ -15,36 +16,22 @@ function ConfirmContent() {
   const isSuccess = status === "success";
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center p-4">
       <div className="w-full max-w-md text-center">
         {isSuccess ? (
           <>
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-8 h-8 text-green-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
+            <CheckCircleIcon className="mx-auto text-green-500 mb-6" size={64} />
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Order confirmed!
             </h1>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
               Thank you{buyer ? `, ${buyer}` : ""}! Your order for{" "}
               <strong>{product}</strong> has been placed.
             </p>
 
-            <div className="bg-white border border-gray-100 rounded-xl p-4 mb-6">
-              <p className="text-sm text-gray-500">Amount paid</p>
+            <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4 mb-6">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Amount paid</p>
               <p className="text-2xl font-bold text-brand-600">
                 ₦{amount ? parseInt(amount).toLocaleString() : "—"}
               </p>
@@ -53,7 +40,7 @@ function ConfirmContent() {
               </p>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Let the seller know you&apos;ve paid:
             </p>
 
@@ -73,26 +60,12 @@ function ConfirmContent() {
           </>
         ) : (
           <>
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
+            <XCircleIcon className="mx-auto text-red-500 mb-6" size={64} />
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Something went wrong
             </h1>
-            <p className="text-gray-500 mb-6">{message || "Payment could not be verified."}</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">{message || "Payment could not be verified."}</p>
 
             <a
               href="/"
@@ -111,7 +84,7 @@ export default function ConfirmPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center">
           <p className="text-gray-400">Verifying payment...</p>
         </div>
       }

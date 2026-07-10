@@ -2,12 +2,16 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import { MailIcon } from "@/components/Icons";
+import { useTheme } from "@/components/ThemeProvider";
+import { SunIcon, MoonIcon } from "@/components/Icons";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const { theme, toggle } = useTheme();
   const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,15 +35,13 @@ export default function LoginPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
         <div className="text-center max-w-sm">
-          <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
+          <div className="w-16 h-16 bg-brand-100 dark:bg-brand-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MailIcon className="text-brand-600" size={28} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h2>
-          <p className="text-gray-500">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Check your email</h2>
+          <p className="text-gray-500 dark:text-gray-400">
             We sent a magic link to <strong>{email}</strong>. Click it to sign in.
           </p>
         </div>
@@ -48,30 +50,40 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
       <div className="w-full max-w-md">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={toggle}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+            aria-label="Toggle dark mode"
+          >
+            {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+          </button>
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-brand-600">Shopa</h1>
-          <p className="text-gray-500 mt-2">Your storefront, one link away</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Your storefront, one link away</p>
         </div>
 
         <form
           onSubmit={handleLogin}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8"
+          className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-8"
         >
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Sign in to your store
           </h2>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors"
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
               placeholder="you@example.com"
               required
             />
@@ -84,7 +96,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-medium py-3 rounded-xl transition-colors"
+            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
           >
             {loading ? "Sending link..." : "Send magic link"}
           </button>

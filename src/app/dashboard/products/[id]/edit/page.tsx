@@ -105,19 +105,19 @@ export default function EditProductPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center">
         <p className="text-gray-400">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface">
-      <header className="bg-white border-b border-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="text-sm text-gray-500 hover:text-brand-600 transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
           >
             ← Back to dashboard
           </button>
@@ -131,15 +131,15 @@ export default function EditProductPage({
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Product</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Product</h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white border border-gray-100 rounded-2xl p-6"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6"
         >
           {/* Image Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Product image
             </label>
             <input
@@ -162,7 +162,7 @@ export default function EditProductPage({
                     setImageUrl("");
                     if (fileRef.current) fileRef.current.value = "";
                   }}
-                  className="absolute top-2 right-2 bg-white/90 text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-white"
+                  className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-white dark:hover:bg-black"
                 >
                   Remove
                 </button>
@@ -172,7 +172,7 @@ export default function EditProductPage({
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="w-full h-48 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 hover:text-brand-500 transition-colors"
+                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 transition-colors"
               >
                 {uploading ? (
                   <span>Uploading...</span>
@@ -190,28 +190,28 @@ export default function EditProductPage({
 
           {/* Name */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Product name
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors"
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
               required
             />
           </div>
 
           {/* Price */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Price (₦)
             </label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors"
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
               min="100"
               required
             />
@@ -219,13 +219,13 @@ export default function EditProductPage({
 
           {/* Description */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description <span className="text-gray-400">(optional)</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors resize-none"
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors resize-none bg-transparent text-gray-900 dark:text-white"
               rows={3}
             />
           </div>
@@ -236,7 +236,7 @@ export default function EditProductPage({
               type="button"
               onClick={() => setIsActive(!isActive)}
               className={`w-11 h-6 rounded-full transition-colors relative ${
-                isActive ? "bg-brand-500" : "bg-gray-300"
+                isActive ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"
               }`}
             >
               <span
@@ -245,7 +245,7 @@ export default function EditProductPage({
                 }`}
               />
             </button>
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
               {isActive ? "Visible on store" : "Hidden (draft)"}
             </span>
           </div>
@@ -255,7 +255,7 @@ export default function EditProductPage({
           <button
             type="submit"
             disabled={saving || !name || !price}
-            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-medium py-3 rounded-xl transition-colors"
+            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>

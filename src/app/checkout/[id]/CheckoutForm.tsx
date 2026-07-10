@@ -57,35 +57,35 @@ export default function CheckoutForm({
   return (
     <form
       onSubmit={handleCheckout}
-      className="bg-white border border-gray-100 rounded-2xl p-6"
+      className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6"
     >
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Complete your order
       </h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Your name
         </label>
         <input
           type="text"
           value={buyerName}
           onChange={(e) => setBuyerName(e.target.value)}
-          className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors"
+          className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
           placeholder="e.g. Chidinma"
           required
         />
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Phone number
         </label>
         <input
           type="tel"
           value={buyerPhone}
           onChange={(e) => setBuyerPhone(e.target.value)}
-          className="w-full border-b-2 border-gray-200 focus:border-brand-500 outline-none py-2 transition-colors"
+          className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
           placeholder="+234 801 234 5678"
           required
         />
@@ -96,7 +96,7 @@ export default function CheckoutForm({
       <button
         type="submit"
         disabled={loading || !buyerName || !buyerPhone}
-        className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-medium py-3 rounded-xl transition-colors"
+        className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
       >
         {loading ? "Redirecting to payment..." : `Pay ₦${productPrice.toLocaleString()}`}
       </button>

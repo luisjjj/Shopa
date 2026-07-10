@@ -25,18 +25,18 @@ export default async function CheckoutPage({ params }: Props) {
     .single();
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
       <div className="max-w-lg mx-auto px-4 py-8">
         {/* Back link */}
         <a
           href={`/${seller?.username}`}
-          className="text-sm text-gray-500 hover:text-brand-600 transition-colors mb-6 inline-block"
+          className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors mb-6 inline-block"
         >
           ← Back to {seller?.username}&apos;s store
         </a>
 
         {/* Product card */}
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-6">
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden mb-6">
           {product.image_url && (
             <img
               src={product.image_url}
@@ -45,12 +45,12 @@ export default async function CheckoutPage({ params }: Props) {
             />
           )}
           <div className="p-6">
-            <h1 className="text-xl font-bold text-gray-900">{product.name}</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
             <p className="text-2xl font-bold text-brand-600 mt-2">
               ₦{product.price.toLocaleString()}
             </p>
             {product.description && (
-              <p className="text-gray-500 text-sm mt-3">{product.description}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">{product.description}</p>
             )}
           </div>
         </div>

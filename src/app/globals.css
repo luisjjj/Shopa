@@ -9,6 +9,11 @@
   --brand-dark: #de5c08;
 }
 
+.dark {
+  --background: #0f0f0f;
+  --foreground: #e8e6e3;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -35,6 +40,10 @@ body {
   pointer-events: none;
   z-index: 1;
   animation: grain 8s steps(10) infinite;
+}
+
+.dark .grain-overlay::before {
+  opacity: 0.3;
 }
 
 /* Floating shapes animation */
@@ -76,6 +85,14 @@ body {
   border-radius: 3px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #404040;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
