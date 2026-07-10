@@ -45,6 +45,11 @@ body {
   75% { transform: translate(15px, -10px) rotate(2deg); }
 }
 
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-18px) rotate(var(--rot, 0deg)); }
+}
+
 .shape-drift {
   animation: drift 20s ease-in-out infinite;
 }
