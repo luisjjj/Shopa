@@ -76,7 +76,7 @@ export default function HomePage() {
               <div className="w-3 h-3 rounded-full bg-green-300" />
             </div>
             <div className="flex-1 bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1 text-xs text-gray-400 mx-4">
-              amakabags.shopa-store.name.ng
+              shopa-five.vercel.app/amakabags
             </div>
           </div>
 
@@ -143,7 +143,7 @@ export default function HomePage() {
               {
                 step: "2",
                 title: "Share your link",
-                desc: "Share yourname.shopa-store.name.ng on your Instagram bio or WhatsApp status.",
+                desc: "Share your shopa-five.vercel.app/yourname link on your Instagram bio or WhatsApp status.",
               },
               {
                 step: "3",

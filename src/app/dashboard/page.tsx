@@ -66,7 +66,7 @@ export default async function DashboardPage() {
             Welcome back, {profile.username}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            <span className="font-medium text-brand-600">{profile.username}</span>.shopa-store.name.ng
+            shopa-five.vercel.app/<span className="font-medium text-brand-600">{profile.username}</span>
           </p>
         </div>
 
