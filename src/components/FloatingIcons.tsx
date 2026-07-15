@@ -61,7 +61,7 @@ export default function FloatingIcons() {
         return (
           <div
             key={i}
-            className="absolute text-brand-500/[0.09] dark:text-brand-400/[0.09]"
+            className="absolute text-brand-500/[0.12] dark:text-brand-400/[0.12]"
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
