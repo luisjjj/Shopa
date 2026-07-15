@@ -80,24 +80,27 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
-      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
+      <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
+        <div className="max-w-2xl mx-auto px-5 py-4">
           <button
             onClick={() => router.back()}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
           >
-            ← Back to dashboard
+            <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            Back
           </button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-5 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Product</h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark"
         >
           {/* Image Upload */}
           <div className="mb-6">
@@ -159,7 +162,7 @@ export default function NewProductPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="input-base"
               placeholder="e.g. Leather Tote Bag"
               required
             />
@@ -174,7 +177,7 @@ export default function NewProductPage() {
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="input-base"
               placeholder="e.g. 15000"
               min="100"
               required
@@ -184,13 +187,13 @@ export default function NewProductPage() {
           {/* Stock */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Stock <span className="text-gray-400">(leave empty for unlimited)</span>
+              Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
             </label>
             <input
               type="number"
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="input-base"
               placeholder="e.g. 10"
               min="0"
             />
@@ -199,23 +202,27 @@ export default function NewProductPage() {
           {/* Description */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description <span className="text-gray-400">(optional)</span>
+              Description <span className="text-gray-400 font-normal">(optional)</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors resize-none bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="input-base resize-none"
               rows={3}
               placeholder="Tell buyers about this product..."
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {error && (
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={saving || !name || !price}
-            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
+            className="btn-primary"
           >
             {saving ? "Adding..." : "Add product"}
           </button>

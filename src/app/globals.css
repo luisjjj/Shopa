@@ -7,11 +7,19 @@
   --foreground: #1a1a1a;
   --brand: #ed7712;
   --brand-dark: #de5c08;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.1);
 }
 
 .dark {
-  --background: #0f0f0f;
+  --background: #0a0a0a;
   --foreground: #e8e6e3;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.4);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 body {
@@ -20,9 +28,56 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Subtle noise texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+.dark body::before {
+  opacity: 0.03;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .card {
+    @apply bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200;
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  .input-base {
+    @apply w-full bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all duration-200;
+  }
+
+  .input-base:focus {
+    @apply border-brand-400 dark:border-brand-500 ring-2 ring-brand-500/10;
+  }
+
+  .btn-primary {
+    @apply w-full bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-all duration-200;
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
   }
 }
 
@@ -75,4 +130,10 @@ body {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(237, 119, 18, 0.15);
+  color: inherit;
 }

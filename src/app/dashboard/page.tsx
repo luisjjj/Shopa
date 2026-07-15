@@ -33,24 +33,30 @@ export default async function DashboardPage() {
   const canAddProduct = isPremium || productCount < 3;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
       {/* Header */}
-      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-brand-600">
-            Shopa
+      <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+              </svg>
+            </div>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">Shopa</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Link
               href={`/${profile.username}`}
               target="_blank"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06]"
             >
               View store ↗
             </Link>
             <Link
               href="/dashboard/profile"
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
               title="Profile"
             >
               <UserIcon size={16} />
@@ -59,7 +65,7 @@ export default async function DashboardPage() {
             <form action="/api/auth/signout" method="post">
               <button
                 type="submit"
-                className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+                className="text-sm text-gray-400 hover:text-red-500 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
               >
                 Sign out
               </button>
@@ -68,14 +74,14 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-5 py-8">
         {/* Welcome */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Welcome back, {profile.username}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            shopa-five.vercel.app/<span className="font-medium text-brand-600">{profile.username}</span>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+            shopa-store.name.ng/<span className="font-medium text-brand-600 dark:text-brand-400">{profile.username}</span>
           </p>
         </div>
 
@@ -85,30 +91,34 @@ export default async function DashboardPage() {
 
         {/* Premium Status */}
         {isPremium ? (
-          <div className="bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-950/50 dark:to-brand-900/30 border border-brand-200 dark:border-brand-800/50 rounded-xl p-4 mb-8">
-            <div className="flex items-center gap-2">
-              <SparkleIcon className="text-brand-600" size={18} />
-              <span className="text-brand-600 dark:text-brand-400 font-semibold">Premium Active</span>
-              {profile.premium_until && (
-                <span className="text-sm text-brand-500">
-                  until {new Date(profile.premium_until).toLocaleDateString("en-NG")}
-                </span>
-              )}
+          <div className="bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-950/30 dark:to-brand-900/20 border border-brand-200/60 dark:border-brand-800/30 rounded-2xl p-5 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
+                <SparkleIcon className="text-white" size={16} />
+              </div>
+              <div>
+                <span className="text-brand-700 dark:text-brand-300 font-semibold text-sm">Premium Active</span>
+                {profile.premium_until && (
+                  <p className="text-xs text-brand-500 dark:text-brand-400/70 mt-0.5">
+                    Renews {new Date(profile.premium_until).toLocaleDateString("en-NG")}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4 mb-8 flex items-center justify-between">
+          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 flex items-center justify-between shadow-card dark:shadow-card-dark">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                You&apos;re on the <strong>Free plan</strong> — 3 product slots
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Free plan — 3 product slots
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                Upgrade for ₦5,000/month to unlock unlimited products & remove branding
+                Upgrade for unlimited products & customization
               </p>
             </div>
             <Link
               href="/dashboard/upgrade"
-              className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+              className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm shadow-brand-500/20 active:scale-[0.98]"
             >
               Upgrade
             </Link>
@@ -117,11 +127,11 @@ export default async function DashboardPage() {
 
         {/* Product Limit Warning */}
         {!canAddProduct && (
-          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl p-4 mb-6">
+          <div className="bg-red-50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-900/30 rounded-2xl p-5 mb-6">
             <p className="text-sm text-red-700 dark:text-red-400 font-medium">
-              You&apos;ve reached the 3-product limit on the free plan.
+              Product limit reached
             </p>
-            <p className="text-xs text-red-500 dark:text-red-400/70 mt-1">
+            <p className="text-xs text-red-500/80 dark:text-red-400/60 mt-1">
               Upgrade to Premium to add unlimited products.
             </p>
           </div>
@@ -131,31 +141,31 @@ export default async function DashboardPage() {
         {isPremium && (
           <Link
             href="/dashboard/customize"
-            className="flex items-center gap-3 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4 mb-8 hover:border-brand-300 dark:hover:border-brand-700 transition-colors group"
+            className="flex items-center gap-4 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 shadow-card dark:shadow-card-dark transition-all hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-0.5 group"
           >
-            <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/30 rounded-lg flex items-center justify-center shrink-0">
-              <PaletteIcon className="text-brand-600" size={20} />
+            <div className="w-11 h-11 bg-brand-50 dark:bg-brand-950/40 rounded-xl flex items-center justify-center shrink-0">
+              <PaletteIcon className="text-brand-600 dark:text-brand-400" size={20} />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                 Customize Store
               </p>
-              <p className="text-xs text-gray-400">
-                Change colors, layout, banner & more
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                Colors, layout, banner, social links
               </p>
             </div>
-            <span className="text-gray-300 dark:text-gray-600">→</span>
+            <span className="text-gray-300 dark:text-gray-600 group-hover:text-brand-500 transition-colors">→</span>
           </Link>
         )}
 
         {/* Products Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Products</h2>
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Products</h2>
             {canAddProduct && (
               <Link
                 href="/dashboard/products/new"
-                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98]"
               >
                 Add product
               </Link>
@@ -167,7 +177,7 @@ export default async function DashboardPage() {
 
         {/* Orders Section */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Orders</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Orders</h2>
           <OrderList userId={user.id} />
         </div>
       </main>
@@ -185,66 +195,64 @@ async function ProductList({ userId }: { userId: string }) {
 
   if (!products || products.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-8 text-center">
-        <PackageIcon className="mx-auto text-gray-300 dark:text-gray-600 mb-3" size={40} />
-        <p className="text-gray-400">No products yet. Add your first product!</p>
+      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
+        <div className="w-14 h-14 bg-gray-100 dark:bg-white/[0.04] rounded-2xl mx-auto mb-4 flex items-center justify-center">
+          <PackageIcon className="text-gray-300 dark:text-gray-600" size={28} />
+        </div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">No products yet</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add your first product to get started</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {products.map((product) => (
-        <div
+        <Link
           key={product.id}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden"
+          href={`/dashboard/products/${product.id}/edit`}
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark transition-all hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-0.5 group"
         >
           {product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-32 object-cover"
+              className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-32 bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+            <div className="w-full aspect-square bg-gray-50 dark:bg-white/[0.02] flex items-center justify-center">
               <PackageIcon className="text-gray-300 dark:text-gray-600" size={32} />
             </div>
           )}
-          <div className="p-3">
-            <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">{product.name}</h3>
-            <p className="text-brand-600 font-semibold text-sm">₦{product.price.toLocaleString()}</p>
-            <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+          <div className="p-3.5">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">{product.name}</h3>
+            <p className="text-brand-600 dark:text-brand-400 font-bold text-sm mt-0.5">₦{product.price.toLocaleString()}</p>
+            <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
               {product.stock != null && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                     product.stock === 0
                       ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                       : product.stock <= 2
-                        ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                        ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
                         : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                   }`}
                 >
-                  {product.stock === 0 ? "Out" : `${product.stock} left`}
+                  {product.stock === 0 ? "Out of stock" : `${product.stock} left`}
                 </span>
               )}
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                   product.is_active
                     ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                    : "bg-gray-100 dark:bg-white/10 text-gray-500"
+                    : "bg-gray-100 dark:bg-white/[0.05] text-gray-500"
                 }`}
               >
                 {product.is_active ? "Active" : "Draft"}
               </span>
             </div>
-            <Link
-              href={`/dashboard/products/${product.id}/edit`}
-              className="block text-center text-xs text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors mt-2"
-            >
-              Edit
-            </Link>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );
@@ -261,16 +269,17 @@ async function OrderList({ userId }: { userId: string }) {
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-red-200 dark:border-red-900/50 rounded-xl p-8 text-center">
-        <p className="text-red-500 text-sm">Error loading orders: {error.message}</p>
+      <div className="bg-white dark:bg-[#141414] border border-red-200/60 dark:border-red-900/30 rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
+        <p className="text-red-500 text-sm">{error.message}</p>
       </div>
     );
   }
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-8 text-center">
-        <p className="text-gray-400">No orders yet.</p>
+      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
+        <p className="text-gray-400 dark:text-gray-500 font-medium">No orders yet</p>
+        <p className="text-sm text-gray-300 dark:text-gray-600 mt-1">Orders will appear here when buyers purchase</p>
       </div>
     );
   }
@@ -280,29 +289,29 @@ async function OrderList({ userId }: { userId: string }) {
       {orders.map((order) => (
         <div
           key={order.id}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark"
         >
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <div className="font-medium text-gray-900 dark:text-white">{order.buyer_name || "—"}</div>
-              <div className="text-xs text-gray-400">{order.buyer_phone}</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{order.buyer_name || "—"}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{order.buyer_phone}</div>
             </div>
             <span
-              className={`text-xs px-2 py-1 rounded-full shrink-0 ${
+              className={`text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0 ${
                 order.paid
                   ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                  : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                  : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
               }`}
             >
               {order.paid ? "Paid" : "Pending"}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {(order.products as { name: string })?.name || "—"}
               </span>
-              <span className="text-sm font-semibold text-brand-600 ml-2">
+              <span className="text-sm font-bold text-gray-900 dark:text-white">
                 ₦{order.amount.toLocaleString()}
               </span>
             </div>
@@ -325,7 +334,7 @@ function FulfilledToggle({
 }) {
   if (!paid) {
     return (
-      <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-500">
+      <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
         Awaiting payment
       </span>
     );
@@ -337,14 +346,14 @@ function FulfilledToggle({
       <input type="hidden" name="fulfilled" value={fulfilled ? "false" : "true"} />
       <button
         type="submit"
-        className={`text-xs px-2 py-1 rounded-full transition-colors flex items-center gap-1 ${
+        className={`text-[11px] font-medium px-2.5 py-1 rounded-full transition-all flex items-center gap-1 active:scale-95 ${
           fulfilled
             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-            : "bg-gray-100 dark:bg-white/10 text-gray-500 hover:bg-gray-200 dark:hover:bg-white/15"
+            : "bg-gray-100 dark:bg-white/[0.05] text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/[0.1]"
         }`}
       >
         {fulfilled ? (
-          <><CheckIcon size={12} /> Fulfilled</>
+          <><CheckIcon size={11} /> Fulfilled</>
         ) : (
           "Mark fulfilled"
         )}

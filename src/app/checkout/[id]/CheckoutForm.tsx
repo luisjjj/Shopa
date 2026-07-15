@@ -57,9 +57,9 @@ export default function CheckoutForm({
   return (
     <form
       onSubmit={handleCheckout}
-      className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6"
+      className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark"
     >
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">
         Complete your order
       </h2>
 
@@ -71,7 +71,7 @@ export default function CheckoutForm({
           type="text"
           value={buyerName}
           onChange={(e) => setBuyerName(e.target.value)}
-          className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+          className="input-base"
           placeholder="e.g. Chidinma"
           required
         />
@@ -85,25 +85,42 @@ export default function CheckoutForm({
           type="tel"
           value={buyerPhone}
           onChange={(e) => setBuyerPhone(e.target.value)}
-          className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+          className="input-base"
           placeholder="+234 801 234 5678"
           required
         />
       </div>
 
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">
+          <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+        </div>
+      )}
 
       <button
         type="submit"
         disabled={loading || !buyerName || !buyerPhone}
-        className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
+        className="btn-primary flex items-center justify-center gap-2"
       >
-        {loading ? "Redirecting to payment..." : `Pay ₦${productPrice.toLocaleString()}`}
+        {loading ? (
+          <>
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Redirecting to payment...
+          </>
+        ) : `Pay ₦${productPrice.toLocaleString()}`}
       </button>
 
-      <p className="text-xs text-gray-400 text-center mt-3">
-        Secure payment powered by Paystack
-      </p>
+      <div className="flex items-center justify-center gap-2 mt-4">
+        <svg className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          Secure payment powered by Paystack
+        </p>
+      </div>
     </form>
   );
 }

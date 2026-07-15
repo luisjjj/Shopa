@@ -118,30 +118,33 @@ export default function EditProductPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
-      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
+      <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
+        <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
           >
-            ← Back to dashboard
+            <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            Back
           </button>
           <button
             onClick={handleDelete}
-            className="text-sm text-red-400 hover:text-red-600 transition-colors"
+            className="text-sm text-red-400 hover:text-red-600 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
           >
-            Delete product
+            Delete
           </button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-5 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Product</h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark"
         >
           {/* Image Upload */}
           <div className="mb-6">
@@ -203,7 +206,7 @@ export default function EditProductPage({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
+              className="input-base"
               required
             />
           </div>
@@ -217,7 +220,7 @@ export default function EditProductPage({
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
+              className="input-base"
               min="100"
               required
             />
@@ -226,13 +229,13 @@ export default function EditProductPage({
           {/* Stock */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Stock <span className="text-gray-400">(leave empty for unlimited)</span>
+              Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
             </label>
             <input
               type="number"
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
+              className="input-base"
               placeholder="Leave empty for unlimited"
               min="0"
             />
@@ -241,12 +244,12 @@ export default function EditProductPage({
           {/* Description */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description <span className="text-gray-400">(optional)</span>
+              Description <span className="text-gray-400 font-normal">(optional)</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors resize-none bg-transparent text-gray-900 dark:text-white"
+              className="input-base resize-none"
               rows={3}
             />
           </div>
@@ -256,12 +259,12 @@ export default function EditProductPage({
             <button
               type="button"
               onClick={() => setIsActive(!isActive)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${
-                isActive ? "bg-brand-500" : "bg-gray-300 dark:bg-gray-600"
+              className={`w-11 h-6 rounded-full transition-all relative ${
+                isActive ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
                   isActive ? "translate-x-5" : ""
                 }`}
               />
@@ -271,12 +274,16 @@ export default function EditProductPage({
             </span>
           </div>
 
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {error && (
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={saving || !name || !price}
-            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
+            className="btn-primary"
           >
             {saving ? "Saving..." : "Save changes"}
           </button>
