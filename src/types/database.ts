@@ -70,6 +70,65 @@ export interface Database {
           created_at?: string;
         };
       };
+      storefront_settings: {
+        Row: {
+          user_id: string;
+          primary_color: string;
+          background_color: string;
+          banner_url: string | null;
+          font_style: string;
+          layout: string;
+          card_style: string;
+          text_align: string;
+          show_socials: boolean;
+          instagram: string | null;
+          twitter: string | null;
+          tiktok: string | null;
+          facebook: string | null;
+          whatsapp_store: string | null;
+          phone: string | null;
+          email: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          primary_color?: string;
+          background_color?: string;
+          banner_url?: string | null;
+          font_style?: string;
+          layout?: string;
+          card_style?: string;
+          text_align?: string;
+          show_socials?: boolean;
+          instagram?: string | null;
+          twitter?: string | null;
+          tiktok?: string | null;
+          facebook?: string | null;
+          whatsapp_store?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          primary_color?: string;
+          background_color?: string;
+          banner_url?: string | null;
+          font_style?: string;
+          layout?: string;
+          card_style?: string;
+          text_align?: string;
+          show_socials?: boolean;
+          instagram?: string | null;
+          twitter?: string | null;
+          tiktok?: string | null;
+          facebook?: string | null;
+          whatsapp_store?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          updated_at?: string;
+        };
+      };
       orders: {
         Row: {
           id: string;

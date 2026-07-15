@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PackageIcon, CheckIcon, SparkleIcon } from "@/components/Icons";
+import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon } from "@/components/Icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function DashboardPage() {
@@ -112,6 +112,27 @@ export default async function DashboardPage() {
               Upgrade to Premium to add unlimited products.
             </p>
           </div>
+        )}
+
+        {/* Customize Store (Premium only) */}
+        {isPremium && (
+          <Link
+            href="/dashboard/customize"
+            className="flex items-center gap-3 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4 mb-8 hover:border-brand-300 dark:hover:border-brand-700 transition-colors group"
+          >
+            <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/30 rounded-lg flex items-center justify-center shrink-0">
+              <PaletteIcon className="text-brand-600" size={20} />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
+                Customize Store
+              </p>
+              <p className="text-xs text-gray-400">
+                Change colors, layout, banner & more
+              </p>
+            </div>
+            <span className="text-gray-300 dark:text-gray-600">→</span>
+          </Link>
         )}
 
         {/* Products Section */}
