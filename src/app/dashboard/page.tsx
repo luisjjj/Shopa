@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon, UserIcon } from "@/components/Icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBanner } from "@/components/NotificationBanner";
+import { AnalyticsSection } from "@/components/AnalyticsSection";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -79,6 +80,8 @@ export default async function DashboardPage() {
         </div>
 
         <NotificationBanner />
+
+        <AnalyticsSection />
 
         {/* Premium Status */}
         {isPremium ? (
@@ -212,6 +215,19 @@ async function ProductList({ userId }: { userId: string }) {
             <p className="text-brand-600 font-semibold">₦{product.price.toLocaleString()}</p>
           </div>
           <div className="flex items-center gap-2">
+            {product.stock != null && (
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${
+                  product.stock === 0
+                    ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                    : product.stock <= 2
+                      ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                      : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                }`}
+              >
+                {product.stock === 0 ? "Out of stock" : `${product.stock} left`}
+              </span>
+            )}
             <span
               className={`text-xs px-2 py-1 rounded-full ${
                 product.is_active

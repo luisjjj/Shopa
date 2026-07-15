@@ -9,6 +9,7 @@ export default function NewProductPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [stock, setStock] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -66,6 +67,7 @@ export default function NewProductPage() {
       price: parseInt(price),
       description: description || null,
       image_url: imageUrl || null,
+      stock: stock ? parseInt(stock) : null,
     });
 
     if (insertError) {
@@ -176,6 +178,21 @@ export default function NewProductPage() {
               placeholder="e.g. 15000"
               min="100"
               required
+            />
+          </div>
+
+          {/* Stock */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Stock <span className="text-gray-400">(leave empty for unlimited)</span>
+            </label>
+            <input
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              placeholder="e.g. 10"
+              min="0"
             />
           </div>
 

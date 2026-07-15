@@ -24,8 +24,23 @@ export async function GET(request: Request) {
       .from("orders")
       .update({ paid: true })
       .eq("paystack_reference", reference)
-      .select("user_id")
+      .select("user_id, product_id")
       .single();
+
+    if (order?.product_id) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("stock")
+        .eq("id", order.product_id)
+        .single();
+
+      if (product && product.stock != null && product.stock > 0) {
+        await supabase
+          .from("products")
+          .update({ stock: product.stock - 1 })
+          .eq("id", order.product_id);
+      }
+    }
 
     if (order?.user_id) {
       fetch(`${origin}/api/push/notify`, {

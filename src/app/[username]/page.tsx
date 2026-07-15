@@ -46,9 +46,10 @@ export default async function StorePage({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, price, image_url, description")
+    .select("id, name, price, image_url, description, stock")
     .eq("user_id", profile.id)
     .eq("is_active", true)
+    .or("stock.is.null,stock.gt.0")
     .order("created_at", { ascending: false });
 
   const s = settings || null;

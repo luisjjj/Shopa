@@ -13,6 +13,7 @@ export default function EditProductPage({
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [stock, setStock] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -34,6 +35,7 @@ export default function EditProductPage({
         setPrice(String(data.price));
         setDescription(data.description || "");
         setImageUrl(data.image_url || "");
+        setStock(data.stock != null ? String(data.stock) : "");
         setIsActive(data.is_active);
       }
       setLoading(false);
@@ -88,6 +90,7 @@ export default function EditProductPage({
         description: description || null,
         image_url: imageUrl || null,
         is_active: isActive,
+        stock: stock ? parseInt(stock) : null,
       })
       .eq("id", params.id);
 
@@ -217,6 +220,21 @@ export default function EditProductPage({
               className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
               min="100"
               required
+            />
+          </div>
+
+          {/* Stock */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Stock <span className="text-gray-400">(leave empty for unlimited)</span>
+            </label>
+            <input
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white"
+              placeholder="Leave empty for unlimited"
+              min="0"
             />
           </div>
 

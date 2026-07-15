@@ -47,6 +47,7 @@ export interface Database {
           image_url: string | null;
           description: string | null;
           is_active: boolean;
+          stock: number | null;
           created_at: string;
         };
         Insert: {
@@ -57,6 +58,7 @@ export interface Database {
           image_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          stock?: number | null;
           created_at?: string;
         };
         Update: {
@@ -67,6 +69,7 @@ export interface Database {
           image_url?: string | null;
           description?: string | null;
           is_active?: boolean;
+          stock?: number | null;
           created_at?: string;
         };
       };
