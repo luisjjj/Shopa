@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon } from "@/components/Icons";
+import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon, UserIcon } from "@/components/Icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function DashboardPage() {
@@ -45,6 +45,13 @@ export default async function DashboardPage() {
               className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
             >
               View store ↗
+            </Link>
+            <Link
+              href="/dashboard/profile"
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+              title="Profile"
+            >
+              <UserIcon size={16} />
             </Link>
             <ThemeToggle />
             <form action="/api/auth/signout" method="post">
