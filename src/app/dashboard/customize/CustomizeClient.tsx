@@ -64,6 +64,7 @@ export default function CustomizeClient({
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const previewRef = useRef<HTMLIFrameElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -158,7 +159,7 @@ export default function CustomizeClient({
           </div>
         </header>
         <main className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-12">
+          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-8 md:p-12">
             <div className="w-16 h-16 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <PaletteIcon className="text-brand-600" size={28} />
             </div>
@@ -187,20 +188,20 @@ export default function CustomizeClient({
       {/* Header */}
       <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10 shrink-0">
         <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-lg font-bold text-brand-600">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <Link href="/dashboard" className="text-lg font-bold text-brand-600 shrink-0">
               Shopa
             </Link>
-            <span className="text-sm text-gray-400">/</span>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm text-gray-400 hidden md:inline">/</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:inline">
               Customize Store
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <Link
               href={`/${username}`}
               target="_blank"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 transition-colors"
+              className="text-xs md:text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 transition-colors hidden sm:inline"
             >
               View store ↗
             </Link>
@@ -208,7 +209,7 @@ export default function CustomizeClient({
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1.5 text-sm font-medium px-3 md:px-4 py-2 rounded-lg transition-colors ${
                 saved
                   ? "bg-green-500 text-white"
                   : "bg-brand-500 hover:bg-brand-600 text-white"
@@ -228,199 +229,255 @@ export default function CustomizeClient({
         </div>
       </header>
 
-      {/* Split View */}
+      {/* Mobile Tab Bar */}
+      <div className="flex md:hidden border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414] shrink-0">
+        <button
+          onClick={() => setActiveTab("edit")}
+          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            activeTab === "edit"
+              ? "text-brand-600 border-b-2 border-brand-500"
+              : "text-gray-500"
+          }`}
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => setActiveTab("preview")}
+          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            activeTab === "preview"
+              ? "text-brand-600 border-b-2 border-brand-500"
+              : "text-gray-500"
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+
+      {/* Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Settings Panel */}
-        <div className="w-[380px] shrink-0 border-r border-gray-200 dark:border-white/10 overflow-y-auto bg-white dark:bg-[#141414]">
-          {loading ? (
-            <div className="p-8 text-center text-gray-400">Loading...</div>
-          ) : (
-            <div className="p-5 space-y-6">
-              {/* Colors */}
-              <Section icon={<PaletteIcon size={16} />} title="Colors">
-                <ColorField
-                  label="Primary color"
-                  value={settings.primary_color}
-                  onChange={(v) => update("primary_color", v)}
-                />
-                <ColorField
-                  label="Background color"
-                  value={settings.background_color}
-                  onChange={(v) => update("background_color", v)}
-                />
-              </Section>
+        <div
+          className={`${
+            activeTab === "edit" ? "flex" : "hidden"
+          } md:flex flex-col md:flex-row flex-1 overflow-hidden`}
+        >
+          <div className="flex-1 overflow-y-auto bg-white dark:bg-[#141414] md:border-r border-gray-200 dark:border-white/10">
+            {loading ? (
+              <div className="p-8 text-center text-gray-400">Loading...</div>
+            ) : (
+              <div className="p-4 md:p-5 space-y-5 md:space-y-6">
+                {/* Colors */}
+                <Section icon={<PaletteIcon size={16} />} title="Colors">
+                  <ColorField
+                    label="Primary color"
+                    value={settings.primary_color}
+                    onChange={(v) => update("primary_color", v)}
+                  />
+                  <ColorField
+                    label="Background color"
+                    value={settings.background_color}
+                    onChange={(v) => update("background_color", v)}
+                  />
+                </Section>
 
-              {/* Banner */}
-              <Section icon={<ImageIcon size={16} />} title="Banner">
-                {settings.banner_url ? (
-                  <div className="relative">
-                    <img
-                      src={settings.banner_url}
-                      alt="Banner"
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
+                {/* Banner */}
+                <Section icon={<ImageIcon size={16} />} title="Banner">
+                  {settings.banner_url ? (
+                    <div className="relative">
+                      <img
+                        src={settings.banner_url}
+                        alt="Banner"
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        onClick={() => update("banner_url", null)}
+                        className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md hover:bg-black/70"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={() => update("banner_url", null)}
-                      className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-md hover:bg-black/70"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="w-full border-2 border-dashed border-gray-200 dark:border-white/10 rounded-lg p-6 text-center hover:border-brand-300 dark:hover:border-brand-700 transition-colors"
                     >
-                      Remove
+                      <UploadIcon className="mx-auto text-gray-400 mb-2" size={24} />
+                      <p className="text-sm text-gray-500">
+                        {uploading ? "Uploading..." : "Click to upload banner"}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">1200x400 recommended</p>
                     </button>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerUpload}
+                    className="hidden"
+                  />
+                </Section>
+
+                {/* Typography */}
+                <Section icon={<TypeIcon size={16} />} title="Typography">
+                  <SelectField
+                    label="Font style"
+                    value={settings.font_style}
+                    options={[
+                      { value: "sans", label: "Sans-serif" },
+                      { value: "serif", label: "Serif" },
+                      { value: "mono", label: "Monospace" },
+                    ]}
+                    onChange={(v) => update("font_style", v)}
+                  />
+                  <SelectField
+                    label="Text alignment"
+                    value={settings.text_align}
+                    options={[
+                      { value: "center", label: "Center" },
+                      { value: "left", label: "Left" },
+                    ]}
+                    onChange={(v) => update("text_align", v)}
+                  />
+                </Section>
+
+                {/* Layout */}
+                <Section icon={<LayoutIcon size={16} />} title="Layout">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Product grid
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => update("layout", "grid")}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          settings.layout === "grid"
+                            ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
+                            : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
+                        }`}
+                      >
+                        <GridIcon size={16} /> Grid
+                      </button>
+                      <button
+                        onClick={() => update("layout", "list")}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          settings.layout === "list"
+                            ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
+                            : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
+                        }`}
+                      >
+                        <ListIcon size={16} /> List
+                      </button>
+                    </div>
                   </div>
-                ) : (
+                  <SelectField
+                    label="Card style"
+                    value={settings.card_style}
+                    options={[
+                      { value: "minimal", label: "Minimal" },
+                      { value: "bordered", label: "Bordered" },
+                      { value: "shadow", label: "Shadow" },
+                    ]}
+                    onChange={(v) => update("card_style", v)}
+                  />
+                </Section>
+
+                {/* Socials */}
+                <Section icon={<PaletteIcon size={16} />} title="Social Links">
+                  <ToggleField
+                    label="Show social links"
+                    checked={settings.show_socials}
+                    onChange={(v) => update("show_socials", v)}
+                  />
+                  {settings.show_socials && (
+                    <div className="space-y-3 mt-3">
+                      <TextField
+                        label="Instagram"
+                        value={settings.instagram || ""}
+                        placeholder="@username"
+                        onChange={(v) => update("instagram", v || null)}
+                      />
+                      <TextField
+                        label="Twitter / X"
+                        value={settings.twitter || ""}
+                        placeholder="@username"
+                        onChange={(v) => update("twitter", v || null)}
+                      />
+                      <TextField
+                        label="TikTok"
+                        value={settings.tiktok || ""}
+                        placeholder="@username"
+                        onChange={(v) => update("tiktok", v || null)}
+                      />
+                      <TextField
+                        label="Facebook"
+                        value={settings.facebook || ""}
+                        placeholder="Page URL"
+                        onChange={(v) => update("facebook", v || null)}
+                      />
+                      <TextField
+                        label="WhatsApp"
+                        value={settings.whatsapp_store || ""}
+                        placeholder="2348012345678"
+                        onChange={(v) => update("whatsapp_store", v || null)}
+                      />
+                      <TextField
+                        label="Phone"
+                        value={settings.phone || ""}
+                        placeholder="08012345678"
+                        onChange={(v) => update("phone", v || null)}
+                      />
+                      <TextField
+                        label="Email"
+                        value={settings.email || ""}
+                        placeholder="you@example.com"
+                        onChange={(v) => update("email", v || null)}
+                      />
+                    </div>
+                  )}
+                </Section>
+
+                {/* Mobile preview link */}
+                <div className="md:hidden pb-4">
                   <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="w-full border-2 border-dashed border-gray-200 dark:border-white/10 rounded-lg p-6 text-center hover:border-brand-300 dark:hover:border-brand-700 transition-colors"
+                    onClick={() => setActiveTab("preview")}
+                    className="w-full py-3 text-sm font-medium text-brand-600 border border-brand-200 dark:border-brand-800 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
                   >
-                    <UploadIcon className="mx-auto text-gray-400 mb-2" size={24} />
-                    <p className="text-sm text-gray-500">
-                      {uploading ? "Uploading..." : "Click to upload banner"}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">1200x400 recommended</p>
+                    Preview storefront →
                   </button>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                  className="hidden"
-                />
-              </Section>
-
-              {/* Typography */}
-              <Section icon={<TypeIcon size={16} />} title="Typography">
-                <SelectField
-                  label="Font style"
-                  value={settings.font_style}
-                  options={[
-                    { value: "sans", label: "Sans-serif" },
-                    { value: "serif", label: "Serif" },
-                    { value: "mono", label: "Monospace" },
-                  ]}
-                  onChange={(v) => update("font_style", v)}
-                />
-                <SelectField
-                  label="Text alignment"
-                  value={settings.text_align}
-                  options={[
-                    { value: "center", label: "Center" },
-                    { value: "left", label: "Left" },
-                  ]}
-                  onChange={(v) => update("text_align", v)}
-                />
-              </Section>
-
-              {/* Layout */}
-              <Section icon={<LayoutIcon size={16} />} title="Layout">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Product grid
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => update("layout", "grid")}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                        settings.layout === "grid"
-                          ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
-                          : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
-                      }`}
-                    >
-                      <GridIcon size={16} /> Grid
-                    </button>
-                    <button
-                      onClick={() => update("layout", "list")}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                        settings.layout === "list"
-                          ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
-                          : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
-                      }`}
-                    >
-                      <ListIcon size={16} /> List
-                    </button>
-                  </div>
                 </div>
-                <SelectField
-                  label="Card style"
-                  value={settings.card_style}
-                  options={[
-                    { value: "minimal", label: "Minimal" },
-                    { value: "bordered", label: "Bordered" },
-                    { value: "shadow", label: "Shadow" },
-                  ]}
-                  onChange={(v) => update("card_style", v)}
-                />
-              </Section>
+              </div>
+            )}
+          </div>
 
-              {/* Socials */}
-              <Section icon={<PaletteIcon size={16} />} title="Social Links">
-                <ToggleField
-                  label="Show social links"
-                  checked={settings.show_socials}
-                  onChange={(v) => update("show_socials", v)}
+          {/* Preview Panel - Desktop */}
+          <div className="hidden md:flex flex-1 items-start justify-center p-6 overflow-auto bg-gray-100 dark:bg-[#0a0a0a]">
+            <div className="w-full max-w-md">
+              <p className="text-xs text-gray-400 mb-3 text-center font-medium uppercase tracking-wide">
+                Live Preview
+              </p>
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414]">
+                <iframe
+                  ref={previewRef}
+                  src={`/${username}`}
+                  className="w-full h-[600px] border-0"
+                  title="Storefront preview"
                 />
-                {settings.show_socials && (
-                  <div className="space-y-3 mt-3">
-                    <TextField
-                      label="Instagram"
-                      value={settings.instagram || ""}
-                      placeholder="@username"
-                      onChange={(v) => update("instagram", v || null)}
-                    />
-                    <TextField
-                      label="Twitter / X"
-                      value={settings.twitter || ""}
-                      placeholder="@username"
-                      onChange={(v) => update("twitter", v || null)}
-                    />
-                    <TextField
-                      label="TikTok"
-                      value={settings.tiktok || ""}
-                      placeholder="@username"
-                      onChange={(v) => update("tiktok", v || null)}
-                    />
-                    <TextField
-                      label="Facebook"
-                      value={settings.facebook || ""}
-                      placeholder="Page URL"
-                      onChange={(v) => update("facebook", v || null)}
-                    />
-                    <TextField
-                      label="WhatsApp"
-                      value={settings.whatsapp_store || ""}
-                      placeholder="2348012345678"
-                      onChange={(v) => update("whatsapp_store", v || null)}
-                    />
-                    <TextField
-                      label="Phone"
-                      value={settings.phone || ""}
-                      placeholder="08012345678"
-                      onChange={(v) => update("phone", v || null)}
-                    />
-                    <TextField
-                      label="Email"
-                      value={settings.email || ""}
-                      placeholder="you@example.com"
-                      onChange={(v) => update("email", v || null)}
-                    />
-                  </div>
-                )}
-              </Section>
+              </div>
+              <p className="text-xs text-gray-400 mt-3 text-center">
+                Save changes, then refresh to see updates
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Preview Panel */}
-        <div className="flex-1 flex items-start justify-center p-6 overflow-auto bg-gray-100 dark:bg-[#0a0a0a]">
-          <div className="w-full max-w-md">
-            <p className="text-xs text-gray-400 mb-3 text-center font-medium uppercase tracking-wide">
-              Live Preview
-            </p>
-            <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414]">
+        {/* Preview Panel - Mobile */}
+        {activeTab === "preview" && (
+          <div className="flex md:hidden flex-1 flex-col p-4 overflow-auto bg-gray-100 dark:bg-[#0a0a0a]">
+            <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414] flex-1">
               <iframe
-                ref={previewRef}
                 src={`/${username}`}
-                className="w-full h-[600px] border-0"
+                className="w-full h-full border-0 min-h-[500px]"
                 title="Storefront preview"
               />
             </div>
@@ -428,7 +485,7 @@ export default function CustomizeClient({
               Save changes, then refresh to see updates
             </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     .eq("id", sellerId)
     .single();
 
-  if (!seller) {
-    return NextResponse.json({ error: "Seller not found" }, { status: 404 });
+  if (!seller || !seller.email || !seller.email.includes("@")) {
+    return NextResponse.json({ error: "Seller not found or invalid email" }, { status: 404 });
   }
 
   const reference = `shopa_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

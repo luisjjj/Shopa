@@ -14,20 +14,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("email")
-    .eq("id", user.id)
-    .single();
+  const email = user.email;
 
-  if (!profile) {
-    return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+  if (!email || !email.includes("@")) {
+    return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
   }
 
   const reference = `shopa_upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
   const result = await initializeTransaction({
-    email: profile.email,
+    email,
     amount: 5000,
     callback_url: `${origin}/api/upgrade/verify?reference=${reference}`,
     reference,
