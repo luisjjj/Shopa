@@ -8,13 +8,6 @@ export async function initializeTransaction(params: {
   reference?: string;
   metadata?: Record<string, unknown>;
 }) {
-  console.log("Paystack initialize - sending:", {
-    email: params.email,
-    amount: params.amount * 100,
-    callback_url: params.callback_url,
-    reference: params.reference,
-  });
-
   const res = await fetch(`${PAYSTACK_BASE}/transaction/initialize`, {
     method: "POST",
     headers: {
@@ -29,10 +22,7 @@ export async function initializeTransaction(params: {
       metadata: params.metadata,
     }),
   });
-
-  const data = await res.json();
-  console.log("Paystack initialize - response:", JSON.stringify(data, null, 2));
-  return data;
+  return res.json();
 }
 
 export async function verifyTransaction(reference: string) {

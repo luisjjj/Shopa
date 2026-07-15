@@ -18,6 +18,26 @@ export default function SignupPage() {
   const { theme, toggle } = useTheme();
   const supabase = createClient();
 
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (value: string) => {
+    setEmail(value);
+    if (!value) {
+      setEmailError("");
+      return;
+    }
+    const domain = value.split("@")[1]?.toLowerCase();
+    if (domain === "gmail.con") {
+      setEmailError("Did you mean gmail.com?");
+    } else if (domain === "yahoo.con") {
+      setEmailError("Did you mean yahoo.com?");
+    } else if (domain === "hotmail.con") {
+      setEmailError("Did you mean hotmail.com?");
+    } else {
+      setEmailError("");
+    }
+  };
+
   const checkUsername = async (value: string) => {
     setUsername(value);
     setAvailable(null);
@@ -135,11 +155,14 @@ export default function SignupPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => validateEmail(e.target.value)}
               className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
               placeholder="you@example.com"
               required
             />
+            {emailError && (
+              <p className="text-xs text-amber-500 mt-1">{emailError}</p>
+            )}
           </div>
 
           {/* Password */}
