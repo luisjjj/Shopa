@@ -8,7 +8,11 @@ export async function POST(request: Request) {
 
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
+
+  console.log("Upgrade - auth user:", JSON.stringify(user, null, 2));
+  console.log("Upgrade - auth error:", authError);
 
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -16,8 +20,13 @@ export async function POST(request: Request) {
 
   const email = user.email;
 
+  console.log("Upgrade - user email:", email);
+
   if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    return NextResponse.json(
+      { error: `Invalid email address: ${email || "empty"}` },
+      { status: 400 }
+    );
   }
 
   const reference = `shopa_upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -32,6 +41,8 @@ export async function POST(request: Request) {
       userId: user.id,
     },
   });
+
+  console.log("Upgrade - paystack result:", JSON.stringify(result, null, 2));
 
   if (!result.status) {
     return NextResponse.json(
