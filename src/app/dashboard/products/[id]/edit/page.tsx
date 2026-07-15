@@ -49,7 +49,10 @@ export default function EditProductPage({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setUploading(false);
+      return;
+    }
 
     const ext = file.name.split(".").pop();
     const path = `${user.id}/${Date.now()}.${ext}`;

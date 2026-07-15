@@ -55,7 +55,10 @@ export default function NewProductPage() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setSaving(false);
+      return;
+    }
 
     const { error: insertError } = await supabase.from("products").insert({
       user_id: user.id,
