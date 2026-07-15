@@ -20,13 +20,24 @@ export async function GET(request: Request) {
   if (result.status && result.data.status === "success") {
     const supabase = createClient();
 
-    const { error } = await supabase
+    const { data: order } = await supabase
       .from("orders")
       .update({ paid: true })
-      .eq("paystack_reference", reference);
+      .eq("paystack_reference", reference)
+      .select("user_id")
+      .single();
 
-    if (error) {
-      console.error("Failed to mark order as paid:", error);
+    if (order?.user_id) {
+      fetch(`${origin}/api/push/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: order.user_id,
+          title: "New Order!",
+          body: `You just received an order for ${product || "a product"} — ₦${amount ? parseInt(amount).toLocaleString() : ""}`,
+          url: "/dashboard",
+        }),
+      }).catch(() => {});
     }
 
     const params = new URLSearchParams({

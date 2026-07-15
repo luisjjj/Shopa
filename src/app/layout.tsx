@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingIcons from "@/components/FloatingIcons";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -38,6 +39,7 @@ export default function RootLayout({
       >
         <ThemeProvider initialTheme={initialTheme}>
           <FloatingIcons />
+          <ServiceWorkerRegistration />
           {children}
         </ThemeProvider>
       </body>

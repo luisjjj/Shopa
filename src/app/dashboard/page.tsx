@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon, UserIcon } from "@/components/Icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBanner } from "@/components/NotificationBanner";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -76,6 +77,8 @@ export default async function DashboardPage() {
             shopa-five.vercel.app/<span className="font-medium text-brand-600">{profile.username}</span>
           </p>
         </div>
+
+        <NotificationBanner />
 
         {/* Premium Status */}
         {isPremium ? (
