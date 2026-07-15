@@ -236,12 +236,20 @@ async function ProductList({ userId }: { userId: string }) {
 
 async function OrderList({ userId }: { userId: string }) {
   const supabase = createClient();
-  const { data: orders } = await supabase
+  const { data: orders, error } = await supabase
     .from("orders")
     .select("*, products(name)")
     .eq("seller_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-[#141414] border border-red-200 dark:border-red-900/50 rounded-xl p-8 text-center">
+        <p className="text-red-500 text-sm">Error loading orders: {error.message}</p>
+      </div>
+    );
+  }
 
   if (!orders || orders.length === 0) {
     return (
@@ -252,49 +260,40 @@ async function OrderList({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-gray-100 dark:border-white/10 text-left text-gray-500">
-            <th className="px-4 py-3 font-medium">Buyer</th>
-            <th className="px-4 py-3 font-medium">Product</th>
-            <th className="px-4 py-3 font-medium">Amount</th>
-            <th className="px-4 py-3 font-medium">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id} className="border-b border-gray-50 dark:border-white/5 last:border-0">
-              <td className="px-4 py-3">
-                <div className="font-medium text-gray-900 dark:text-white">{order.buyer_name || "—"}</div>
-                <div className="text-xs text-gray-400">{order.buyer_phone}</div>
-              </td>
-              <td className="px-4 py-3 text-gray-700 dark:text-gray-400">
+    <div className="space-y-3">
+      {orders.map((order) => (
+        <div
+          key={order.id}
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <div className="font-medium text-gray-900 dark:text-white">{order.buyer_name || "—"}</div>
+              <div className="text-xs text-gray-400">{order.buyer_phone}</div>
+            </div>
+            <span
+              className={`text-xs px-2 py-1 rounded-full shrink-0 ${
+                order.paid
+                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                  : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+              }`}
+            >
+              {order.paid ? "Paid" : "Pending"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {(order.products as { name: string })?.name || "—"}
-              </td>
-              <td className="px-4 py-3 font-medium text-brand-600">
+              </span>
+              <span className="text-sm font-semibold text-brand-600 ml-2">
                 ₦{order.amount.toLocaleString()}
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      order.paid
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                    }`}
-                  >
-                    {order.paid ? "Paid" : "Pending"}
-                  </span>
-                  {order.paid && (
-                    <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} />
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </span>
+            </div>
+            <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -302,10 +301,20 @@ async function OrderList({ userId }: { userId: string }) {
 function FulfilledToggle({
   orderId,
   fulfilled,
+  paid,
 }: {
   orderId: string;
   fulfilled: boolean;
+  paid: boolean;
 }) {
+  if (!paid) {
+    return (
+      <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-500">
+        Awaiting payment
+      </span>
+    );
+  }
+
   return (
     <form action="/api/orders/fulfilled" method="post" className="inline">
       <input type="hidden" name="order_id" value={orderId} />
