@@ -3,13 +3,12 @@ import { verifyTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const { searchParams, origin } = new URL(request.url);
   const reference = searchParams.get("reference");
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   if (!reference) {
     return NextResponse.redirect(
-      `${baseUrl}/dashboard?upgrade=error&message=Missing+reference`
+      `${origin}/dashboard?upgrade=error&message=Missing+reference`
     );
   }
 
@@ -18,29 +17,34 @@ export async function GET(request: Request) {
   if (result.status && result.data.status === "success") {
     const supabase = createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const userId = result.data.metadata?.userId;
 
-    if (user) {
+    if (userId) {
       const premiumUntil = new Date();
       premiumUntil.setDate(premiumUntil.getDate() + 30);
 
-      await supabase
+      const { error } = await supabase
         .from("users")
         .update({
           is_premium: true,
           premium_until: premiumUntil.toISOString(),
         })
-        .eq("id", user.id);
+        .eq("id", userId);
+
+      if (error) {
+        console.error("Failed to upgrade user:", error);
+        return NextResponse.redirect(
+          `${origin}/dashboard?upgrade=error&message=Failed+to+update+profile`
+        );
+      }
 
       return NextResponse.redirect(
-        `${baseUrl}/dashboard?upgrade=success`
+        `${origin}/dashboard?upgrade=success`
       );
     }
   }
 
   return NextResponse.redirect(
-    `${baseUrl}/dashboard?upgrade=error&message=Payment+verification+failed`
+    `${origin}/dashboard?upgrade=error&message=Payment+verification+failed`
   );
 }

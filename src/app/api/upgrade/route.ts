@@ -2,8 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { initializeTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = createClient();
+  const { origin } = new URL(request.url);
 
   const {
     data: { user },
@@ -24,12 +25,11 @@ export async function POST() {
   }
 
   const reference = `shopa_upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   const result = await initializeTransaction({
     email: profile.email,
     amount: 5000,
-    callback_url: `${baseUrl}/api/upgrade/verify?reference=${reference}`,
+    callback_url: `${origin}/api/upgrade/verify?reference=${reference}`,
     reference,
     metadata: {
       type: "subscription_upgrade",

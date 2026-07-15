@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  const { origin } = new URL(request.url);
   const supabase = createClient();
 
   const { data: seller } = await supabase
@@ -39,12 +40,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
   const result = await initializeTransaction({
     email: seller.email,
     amount,
-    callback_url: `${baseUrl}/api/verify?reference=${reference}&product=${productName}&amount=${amount}&buyer=${encodeURIComponent(buyerName)}`,
+    callback_url: `${origin}/api/verify?reference=${reference}&product=${productName}&amount=${amount}&buyer=${encodeURIComponent(buyerName)}`,
     reference,
     metadata: {
       productId,

@@ -3,7 +3,7 @@ import { verifyTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const { searchParams, origin } = new URL(request.url);
   const reference = searchParams.get("reference");
   const product = searchParams.get("product");
   const amount = searchParams.get("amount");
@@ -16,8 +16,6 @@ export async function GET(request: Request) {
   }
 
   const result = await verifyTransaction(reference);
-
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   if (result.status && result.data.status === "success") {
     const supabase = createClient();
@@ -39,10 +37,10 @@ export async function GET(request: Request) {
       reference,
     });
 
-    return NextResponse.redirect(`${baseUrl}/confirm?${params.toString()}`);
+    return NextResponse.redirect(`${origin}/confirm?${params.toString()}`);
   }
 
   return NextResponse.redirect(
-    `${baseUrl}/confirm?status=error&message=Payment+verification+failed`
+    `${origin}/confirm?status=error&message=Payment+verification+failed`
   );
 }
