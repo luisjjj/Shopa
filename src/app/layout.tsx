@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Shopa — Your Storefront Link",
   description:
     "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
