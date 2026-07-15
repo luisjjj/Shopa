@@ -193,53 +193,53 @@ async function ProductList({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-2 gap-3">
       {products.map((product) => (
         <div
           key={product.id}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-4 flex items-center gap-4"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden"
         >
           {product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-16 h-16 rounded-lg object-cover"
+              className="w-full h-32 object-cover"
             />
           ) : (
-            <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-              <PackageIcon className="text-gray-300 dark:text-gray-600" size={24} />
+            <div className="w-full h-32 bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+              <PackageIcon className="text-gray-300 dark:text-gray-600" size={32} />
             </div>
           )}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-gray-900 dark:text-white truncate">{product.name}</h3>
-            <p className="text-brand-600 font-semibold">₦{product.price.toLocaleString()}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {product.stock != null && (
+          <div className="p-3">
+            <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">{product.name}</h3>
+            <p className="text-brand-600 font-semibold text-sm">₦{product.price.toLocaleString()}</p>
+            <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+              {product.stock != null && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                    product.stock === 0
+                      ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                      : product.stock <= 2
+                        ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                        : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                  }`}
+                >
+                  {product.stock === 0 ? "Out" : `${product.stock} left`}
+                </span>
+              )}
               <span
-                className={`text-xs px-2 py-1 rounded-full ${
-                  product.stock === 0
-                    ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
-                    : product.stock <= 2
-                      ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                      : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  product.is_active
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                    : "bg-gray-100 dark:bg-white/10 text-gray-500"
                 }`}
               >
-                {product.stock === 0 ? "Out of stock" : `${product.stock} left`}
+                {product.is_active ? "Active" : "Draft"}
               </span>
-            )}
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                product.is_active
-                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                  : "bg-gray-100 dark:bg-white/10 text-gray-500"
-              }`}
-            >
-              {product.is_active ? "Active" : "Draft"}
-            </span>
+            </div>
             <Link
               href={`/dashboard/products/${product.id}/edit`}
-              className="text-sm text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+              className="block text-center text-xs text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors mt-2"
             >
               Edit
             </Link>
