@@ -44,7 +44,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/signup"
-              className="text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-2.5 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-all active:scale-[0.98]"
+              className="text-sm font-semibold bg-brand-500 hover:bg-brand-600 text-white px-5 py-2.5 rounded-xl transition-all active:scale-[0.98]"
             >
               Get started
             </Link>
