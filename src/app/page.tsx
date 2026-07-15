@@ -54,11 +54,6 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 pt-20 pb-28 text-center">
-        <div className="inline-flex items-center gap-2 bg-brand-50 dark:bg-brand-950/40 border border-brand-200/60 dark:border-brand-800/30 text-brand-700 dark:text-brand-300 text-sm font-medium px-4 py-1.5 rounded-full mb-8 animate-fade-in">
-          <span className="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse" />
-          Built for Nigerian sellers
-        </div>
-
         <h1 className="text-5xl sm:text-7xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.08] mb-7 animate-slide-up">
           Your store.
           <br />
