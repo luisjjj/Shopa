@@ -73,6 +73,13 @@ export async function PUT(request: Request) {
     whatsapp_store: body.whatsapp_store || null,
     phone: body.phone || null,
     email: body.email || null,
+    product_name_size: body.product_name_size || "medium",
+    price_style: body.price_style || "bold",
+    card_padding: body.card_padding || "normal",
+    card_border: body.card_border || "none",
+    card_shadow: body.card_shadow || "none",
+    container_width: body.container_width || "normal",
+    product_image_ratio: body.product_image_ratio || "square",
     updated_at: new Date().toISOString(),
   };
 

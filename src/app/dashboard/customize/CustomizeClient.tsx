@@ -8,8 +8,6 @@ import {
   LayoutIcon,
   ImageIcon,
   TypeIcon,
-  GridIcon,
-  ListIcon,
   UploadIcon,
   CheckIcon,
   SparkleIcon,
@@ -46,6 +44,13 @@ interface StorefrontSettings {
   whatsapp_store: string | null;
   phone: string | null;
   email: string | null;
+  product_name_size: string;
+  price_style: string;
+  card_padding: string;
+  card_border: string;
+  card_shadow: string;
+  container_width: string;
+  product_image_ratio: string;
 }
 
 const DEFAULTS: StorefrontSettings = {
@@ -78,6 +83,13 @@ const DEFAULTS: StorefrontSettings = {
   whatsapp_store: null,
   phone: null,
   email: null,
+  product_name_size: "medium",
+  price_style: "bold",
+  card_padding: "normal",
+  card_border: "none",
+  card_shadow: "none",
+  container_width: "normal",
+  product_image_ratio: "square",
 };
 
 export default function CustomizeClient({
@@ -92,6 +104,7 @@ export default function CustomizeClient({
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const previewRef = useRef<HTMLIFrameElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -131,6 +144,13 @@ export default function CustomizeClient({
             whatsapp_store: data.whatsapp_store || null,
             phone: data.phone || null,
             email: data.email || null,
+            product_name_size: data.product_name_size || DEFAULTS.product_name_size,
+            price_style: data.price_style || DEFAULTS.price_style,
+            card_padding: data.card_padding || DEFAULTS.card_padding,
+            card_border: data.card_border || DEFAULTS.card_border,
+            card_shadow: data.card_shadow || DEFAULTS.card_shadow,
+            container_width: data.container_width || DEFAULTS.container_width,
+            product_image_ratio: data.product_image_ratio || DEFAULTS.product_image_ratio,
           });
         }
         setLoading(false);
@@ -146,29 +166,62 @@ export default function CustomizeClient({
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Image must be under 5MB");
+      return;
+    }
     setUploading(true);
+    setUploadError(null);
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
       setUploading(false);
+      setUploadError("Not logged in");
       return;
     }
-    const ext = file.name.split(".").pop();
-    const path = `banners/${user.id}_${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(path, file);
-    if (uploadError) {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${user.id}_${Date.now()}.${ext}`;
+
+    let uploadError2 = null;
+    let publicUrl = "";
+
+    const { error: e1 } = await supabase.storage
+      .from("banners")
+      .upload(path, file, { upsert: true });
+    if (e1) {
+      uploadError2 = e1;
+    } else {
+      const { data } = supabase.storage.from("banners").getPublicUrl(path);
+      publicUrl = data?.publicUrl || "";
+    }
+
+    if (uploadError2 || !publicUrl) {
+      const { error: e2 } = await supabase.storage
+        .from("products")
+        .upload(`banners/${path}`, file, { upsert: true });
+      if (e2) {
+        setUploading(false);
+        setUploadError("Upload failed: " + (e2.message || "Unknown error"));
+        return;
+      }
+      const { data } = supabase.storage
+        .from("products")
+        .getPublicUrl(`banners/${path}`);
+      publicUrl = data?.publicUrl || "";
+    }
+
+    if (!publicUrl) {
       setUploading(false);
+      setUploadError("Failed to get image URL");
       return;
     }
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("products").getPublicUrl(path);
+
     update("banner_url", publicUrl);
     setUploading(false);
+    setUploadError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSave = async () => {
@@ -404,6 +457,9 @@ export default function CustomizeClient({
                     onChange={handleBannerUpload}
                     className="hidden"
                   />
+                  {uploadError && (
+                    <p className="text-xs text-red-500 mt-2">{uploadError}</p>
+                  )}
                   <SelectField
                     label="Height"
                     value={settings.banner_height}
@@ -452,9 +508,18 @@ export default function CustomizeClient({
                     label="Font"
                     value={settings.font_style}
                     options={[
-                      { value: "sans", label: "Sans-serif" },
-                      { value: "serif", label: "Serif" },
+                      { value: "sans", label: "System Sans" },
+                      { value: "serif", label: "System Serif" },
                       { value: "mono", label: "Monospace" },
+                      { value: "elegant", label: "Elegant (Playfair)" },
+                      { value: "clean", label: "Clean (Lato)" },
+                      { value: "bold", label: "Bold (Oswald)" },
+                      { value: "thin", label: "Thin (Raleway)" },
+                      { value: "rounded", label: "Rounded (Nunito)" },
+                      { value: "geometric", label: "Geometric (Inter)" },
+                      { value: "editorial", label: "Editorial (Merriweather)" },
+                      { value: "modern", label: "Modern (Space Grotesk)" },
+                      { value: "friendly", label: "Friendly (DM Sans)" },
                     ]}
                     onChange={(v) => update("font_style", v)}
                   />
@@ -462,9 +527,11 @@ export default function CustomizeClient({
                     label="Size"
                     value={settings.font_size}
                     options={[
+                      { value: "xsmall", label: "Extra Small" },
                       { value: "small", label: "Small" },
                       { value: "medium", label: "Medium" },
                       { value: "large", label: "Large" },
+                      { value: "xlarge", label: "Extra Large" },
                     ]}
                     onChange={(v) => update("font_size", v)}
                   />
@@ -474,6 +541,7 @@ export default function CustomizeClient({
                     options={[
                       { value: "center", label: "Center" },
                       { value: "left", label: "Left" },
+                      { value: "right", label: "Right" },
                     ]}
                     onChange={(v) => update("text_align", v)}
                   />
@@ -481,31 +549,30 @@ export default function CustomizeClient({
 
                 {/* Layout */}
                 <Section icon={<LayoutIcon size={16} />} title="Layout">
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Product grid</label>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => update("layout", "grid")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                          settings.layout === "grid"
-                            ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
-                            : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
-                        }`}
-                      >
-                        <GridIcon size={16} /> Grid
-                      </button>
-                      <button
-                        onClick={() => update("layout", "list")}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                          settings.layout === "list"
-                            ? "border-brand-500 bg-brand-50 dark:bg-brand-950/50 text-brand-600"
-                            : "border-gray-200 dark:border-white/10 text-gray-500 hover:border-gray-300"
-                        }`}
-                      >
-                        <ListIcon size={16} /> List
-                      </button>
-                    </div>
-                  </div>
+                  <SelectField
+                    label="Product grid"
+                    value={settings.layout}
+                    options={[
+                      { value: "grid", label: "2-Column Grid" },
+                      { value: "grid3", label: "3-Column Grid" },
+                      { value: "grid4", label: "4-Column Grid" },
+                      { value: "list", label: "Full-width List" },
+                      { value: "horizontal", label: "Horizontal Scroll" },
+                      { value: "masonry", label: "Masonry" },
+                    ]}
+                    onChange={(v) => update("layout", v)}
+                  />
+                  <SelectField
+                    label="Container width"
+                    value={settings.container_width}
+                    options={[
+                      { value: "narrow", label: "Narrow (480px)" },
+                      { value: "normal", label: "Normal (640px)" },
+                      { value: "wide", label: "Wide (768px)" },
+                      { value: "full", label: "Full width" },
+                    ]}
+                    onChange={(v) => update("container_width", v)}
+                  />
                   <SelectField
                     label="Spacing"
                     value={settings.spacing}
@@ -513,6 +580,7 @@ export default function CustomizeClient({
                       { value: "compact", label: "Compact" },
                       { value: "normal", label: "Normal" },
                       { value: "relaxed", label: "Relaxed" },
+                      { value: "spacious", label: "Spacious" },
                     ]}
                     onChange={(v) => update("spacing", v)}
                   />
@@ -528,6 +596,8 @@ export default function CustomizeClient({
                       { value: "bordered", label: "Bordered" },
                       { value: "shadow", label: "Shadow" },
                       { value: "glass", label: "Glass" },
+                      { value: "outlined", label: "Outlined" },
+                      { value: "filled", label: "Filled" },
                     ]}
                     onChange={(v) => update("card_style", v)}
                   />
@@ -539,9 +609,44 @@ export default function CustomizeClient({
                       { value: "sm", label: "Small" },
                       { value: "md", label: "Medium" },
                       { value: "lg", label: "Large" },
+                      { value: "xl", label: "Extra Large" },
                       { value: "pill", label: "Pill" },
                     ]}
                     onChange={(v) => update("card_border_radius", v)}
+                  />
+                  <SelectField
+                    label="Padding"
+                    value={settings.card_padding}
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "compact", label: "Compact" },
+                      { value: "normal", label: "Normal" },
+                      { value: "relaxed", label: "Relaxed" },
+                    ]}
+                    onChange={(v) => update("card_padding", v)}
+                  />
+                  <SelectField
+                    label="Border"
+                    value={settings.card_border}
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "light", label: "Light" },
+                      { value: "medium", label: "Medium" },
+                      { value: "accent", label: "Accent color" },
+                    ]}
+                    onChange={(v) => update("card_border", v)}
+                  />
+                  <SelectField
+                    label="Shadow"
+                    value={settings.card_shadow}
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "sm", label: "Small" },
+                      { value: "md", label: "Medium" },
+                      { value: "lg", label: "Large" },
+                      { value: "glow", label: "Glow" },
+                    ]}
+                    onChange={(v) => update("card_shadow", v)}
                   />
                   <SelectField
                     label="Image shape"
@@ -554,7 +659,28 @@ export default function CustomizeClient({
                     onChange={(v) => update("image_shape", v)}
                   />
                   <SelectField
-                    label="Product name"
+                    label="Image ratio"
+                    value={settings.product_image_ratio}
+                    options={[
+                      { value: "square", label: "Square (1:1)" },
+                      { value: "portrait", label: "Portrait (3:4)" },
+                      { value: "landscape", label: "Landscape (4:3)" },
+                      { value: "wide", label: "Wide (16:9)" },
+                    ]}
+                    onChange={(v) => update("product_image_ratio", v)}
+                  />
+                  <SelectField
+                    label="Product name size"
+                    value={settings.product_name_size}
+                    options={[
+                      { value: "small", label: "Small" },
+                      { value: "medium", label: "Medium" },
+                      { value: "large", label: "Large" },
+                    ]}
+                    onChange={(v) => update("product_name_size", v)}
+                  />
+                  <SelectField
+                    label="Product name weight"
                     value={settings.product_name_weight}
                     options={[
                       { value: "normal", label: "Normal" },
@@ -562,6 +688,17 @@ export default function CustomizeClient({
                       { value: "bold", label: "Bold" },
                     ]}
                     onChange={(v) => update("product_name_weight", v)}
+                  />
+                  <SelectField
+                    label="Price style"
+                    value={settings.price_style}
+                    options={[
+                      { value: "normal", label: "Normal" },
+                      { value: "bold", label: "Bold" },
+                      { value: "large", label: "Large" },
+                      { value: "accent", label: "Accent background" },
+                    ]}
+                    onChange={(v) => update("price_style", v)}
                   />
                 </Section>
 

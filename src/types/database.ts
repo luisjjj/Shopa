@@ -105,6 +105,13 @@ export interface Database {
           whatsapp_store: string | null;
           phone: string | null;
           email: string | null;
+          product_name_size: string;
+          price_style: string;
+          card_padding: string;
+          card_border: string;
+          card_shadow: string;
+          container_width: string;
+          product_image_ratio: string;
           updated_at: string;
         };
         Insert: {
@@ -138,6 +145,13 @@ export interface Database {
           whatsapp_store?: string | null;
           phone?: string | null;
           email?: string | null;
+          product_name_size?: string;
+          price_style?: string;
+          card_padding?: string;
+          card_border?: string;
+          card_shadow?: string;
+          container_width?: string;
+          product_image_ratio?: string;
           updated_at?: string;
         };
         Update: {
@@ -171,6 +185,13 @@ export interface Database {
           whatsapp_store?: string | null;
           phone?: string | null;
           email?: string | null;
+          product_name_size?: string;
+          price_style?: string;
+          card_padding?: string;
+          card_border?: string;
+          card_shadow?: string;
+          container_width?: string;
+          product_image_ratio?: string;
           updated_at?: string;
         };
       };
