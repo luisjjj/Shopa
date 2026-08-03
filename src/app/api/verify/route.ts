@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { verifyTransaction } from "@/lib/paystack";
 import { NextResponse } from "next/server";
 
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const result = await verifyTransaction(reference);
 
   if (result.status && result.data.status === "success") {
-    const supabase = createClient();
+    const supabase = createServiceRoleClient();
 
     const { data: order } = await supabase
       .from("orders")
@@ -28,16 +28,16 @@ export async function GET(request: Request) {
       .single();
 
     if (order?.product_id) {
-      const { data: product } = await supabase
+      const { data: prod } = await supabase
         .from("products")
         .select("stock")
         .eq("id", order.product_id)
         .single();
 
-      if (product && product.stock != null && product.stock > 0) {
+      if (prod && prod.stock != null && prod.stock > 0) {
         await supabase
           .from("products")
-          .update({ stock: product.stock - 1 })
+          .update({ stock: prod.stock - 1 })
           .eq("id", order.product_id);
       }
     }
