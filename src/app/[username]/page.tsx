@@ -229,20 +229,22 @@ export default async function StorePage({
 
   // Card border
   const cardBorder = (() => {
+    const styleWantsBorder = s?.card_style === "bordered" || s?.card_style === "outlined";
     switch (s?.card_border) {
       case "light":
         return "border border-gray-100";
       case "medium":
         return "border border-gray-200";
       case "accent":
-        return `border-2`;
+        return "border-2";
       default:
-        return "";
+        return styleWantsBorder ? "border border-gray-200" : "";
     }
   })();
 
   // Card shadow
   const cardShadow = (() => {
+    const styleWantsShadow = s?.card_style === "shadow";
     switch (s?.card_shadow) {
       case "sm":
         return "shadow-sm";
@@ -251,9 +253,9 @@ export default async function StorePage({
       case "lg":
         return "shadow-xl";
       case "glow":
-        return `shadow-lg`;
+        return "shadow-lg";
       default:
-        return "";
+        return styleWantsShadow ? "shadow-lg" : "";
     }
   })();
 
@@ -264,6 +266,8 @@ export default async function StorePage({
         return { background: `${cardBg}b3`, backdropFilter: "blur(12px)" };
       case "filled":
         return { background: `${textColor}08` };
+      case "outlined":
+        return { background: "transparent" };
       default:
         return s ? { background: cardBg } : {};
     }
@@ -276,10 +280,19 @@ export default async function StorePage({
     cardPadding,
     cardBorder,
     cardShadow,
-    s?.card_style === "bordered" ? "border border-gray-200" : "",
-    s?.card_style === "shadow" ? "shadow-lg" : "",
-    s?.card_style === "outlined" ? `border-2` : "",
   ].filter(Boolean).join(" ");
+
+  // Card inline border color (for accent/outline that can't be set via Tailwind classes)
+  const cardInlineStyle: React.CSSProperties = {};
+  if (s?.card_style === "outlined") {
+    cardInlineStyle.borderColor = `${textColor}20`;
+  }
+  if (s?.card_border === "accent") {
+    cardInlineStyle.borderColor = accentColor;
+  }
+  if (s?.card_shadow === "glow") {
+    cardInlineStyle.boxShadow = `0 4px 24px ${accentColor}30`;
+  }
 
   // Product name
   const nameWeight =
@@ -428,8 +441,7 @@ export default async function StorePage({
                 className={cardClasses}
                 style={{
                   ...cardBgStyle,
-                  ...(s?.card_style === "outlined" ? { borderColor: `${textColor}20` } : {}),
-                  ...(s?.card_style === "glow" ? { boxShadow: `0 4px 24px ${accentColor}30` } : {}),
+                  ...cardInlineStyle,
                   ...(isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" } : {}),
                 }}
               >

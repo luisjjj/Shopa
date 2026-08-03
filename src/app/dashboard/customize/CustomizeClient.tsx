@@ -105,6 +105,7 @@ export default function CustomizeClient({
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const previewRef = useRef<HTMLIFrameElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -226,16 +227,23 @@ export default function CustomizeClient({
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
-      await fetch("/api/storefront-settings", {
+      const res = await fetch("/api/storefront-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setSaveError(data.error || "Failed to save settings");
+        setSaving(false);
+        return;
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
-      // ignore
+      setSaveError("Network error — try again");
     }
     setSaving(false);
   };
@@ -320,6 +328,9 @@ export default function CustomizeClient({
                 "Save"
               )}
             </button>
+            {saveError && (
+              <span className="text-xs text-red-500">{saveError}</span>
+            )}
           </div>
         </div>
       </header>
@@ -415,7 +426,7 @@ export default function CustomizeClient({
                             <div className="w-3 h-3 rounded-full border border-white dark:border-gray-900" style={{ background: preset.bg }} />
                           </div>
                           {preset.name}
-                        </button>
+            </button>
                       ))}
                     </div>
                   </div>
