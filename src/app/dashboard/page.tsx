@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PackageIcon, CheckIcon, SparkleIcon, PaletteIcon, UserIcon } from "@/components/Icons";
+import { PackageIcon, CheckIcon, PaletteIcon, UserIcon } from "@/components/Icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBanner } from "@/components/NotificationBanner";
 import { AnalyticsSection } from "@/components/AnalyticsSection";
@@ -89,24 +89,8 @@ export default async function DashboardPage() {
 
         <AnalyticsSection />
 
-        {/* Premium Status */}
-        {isPremium ? (
-          <div className="bg-gradient-to-r from-brand-50 to-brand-100/50 dark:from-brand-950/30 dark:to-brand-900/20 border border-brand-200/60 dark:border-brand-800/30 rounded-2xl p-5 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
-                <SparkleIcon className="text-white" size={16} />
-              </div>
-              <div>
-                <span className="text-brand-700 dark:text-brand-300 font-semibold text-sm">Premium Active</span>
-                {profile.premium_until && (
-                  <p className="text-xs text-brand-500 dark:text-brand-400/70 mt-0.5">
-                    Renews {new Date(profile.premium_until).toLocaleDateString("en-NG")}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
+        {/* Upgrade Prompt (Free plan only) */}
+        {!isPremium && (
           <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 flex items-center justify-between shadow-card dark:shadow-card-dark">
             <div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
