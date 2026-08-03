@@ -61,6 +61,7 @@ export async function GET(request: Request) {
       amount: amount || "",
       buyer: buyer || "",
       reference,
+      seller: order?.user_id || "",
     });
 
     return NextResponse.redirect(`${origin}/confirm?${params.toString()}`);

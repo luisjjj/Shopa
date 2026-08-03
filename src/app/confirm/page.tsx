@@ -1,8 +1,59 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "@/components/Icons";
+
+type StoreSettings = {
+  primary_color: string;
+  background_color: string;
+  text_color: string;
+  accent_color: string;
+  card_background: string;
+  font_style: string;
+  font_size: string;
+  card_border_radius: string;
+  card_style: string;
+  container_width: string;
+} | null;
+
+function getFontFamily(style?: string): string {
+  switch (style) {
+    case "serif": return "Georgia, 'Times New Roman', serif";
+    case "mono": return "'Courier New', monospace";
+    case "elegant": return "'Playfair Display', Georgia, serif";
+    case "clean": return "'Lato', 'Helvetica Neue', sans-serif";
+    case "bold": return "'Oswald', 'Impact', sans-serif";
+    case "thin": return "'Raleway', 'Helvetica Neue', sans-serif";
+    case "rounded": return "'Nunito', 'Helvetica Neue', sans-serif";
+    case "geometric": return "'Inter', 'Helvetica Neue', sans-serif";
+    case "editorial": return "'Merriweather', Georgia, serif";
+    case "modern": return "'Space Grotesk', 'Helvetica Neue', sans-serif";
+    case "friendly": return "'DM Sans', 'Helvetica Neue', sans-serif";
+    default: return "var(--font-geist-sans), system-ui, sans-serif";
+  }
+}
+
+function getFontSize(size?: string): string {
+  switch (size) {
+    case "xsmall": return "12px";
+    case "small": return "13px";
+    case "large": return "17px";
+    case "xlarge": return "19px";
+    default: return "15px";
+  }
+}
+
+function getCardRadius(radius?: string): string {
+  switch (radius) {
+    case "none": return "0";
+    case "sm": return "0.375rem";
+    case "lg": return "1rem";
+    case "xl": return "1.5rem";
+    case "pill": return "9999px";
+    default: return "1rem";
+  }
+}
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
@@ -12,37 +63,83 @@ function ConfirmContent() {
   const buyer = searchParams.get("buyer");
   const reference = searchParams.get("reference");
   const message = searchParams.get("message");
+  const sellerId = searchParams.get("seller");
 
   const isSuccess = status === "success";
+  const [settings, setSettings] = useState<StoreSettings>(null);
+
+  useEffect(() => {
+    if (!sellerId) return;
+    fetch(`/api/storefront-settings?userId=${sellerId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && !data.error) setSettings(data);
+      })
+      .catch(() => {});
+  }, [sellerId]);
+
+  const s = settings;
+  const fontFamily = getFontFamily(s?.font_style);
+  const fontSize = getFontSize(s?.font_size);
+  const bgColor = s?.background_color || "#faf9f7";
+  const textColor = s?.text_color || "#1a1a1a";
+  const cardBg = s?.card_background || "#ffffff";
+  const cardRadius = getCardRadius(s?.card_border_radius);
+  const hasBordered = s?.card_style === "bordered" || s?.card_style === "outlined";
+  const hasShadow = s?.card_style === "shadow";
+
+  const pageStyle: React.CSSProperties = s
+    ? { fontFamily, fontSize, color: textColor, background: bgColor }
+    : { fontFamily, fontSize };
+
+  const containerMax = (() => {
+    switch (s?.container_width) {
+      case "narrow": return "max-w-sm";
+      case "wide": return "max-w-2xl";
+      case "full": return "max-w-4xl";
+      default: return "max-w-md";
+    }
+  })();
+
+  const cardStyle: React.CSSProperties = s ? {
+    background: cardBg,
+    borderRadius: cardRadius,
+    padding: "2rem",
+    border: hasBordered ? `1px solid ${textColor}15` : undefined,
+    boxShadow: hasShadow ? "0 10px 25px rgba(0,0,0,0.1)" : undefined,
+  } : {};
 
   return (
-    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a] flex items-center justify-center p-4">
-      <div className="w-full max-w-md text-center animate-scale-in">
+    <div className={`min-h-screen flex items-center justify-center p-4 ${s ? "" : "bg-gray-50/80 dark:bg-[#0a0a0a]"}`} style={pageStyle}>
+      <div className={`w-full text-center animate-scale-in ${containerMax}`}>
         {isSuccess ? (
-          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mx-auto mb-5 flex items-center justify-center">
-              <CheckCircleIcon className="text-green-500" size={32} />
+          <div className={s ? "" : "bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark"} style={s ? cardStyle : { borderRadius: cardRadius }}>
+            <div className="w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: "#dcfce7" }}>
+              <CheckCircleIcon style={{ color: "#22c55e" }} size={32} />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: s ? textColor : undefined }}>
               Order confirmed!
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm leading-relaxed">
+            <p className="mb-6 text-sm leading-relaxed" style={{ color: s ? `${textColor}80` : undefined }}>
               Thank you{buyer ? `, ${buyer}` : ""}! Your order for{" "}
-              <strong className="text-gray-900 dark:text-white">{product}</strong> has been placed.
+              <strong style={{ color: s ? textColor : undefined }}>{product}</strong> has been placed.
             </p>
 
-            <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 mb-6">
-              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium">Amount paid</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+            <div
+              className={`rounded-xl p-4 mb-6 ${s ? "" : "bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06]"}`}
+              style={s ? { background: `${textColor}05`, border: `1px solid ${textColor}10` } : undefined}
+            >
+              <p className="text-xs uppercase tracking-wider font-medium" style={{ color: s ? `${textColor}50` : undefined }}>Amount paid</p>
+              <p className="text-3xl font-bold mt-1" style={{ color: s ? textColor : undefined }}>
                 ₦{amount ? parseInt(amount).toLocaleString() : "—"}
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 font-mono">
+              <p className="text-xs mt-2 font-mono" style={{ color: s ? `${textColor}40` : undefined }}>
                 Ref: {reference}
               </p>
             </div>
 
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm mb-4" style={{ color: s ? `${textColor}80` : undefined }}>
               Let the seller know you&apos;ve paid:
             </p>
 
@@ -61,21 +158,25 @@ function ConfirmContent() {
             </a>
           </div>
         ) : (
-          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark">
-            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-5 flex items-center justify-center">
-              <XCircleIcon className="text-red-500" size={32} />
+          <div className={s ? "" : "bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark"} style={s ? cardStyle : { borderRadius: cardRadius }}>
+            <div className="w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: "#fee2e2" }}>
+              <XCircleIcon style={{ color: "#ef4444" }} size={32} />
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: s ? textColor : undefined }}>
               Something went wrong
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm">
+            <p className="mb-8 text-sm" style={{ color: s ? `${textColor}80` : undefined }}>
               {message || "Payment could not be verified."}
             </p>
 
             <a
               href="/"
-              className="inline-flex items-center justify-center bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold px-8 py-3.5 rounded-xl transition-all hover:bg-gray-800 dark:hover:bg-gray-100 active:scale-[0.98]"
+              className={`inline-flex items-center justify-center font-semibold px-8 py-3.5 rounded-xl transition-all active:scale-[0.98] ${s ? "" : "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"}`}
+              style={s ? {
+                background: textColor,
+                color: cardBg,
+              } : undefined}
             >
               Go back home
             </a>
