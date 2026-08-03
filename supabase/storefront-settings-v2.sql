@@ -1,0 +1,14 @@
+alter table storefront_settings add column if not exists text_color text default '#1a1a1a';
+alter table storefront_settings add column if not exists accent_color text default '#ed7712';
+alter table storefront_settings add column if not exists card_background text default '#ffffff';
+alter table storefront_settings add column if not exists font_size text default 'medium';
+alter table storefront_settings add column if not exists image_shape text default 'rounded';
+alter table storefront_settings add column if not exists spacing text default 'normal';
+alter table storefront_settings add column if not exists card_border_radius text default 'md';
+alter table storefront_settings add column if not exists product_name_weight text default 'medium';
+alter table storefront_settings add column if not exists banner_height text default 'medium';
+alter table storefront_settings add column if not exists banner_overlay boolean default false;
+alter table storefront_settings add column if not exists header_style text default 'centered';
+alter table storefront_settings add column if not exists tagline text default null;
+alter table storefront_settings add column if not exists show_store_name boolean default true;
+alter table storefront_settings add column if not exists social_style text default 'pills';

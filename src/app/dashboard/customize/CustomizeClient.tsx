@@ -19,12 +19,26 @@ import Link from "next/link";
 interface StorefrontSettings {
   primary_color: string;
   background_color: string;
+  text_color: string;
+  accent_color: string;
+  card_background: string;
   banner_url: string | null;
   font_style: string;
+  font_size: string;
   layout: string;
+  image_shape: string;
+  spacing: string;
   card_style: string;
+  card_border_radius: string;
+  product_name_weight: string;
   text_align: string;
+  banner_height: string;
+  banner_overlay: boolean;
+  header_style: string;
+  tagline: string | null;
+  show_store_name: boolean;
   show_socials: boolean;
+  social_style: string;
   instagram: string | null;
   twitter: string | null;
   tiktok: string | null;
@@ -37,12 +51,26 @@ interface StorefrontSettings {
 const DEFAULTS: StorefrontSettings = {
   primary_color: "#ed7712",
   background_color: "#faf9f7",
+  text_color: "#1a1a1a",
+  accent_color: "#ed7712",
+  card_background: "#ffffff",
   banner_url: null,
   font_style: "sans",
+  font_size: "medium",
   layout: "grid",
+  image_shape: "rounded",
+  spacing: "normal",
   card_style: "minimal",
+  card_border_radius: "md",
+  product_name_weight: "medium",
   text_align: "center",
+  banner_height: "medium",
+  banner_overlay: false,
+  header_style: "centered",
+  tagline: null,
+  show_store_name: true,
   show_socials: false,
+  social_style: "pills",
   instagram: null,
   twitter: null,
   tiktok: null,
@@ -76,12 +104,26 @@ export default function CustomizeClient({
           setSettings({
             primary_color: data.primary_color || DEFAULTS.primary_color,
             background_color: data.background_color || DEFAULTS.background_color,
+            text_color: data.text_color || DEFAULTS.text_color,
+            accent_color: data.accent_color || DEFAULTS.accent_color,
+            card_background: data.card_background || DEFAULTS.card_background,
             banner_url: data.banner_url || null,
             font_style: data.font_style || DEFAULTS.font_style,
+            font_size: data.font_size || DEFAULTS.font_size,
             layout: data.layout || DEFAULTS.layout,
+            image_shape: data.image_shape || DEFAULTS.image_shape,
+            spacing: data.spacing || DEFAULTS.spacing,
             card_style: data.card_style || DEFAULTS.card_style,
+            card_border_radius: data.card_border_radius || DEFAULTS.card_border_radius,
+            product_name_weight: data.product_name_weight || DEFAULTS.product_name_weight,
             text_align: data.text_align || DEFAULTS.text_align,
+            banner_height: data.banner_height || DEFAULTS.banner_height,
+            banner_overlay: data.banner_overlay || false,
+            header_style: data.header_style || DEFAULTS.header_style,
+            tagline: data.tagline || null,
+            show_store_name: data.show_store_name !== false,
             show_socials: data.show_socials || false,
+            social_style: data.social_style || DEFAULTS.social_style,
             instagram: data.instagram || null,
             twitter: data.twitter || null,
             tiktok: data.tiktok || null,
@@ -167,7 +209,7 @@ export default function CustomizeClient({
               Customize your store
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
-              Change colors, fonts, layout, and more to make your storefront uniquely yours.
+              Colors, fonts, layout, and more to make your storefront uniquely yours.
               This feature is available for Premium members.
             </p>
             <Link
@@ -266,18 +308,64 @@ export default function CustomizeClient({
               <div className="p-8 text-center text-gray-400">Loading...</div>
             ) : (
               <div className="p-4 md:p-5 space-y-5 md:space-y-6">
+
                 {/* Colors */}
                 <Section icon={<PaletteIcon size={16} />} title="Colors">
                   <ColorField
-                    label="Primary color"
+                    label="Primary"
                     value={settings.primary_color}
                     onChange={(v) => update("primary_color", v)}
                   />
                   <ColorField
-                    label="Background color"
+                    label="Accent"
+                    value={settings.accent_color}
+                    onChange={(v) => update("accent_color", v)}
+                  />
+                  <ColorField
+                    label="Background"
                     value={settings.background_color}
                     onChange={(v) => update("background_color", v)}
                   />
+                  <ColorField
+                    label="Text"
+                    value={settings.text_color}
+                    onChange={(v) => update("text_color", v)}
+                  />
+                  <ColorField
+                    label="Card background"
+                    value={settings.card_background}
+                    onChange={(v) => update("card_background", v)}
+                  />
+                  <div className="pt-2">
+                    <p className="text-xs text-gray-400 mb-2">Presets</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { name: "Orange", primary: "#ed7712", bg: "#faf9f7", text: "#1a1a1a" },
+                        { name: "Midnight", primary: "#6366f1", bg: "#0f172a", text: "#e2e8f0" },
+                        { name: "Forest", primary: "#16a34a", bg: "#f0fdf4", text: "#14532d" },
+                        { name: "Rose", primary: "#e11d48", bg: "#fff1f2", text: "#1c1917" },
+                        { name: "Ocean", primary: "#0ea5e9", bg: "#f0f9ff", text: "#0c4a6e" },
+                        { name: "Minimal", primary: "#171717", bg: "#ffffff", text: "#171717" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.name}
+                          onClick={() => {
+                            update("primary_color", preset.primary);
+                            update("background_color", preset.bg);
+                            update("text_color", preset.text);
+                            update("accent_color", preset.primary);
+                          }}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 text-xs text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20 transition-colors"
+                        >
+                          <div className="flex -space-x-1">
+                            <div className="w-3 h-3 rounded-full border border-white dark:border-gray-900" style={{ background: preset.primary }} />
+                            <div className="w-3 h-3 rounded-full border border-white dark:border-gray-900" style={{ background: preset.bg }} />
+                          </div>
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </Section>
 
                 {/* Banner */}
@@ -316,12 +404,52 @@ export default function CustomizeClient({
                     onChange={handleBannerUpload}
                     className="hidden"
                   />
+                  <SelectField
+                    label="Height"
+                    value={settings.banner_height}
+                    options={[
+                      { value: "short", label: "Short" },
+                      { value: "medium", label: "Medium" },
+                      { value: "tall", label: "Tall" },
+                    ]}
+                    onChange={(v) => update("banner_height", v)}
+                  />
+                  <ToggleField
+                    label="Dark overlay"
+                    checked={settings.banner_overlay}
+                    onChange={(v) => update("banner_overlay", v)}
+                  />
+                </Section>
+
+                {/* Header */}
+                <Section icon={<TypeIcon size={16} />} title="Header">
+                  <ToggleField
+                    label="Show store name"
+                    checked={settings.show_store_name}
+                    onChange={(v) => update("show_store_name", v)}
+                  />
+                  <SelectField
+                    label="Header style"
+                    value={settings.header_style}
+                    options={[
+                      { value: "centered", label: "Centered" },
+                      { value: "left", label: "Left aligned" },
+                      { value: "minimal", label: "Minimal" },
+                    ]}
+                    onChange={(v) => update("header_style", v)}
+                  />
+                  <TextField
+                    label="Tagline"
+                    value={settings.tagline || ""}
+                    placeholder="e.g. Premium leather goods"
+                    onChange={(v) => update("tagline", v || null)}
+                  />
                 </Section>
 
                 {/* Typography */}
                 <Section icon={<TypeIcon size={16} />} title="Typography">
                   <SelectField
-                    label="Font style"
+                    label="Font"
                     value={settings.font_style}
                     options={[
                       { value: "sans", label: "Sans-serif" },
@@ -331,7 +459,17 @@ export default function CustomizeClient({
                     onChange={(v) => update("font_style", v)}
                   />
                   <SelectField
-                    label="Text alignment"
+                    label="Size"
+                    value={settings.font_size}
+                    options={[
+                      { value: "small", label: "Small" },
+                      { value: "medium", label: "Medium" },
+                      { value: "large", label: "Large" },
+                    ]}
+                    onChange={(v) => update("font_size", v)}
+                  />
+                  <SelectField
+                    label="Alignment"
                     value={settings.text_align}
                     options={[
                       { value: "center", label: "Center" },
@@ -344,9 +482,7 @@ export default function CustomizeClient({
                 {/* Layout */}
                 <Section icon={<LayoutIcon size={16} />} title="Layout">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Product grid
-                    </label>
+                    <label className="text-sm text-gray-600 dark:text-gray-400">Product grid</label>
                     <div className="flex gap-2">
                       <button
                         onClick={() => update("layout", "grid")}
@@ -371,14 +507,61 @@ export default function CustomizeClient({
                     </div>
                   </div>
                   <SelectField
-                    label="Card style"
+                    label="Spacing"
+                    value={settings.spacing}
+                    options={[
+                      { value: "compact", label: "Compact" },
+                      { value: "normal", label: "Normal" },
+                      { value: "relaxed", label: "Relaxed" },
+                    ]}
+                    onChange={(v) => update("spacing", v)}
+                  />
+                </Section>
+
+                {/* Cards */}
+                <Section icon={<LayoutIcon size={16} />} title="Cards">
+                  <SelectField
+                    label="Style"
                     value={settings.card_style}
                     options={[
                       { value: "minimal", label: "Minimal" },
                       { value: "bordered", label: "Bordered" },
                       { value: "shadow", label: "Shadow" },
+                      { value: "glass", label: "Glass" },
                     ]}
                     onChange={(v) => update("card_style", v)}
+                  />
+                  <SelectField
+                    label="Border radius"
+                    value={settings.card_border_radius}
+                    options={[
+                      { value: "none", label: "None" },
+                      { value: "sm", label: "Small" },
+                      { value: "md", label: "Medium" },
+                      { value: "lg", label: "Large" },
+                      { value: "pill", label: "Pill" },
+                    ]}
+                    onChange={(v) => update("card_border_radius", v)}
+                  />
+                  <SelectField
+                    label="Image shape"
+                    value={settings.image_shape}
+                    options={[
+                      { value: "square", label: "Square" },
+                      { value: "rounded", label: "Rounded" },
+                      { value: "pill", label: "Pill" },
+                    ]}
+                    onChange={(v) => update("image_shape", v)}
+                  />
+                  <SelectField
+                    label="Product name"
+                    value={settings.product_name_weight}
+                    options={[
+                      { value: "normal", label: "Normal" },
+                      { value: "medium", label: "Medium" },
+                      { value: "bold", label: "Bold" },
+                    ]}
+                    onChange={(v) => update("product_name_weight", v)}
                   />
                 </Section>
 
@@ -390,50 +573,62 @@ export default function CustomizeClient({
                     onChange={(v) => update("show_socials", v)}
                   />
                   {settings.show_socials && (
-                    <div className="space-y-3 mt-3">
-                      <TextField
-                        label="Instagram"
-                        value={settings.instagram || ""}
-                        placeholder="@username"
-                        onChange={(v) => update("instagram", v || null)}
+                    <>
+                      <SelectField
+                        label="Style"
+                        value={settings.social_style}
+                        options={[
+                          { value: "pills", label: "Pills" },
+                          { value: "boxed", label: "Boxed" },
+                          { value: "minimal", label: "Minimal" },
+                        ]}
+                        onChange={(v) => update("social_style", v)}
                       />
-                      <TextField
-                        label="Twitter / X"
-                        value={settings.twitter || ""}
-                        placeholder="@username"
-                        onChange={(v) => update("twitter", v || null)}
-                      />
-                      <TextField
-                        label="TikTok"
-                        value={settings.tiktok || ""}
-                        placeholder="@username"
-                        onChange={(v) => update("tiktok", v || null)}
-                      />
-                      <TextField
-                        label="Facebook"
-                        value={settings.facebook || ""}
-                        placeholder="Page URL"
-                        onChange={(v) => update("facebook", v || null)}
-                      />
-                      <TextField
-                        label="WhatsApp"
-                        value={settings.whatsapp_store || ""}
-                        placeholder="2348012345678"
-                        onChange={(v) => update("whatsapp_store", v || null)}
-                      />
-                      <TextField
-                        label="Phone"
-                        value={settings.phone || ""}
-                        placeholder="08012345678"
-                        onChange={(v) => update("phone", v || null)}
-                      />
-                      <TextField
-                        label="Email"
-                        value={settings.email || ""}
-                        placeholder="you@example.com"
-                        onChange={(v) => update("email", v || null)}
-                      />
-                    </div>
+                      <div className="space-y-3 mt-3">
+                        <TextField
+                          label="Instagram"
+                          value={settings.instagram || ""}
+                          placeholder="@username"
+                          onChange={(v) => update("instagram", v || null)}
+                        />
+                        <TextField
+                          label="Twitter / X"
+                          value={settings.twitter || ""}
+                          placeholder="@username"
+                          onChange={(v) => update("twitter", v || null)}
+                        />
+                        <TextField
+                          label="TikTok"
+                          value={settings.tiktok || ""}
+                          placeholder="@username"
+                          onChange={(v) => update("tiktok", v || null)}
+                        />
+                        <TextField
+                          label="Facebook"
+                          value={settings.facebook || ""}
+                          placeholder="Page URL"
+                          onChange={(v) => update("facebook", v || null)}
+                        />
+                        <TextField
+                          label="WhatsApp"
+                          value={settings.whatsapp_store || ""}
+                          placeholder="2348012345678"
+                          onChange={(v) => update("whatsapp_store", v || null)}
+                        />
+                        <TextField
+                          label="Phone"
+                          value={settings.phone || ""}
+                          placeholder="08012345678"
+                          onChange={(v) => update("phone", v || null)}
+                        />
+                        <TextField
+                          label="Email"
+                          value={settings.email || ""}
+                          placeholder="you@example.com"
+                          onChange={(v) => update("email", v || null)}
+                        />
+                      </div>
+                    </>
                   )}
                 </Section>
 

@@ -54,6 +54,7 @@ export default async function StorePage({
 
   const s = settings || null;
 
+  // Font
   const fontFamily =
     s?.font_style === "serif"
       ? "Georgia, serif"
@@ -61,31 +62,121 @@ export default async function StorePage({
         ? "monospace"
         : "var(--font-geist-sans), system-ui, sans-serif";
 
+  // Font size
+  const fontSize =
+    s?.font_size === "small"
+      ? "13px"
+      : s?.font_size === "large"
+        ? "17px"
+        : "15px";
+
+  // Colors
+  const primaryColor = s?.primary_color || "#ed7712";
+  const bgColor = s?.background_color || "#faf9f7";
+  const textColor = s?.text_color || "#1a1a1a";
+  const accentColor = s?.accent_color || primaryColor;
+  const cardBg = s?.card_background || "#ffffff";
+
   const storeStyles = s
     ? {
-        "--store-primary": s.primary_color,
-        "--store-bg": s.background_color,
+        "--store-primary": primaryColor,
+        "--store-bg": bgColor,
+        "--store-text": textColor,
+        "--store-accent": accentColor,
+        "--store-card-bg": cardBg,
         fontFamily,
+        fontSize,
+        color: textColor,
+        background: bgColor,
       }
-    : { fontFamily };
+    : { fontFamily, fontSize };
 
-  const bgClass = s ? "" : "bg-white dark:bg-[#0f0f0f]";
-
-  const textColor = s
-    ? "var(--store-primary)"
-    : "text-gray-900 dark:text-white";
-
+  // Layout
   const gridCols = s?.layout === "list" ? "grid-cols-1" : "grid-cols-2";
 
+  // Spacing
+  const gapSize =
+    s?.spacing === "compact"
+      ? "gap-2"
+      : s?.spacing === "relaxed"
+        ? "gap-6"
+        : "gap-4";
+
+  const sectionPadding =
+    s?.spacing === "compact"
+      ? "py-4"
+      : s?.spacing === "relaxed"
+        ? "py-10"
+        : "py-6";
+
+  // Image shape
+  const imageRadius =
+    s?.image_shape === "pill"
+      ? "rounded-full"
+      : s?.image_shape === "square"
+        ? "rounded-none"
+        : "rounded-xl";
+
+  // Card border radius
+  const cardRadius =
+    s?.card_border_radius === "none"
+      ? "rounded-none"
+      : s?.card_border_radius === "pill"
+        ? "rounded-full"
+        : s?.card_border_radius === "sm"
+          ? "rounded-sm"
+          : s?.card_border_radius === "lg"
+            ? "rounded-2xl"
+            : "rounded-xl";
+
+  // Card style
   const cardClasses = (() => {
-    if (!s) return "group block";
-    switch (s.card_style) {
+    const base = `group block overflow-hidden ${cardRadius}`;
+    switch (s?.card_style) {
       case "bordered":
-        return "group block border border-gray-200 rounded-xl p-2";
+        return `${base} border border-gray-200 p-2`;
       case "shadow":
-        return "group block shadow-lg rounded-xl p-2";
+        return `${base} shadow-lg p-2`;
+      case "glass":
+        return `${base} backdrop-blur-md bg-white/70 border border-white/20 p-2`;
       default:
-        return "group block";
+        return base;
+    }
+  })();
+
+  // Product name weight
+  const nameWeight =
+    s?.product_name_weight === "bold"
+      ? "font-bold"
+      : s?.product_name_weight === "normal"
+        ? "font-normal"
+        : "font-medium";
+
+  // Banner height
+  const bannerHeight =
+    s?.banner_height === "short"
+      ? "h-32"
+      : s?.banner_height === "tall"
+        ? "h-72"
+        : "h-48";
+
+  // Header style
+  const headerAlign =
+    s?.header_style === "left"
+      ? "text-left"
+      : s?.header_style === "minimal"
+        ? "text-left"
+        : "text-center";
+
+  // Social style
+  const socialClasses = (() => {
+    switch (s?.social_style) {
+      case "boxed":
+        return "text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-300 transition-colors font-medium";
+      case "minimal":
+        return "text-sm px-2 py-1 text-gray-500 hover:text-gray-700 transition-colors underline-offset-4 hover:underline";
+      default:
+        return "text-sm px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-gray-300 transition-colors";
     }
   })();
 
@@ -103,51 +194,82 @@ export default async function StorePage({
 
   return (
     <div
-      className={`min-h-screen ${bgClass}`}
+      className={`min-h-screen ${s ? "" : "bg-white dark:bg-[#0f0f0f]"}`}
       style={storeStyles as React.CSSProperties}
     >
       {/* Banner */}
       {s?.banner_url && (
-        <div className="w-full h-48 md:h-64 overflow-hidden">
+        <div className={`w-full ${bannerHeight} overflow-hidden relative`}>
           <img
             src={s.banner_url}
             alt="Store banner"
             className="w-full h-full object-cover"
           />
+          {s.banner_overlay && (
+            <div className="absolute inset-0 bg-black/40" />
+          )}
         </div>
       )}
 
       {/* Store Header */}
-      <div className="border-b border-gray-100 dark:border-white/10">
-        <div
-          className={`max-w-2xl mx-auto px-4 py-6 ${s?.text_align === "left" ? "text-left" : "text-center"}`}
-        >
-          <h1
-            className="text-2xl font-bold"
-            style={{ color: textColor }}
-          >
-            {profile.username}
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">Shop on WhatsApp</p>
+      {s?.header_style !== "minimal" ? (
+        <div className="border-b" style={{ borderColor: `${textColor}15` }}>
+          <div className={`max-w-2xl mx-auto px-4 ${sectionPadding} ${headerAlign}`}>
+            {s?.show_store_name && (
+              <h1
+                className="text-2xl font-bold"
+                style={{ color: textColor }}
+              >
+                {profile.username}
+              </h1>
+            )}
+            {s?.tagline && (
+              <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
+                {s.tagline}
+              </p>
+            )}
+            {!s?.tagline && (
+              <p className="text-sm mt-1" style={{ color: `${textColor}60` }}>
+                Shop on WhatsApp
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className={`max-w-2xl mx-auto px-4 ${sectionPadding}`}>
+          {s?.show_store_name && (
+            <h1
+              className="text-2xl font-bold"
+              style={{ color: textColor }}
+            >
+              {profile.username}
+            </h1>
+          )}
+          {s?.tagline && (
+            <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
+              {s.tagline}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Products */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className={`max-w-2xl mx-auto px-4 ${sectionPadding}`}>
         {(!products || products.length === 0) ? (
           <div className="text-center py-16">
-            <PackageIcon className="mx-auto text-gray-300 dark:text-gray-600 mb-3" size={48} />
-            <p className="text-gray-400">No products yet. Check back soon!</p>
+            <PackageIcon className="mx-auto mb-3" size={48} style={{ color: `${textColor}30` }} />
+            <p style={{ color: `${textColor}50` }}>No products yet. Check back soon!</p>
           </div>
         ) : (
-          <div className={`grid ${gridCols} gap-4`}>
+          <div className={`grid ${gridCols} ${gapSize}`}>
             {products.map((product) => (
               <a
                 key={product.id}
                 href={`/checkout/${product.id}`}
                 className={cardClasses}
+                style={s?.card_style === "glass" ? { background: `${cardBg}b3` } : s ? { background: cardBg } : undefined}
               >
-                <div className="aspect-square rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 mb-3">
+                <div className={`aspect-square overflow-hidden ${imageRadius} mb-3`} style={s ? { background: `${textColor}08` } : { background: "rgb(243 244 246)" }}>
                   {product.image_url ? (
                     <img
                       src={product.image_url}
@@ -156,16 +278,21 @@ export default async function StorePage({
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <PackageIcon className="text-gray-300 dark:text-gray-600" size={40} />
+                      <PackageIcon size={40} style={{ color: `${textColor}25` }} />
                     </div>
                   )}
                 </div>
-                <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                  {product.name}
-                </h3>
-                <p className="font-semibold text-sm" style={{ color: "var(--store-primary, #ed7712)" }}>
-                  ₦{product.price.toLocaleString()}
-                </p>
+                <div className="px-2 pb-2">
+                  <h3
+                    className={`${nameWeight} text-sm truncate`}
+                    style={{ color: textColor }}
+                  >
+                    {product.name}
+                  </h3>
+                  <p className="font-semibold text-sm" style={{ color: accentColor }}>
+                    ₦{product.price.toLocaleString()}
+                  </p>
+                </div>
               </a>
             ))}
           </div>
@@ -174,11 +301,11 @@ export default async function StorePage({
 
       {/* Social Links */}
       {socials.length > 0 && (
-        <div className="max-w-2xl mx-auto px-4 py-6 border-t border-gray-100 dark:border-white/10">
+        <div className={`max-w-2xl mx-auto px-4 ${sectionPadding} border-t`} style={{ borderColor: `${textColor}10` }}>
           <div className={`flex flex-wrap gap-3 ${s?.text_align === "left" ? "justify-start" : "justify-center"}`}>
-            {socials.map((s) => {
-              if (!s) return null;
-              const social = s as { type: string; value: string };
+            {socials.map((item) => {
+              if (!item) return null;
+              const social = item as { type: string; value: string };
               let href = "#";
               let label = social.type;
               if (social.type === "instagram") {
@@ -209,7 +336,8 @@ export default async function StorePage({
                   href={href}
                   target={social.type !== "phone" && social.type !== "email" ? "_blank" : undefined}
                   rel="noopener noreferrer"
-                  className="text-sm px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20 transition-colors"
+                  className={socialClasses}
+                  style={s?.social_style === "minimal" ? { color: `${textColor}80` } : { color: textColor, borderColor: `${textColor}20` }}
                 >
                   {label}
                 </a>
@@ -221,11 +349,12 @@ export default async function StorePage({
 
       {/* Footer */}
       {!profile.is_premium && (
-        <footer className="border-t border-gray-100 dark:border-white/10 py-4">
+        <footer className="border-t py-4" style={{ borderColor: `${textColor}10` }}>
           <div className="text-center">
             <a
               href="/"
-              className="text-xs text-gray-400 hover:text-brand-500 transition-colors"
+              className="text-xs hover:opacity-80 transition-opacity"
+              style={{ color: `${textColor}40` }}
             >
               Powered by <span className="font-semibold">Shopa</span>
             </a>
