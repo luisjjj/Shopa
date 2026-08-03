@@ -109,6 +109,7 @@ export default function CustomizeClient({
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const previewRef = useRef<HTMLIFrameElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewKey, setPreviewKey] = useState(0);
 
   useEffect(() => {
     fetch("/api/storefront-settings")
@@ -240,6 +241,50 @@ export default function CustomizeClient({
         setSaving(false);
         return;
       }
+
+      const refreshed = await fetch("/api/storefront-settings").then((r) => r.json());
+      if (refreshed && !refreshed.error) {
+        setSettings({
+          primary_color: refreshed.primary_color || DEFAULTS.primary_color,
+          background_color: refreshed.background_color || DEFAULTS.background_color,
+          text_color: refreshed.text_color || DEFAULTS.text_color,
+          accent_color: refreshed.accent_color || DEFAULTS.accent_color,
+          card_background: refreshed.card_background || DEFAULTS.card_background,
+          banner_url: refreshed.banner_url || null,
+          font_style: refreshed.font_style || DEFAULTS.font_style,
+          font_size: refreshed.font_size || DEFAULTS.font_size,
+          layout: refreshed.layout || DEFAULTS.layout,
+          image_shape: refreshed.image_shape || DEFAULTS.image_shape,
+          spacing: refreshed.spacing || DEFAULTS.spacing,
+          card_style: refreshed.card_style || DEFAULTS.card_style,
+          card_border_radius: refreshed.card_border_radius || DEFAULTS.card_border_radius,
+          product_name_weight: refreshed.product_name_weight || DEFAULTS.product_name_weight,
+          text_align: refreshed.text_align || DEFAULTS.text_align,
+          banner_height: refreshed.banner_height || DEFAULTS.banner_height,
+          banner_overlay: refreshed.banner_overlay || false,
+          header_style: refreshed.header_style || DEFAULTS.header_style,
+          tagline: refreshed.tagline || null,
+          show_store_name: refreshed.show_store_name !== false,
+          show_socials: refreshed.show_socials || false,
+          social_style: refreshed.social_style || DEFAULTS.social_style,
+          instagram: refreshed.instagram || null,
+          twitter: refreshed.twitter || null,
+          tiktok: refreshed.tiktok || null,
+          facebook: refreshed.facebook || null,
+          whatsapp_store: refreshed.whatsapp_store || null,
+          phone: refreshed.phone || null,
+          email: refreshed.email || null,
+          product_name_size: refreshed.product_name_size || DEFAULTS.product_name_size,
+          price_style: refreshed.price_style || DEFAULTS.price_style,
+          card_padding: refreshed.card_padding || DEFAULTS.card_padding,
+          card_border: refreshed.card_border || DEFAULTS.card_border,
+          card_shadow: refreshed.card_shadow || DEFAULTS.card_shadow,
+          container_width: refreshed.container_width || DEFAULTS.container_width,
+          product_image_ratio: refreshed.product_image_ratio || DEFAULTS.product_image_ratio,
+        });
+      }
+
+      setPreviewKey((k) => k + 1);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
@@ -802,13 +847,14 @@ export default function CustomizeClient({
               <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414]">
                 <iframe
                   ref={previewRef}
+                  key={previewKey}
                   src={`/${username}`}
                   className="w-full h-[600px] border-0"
                   title="Storefront preview"
                 />
               </div>
               <p className="text-xs text-gray-400 mt-3 text-center">
-                Save changes, then refresh to see updates
+                Preview updates automatically after saving
               </p>
             </div>
           </div>
@@ -819,13 +865,14 @@ export default function CustomizeClient({
           <div className="flex md:hidden flex-1 flex-col p-4 overflow-auto bg-gray-100 dark:bg-[#0a0a0a]">
             <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414] flex-1">
               <iframe
+                key={previewKey}
                 src={`/${username}`}
                 className="w-full h-full border-0 min-h-[500px]"
                 title="Storefront preview"
               />
             </div>
             <p className="text-xs text-gray-400 mt-3 text-center">
-              Save changes, then refresh to see updates
+              Preview updates automatically after saving
             </p>
           </div>
         )}
