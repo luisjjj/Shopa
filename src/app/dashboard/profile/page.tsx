@@ -12,7 +12,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("*")
+    .select("username, email, whatsapp_number, bank_name, account_number, account_name, is_premium, premium_until, created_at")
     .eq("id", user.id)
     .single();
 
@@ -23,6 +23,9 @@ export default async function ProfilePage() {
       username={profile.username}
       email={profile.email}
       whatsappNumber={profile.whatsapp_number || ""}
+      bankName={profile.bank_name || ""}
+      accountNumber={profile.account_number || ""}
+      accountName={profile.account_name || ""}
       isPremium={profile.is_premium}
       premiumUntil={profile.premium_until}
       createdAt={profile.created_at}

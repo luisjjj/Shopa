@@ -4,11 +4,15 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
-import { SunIcon, MoonIcon } from "@/components/Icons";
+import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
+import BankPicker from "@/components/BankPicker";
 
 export default function OnboardingPage() {
   const [username, setUsername] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
@@ -52,6 +56,9 @@ export default function OnboardingPage() {
       email: user.email!,
       username,
       whatsapp_number: whatsapp || null,
+      bank_name: bankName || null,
+      account_number: accountNumber || null,
+      account_name: accountName || null,
     });
 
     if (insertError) {
@@ -90,7 +97,7 @@ export default function OnboardingPage() {
               Pick your store link
             </label>
             <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">shopa-five.vercel.app/</span>
+              <span className="text-gray-400 text-sm mr-1">shopa-store.name.ng/</span>
               <input
                 type="text"
                 value={username}
@@ -116,7 +123,7 @@ export default function OnboardingPage() {
             )}
           </div>
 
-          <div className="mb-8">
+          <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               WhatsApp number{" "}
               <span className="text-gray-400">(optional, for order alerts)</span>
@@ -128,6 +135,51 @@ export default function OnboardingPage() {
               className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
               placeholder="+234 801 234 5678"
             />
+          </div>
+
+          {/* Bank Details */}
+          <div className="mb-8 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+            <div className="flex items-center gap-2 mb-4">
+              <BankIcon size={16} className="text-brand-600" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Bank details
+              </span>
+              <span className="text-xs text-gray-400">(for receiving payments)</span>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Bank name
+                </label>
+                <BankPicker value={bankName} onChange={setBankName} variant="underline" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Account number
+                </label>
+                <input
+                  type="text"
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="0123456789"
+                  maxLength={10}
+                  className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Account name
+                </label>
+                <input
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
+                />
+              </div>
+            </div>
           </div>
 
           {error && (

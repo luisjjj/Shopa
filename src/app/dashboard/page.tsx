@@ -330,6 +330,10 @@ async function OrderList({ userId }: { userId: string }) {
                   ) : (
                     <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                   )
+                ) : order.confirmed_by_buyer ? (
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                    Awaiting your confirmation
+                  </span>
                 ) : (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     Pending

@@ -45,6 +45,7 @@ function getCardRadius(radius?: string): string {
 
 export default async function ConfirmPage({ searchParams }: Props) {
   const sellerId = typeof searchParams.seller === "string" ? searchParams.seller : null;
+  const whatsapp = typeof searchParams.whatsapp === "string" ? searchParams.whatsapp : null;
 
   let settings = null;
 
@@ -97,11 +98,13 @@ export default async function ConfirmPage({ searchParams }: Props) {
       buyer={typeof searchParams.buyer === "string" ? searchParams.buyer : null}
       reference={typeof searchParams.reference === "string" ? searchParams.reference : null}
       message={typeof searchParams.message === "string" ? searchParams.message : null}
+      sellerWhatsapp={whatsapp}
       pageStyle={pageStyle}
       containerMax={containerMax}
       cardStyle={cardStyle}
       textColor={textColor}
       cardBg={cardBg}
+      primaryColor={s?.primary_color || "#ed7712"}
     />
   );
 }

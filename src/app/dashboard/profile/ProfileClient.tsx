@@ -10,12 +10,17 @@ import {
   MailIcon,
   SmartphoneIcon,
   GlobeIcon,
+  BankIcon,
 } from "@/components/Icons";
+import BankPicker from "@/components/BankPicker";
 
 interface ProfileProps {
   username: string;
   email: string;
   whatsappNumber: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
   isPremium: boolean;
   premiumUntil: string | null;
   createdAt: string;
@@ -25,11 +30,17 @@ export default function ProfileClient({
   username,
   email,
   whatsappNumber,
+  bankName,
+  accountNumber,
+  accountName,
   isPremium,
   premiumUntil,
   createdAt,
 }: ProfileProps) {
   const [phone, setPhone] = useState(whatsappNumber);
+  const [bank, setBank] = useState(bankName);
+  const [accountNum, setAccountNum] = useState(accountNumber);
+  const [accountNm, setAccountNm] = useState(accountName);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -41,7 +52,12 @@ export default function ProfileClient({
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ whatsapp_number: phone || null }),
+        body: JSON.stringify({
+          whatsapp_number: phone || null,
+          bank_name: bank || null,
+          account_number: accountNum || null,
+          account_name: accountNm || null,
+        }),
       });
       const data = await res.json();
       if (data.error) {
@@ -127,9 +143,55 @@ export default function ProfileClient({
             <InfoRow
               icon={<GlobeIcon size={16} />}
               label="Store URL"
-              value={`shopa-five.vercel.app/${username}`}
+              value={`shopa-store.name.ng/${username}`}
               mono
             />
+          </div>
+        </section>
+
+        {/* Bank Details */}
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+            <div className="flex items-center gap-2">
+              <BankIcon size={16} className="text-brand-600" />
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bank Details</h2>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Buyers will see this when they checkout
+            </p>
+          </div>
+          <div className="p-5 space-y-4">
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                Bank name
+              </label>
+              <BankPicker value={bank} onChange={setBank} />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                Account number
+              </label>
+              <input
+                type="text"
+                value={accountNum}
+                onChange={(e) => setAccountNum(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                placeholder="0123456789"
+                maxLength={10}
+                className="w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-brand-500 transition-colors placeholder:text-gray-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+                Account name
+              </label>
+              <input
+                type="text"
+                value={accountNm}
+                onChange={(e) => setAccountNm(e.target.value)}
+                placeholder="John Doe"
+                className="w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-brand-500 transition-colors placeholder:text-gray-400"
+              />
+            </div>
           </div>
         </section>
 

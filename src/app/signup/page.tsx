@@ -132,15 +132,15 @@ export default function SignupPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Store username
             </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-gray-500 pointer-events-none">shopa-store.name.ng/</span>
+            <div className="flex items-center input-base !px-0 overflow-hidden">
+              <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 pl-4 pr-0 border-r-0">shopa-store.name.ng/</span>
               <input
                 type="text"
                 value={username}
                 onChange={(e) =>
                   checkUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
                 }
-                className="input-base pl-[170px] font-medium"
+                className="flex-1 min-w-0 bg-transparent border-none outline-none py-3 pr-4 pl-0 font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="yourstore"
                 required
                 minLength={3}

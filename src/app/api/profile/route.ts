@@ -18,6 +18,15 @@ export async function PUT(request: Request) {
   if (body.whatsapp_number !== undefined) {
     updates.whatsapp_number = body.whatsapp_number || null;
   }
+  if (body.bank_name !== undefined) {
+    updates.bank_name = body.bank_name || null;
+  }
+  if (body.account_number !== undefined) {
+    updates.account_number = body.account_number || null;
+  }
+  if (body.account_name !== undefined) {
+    updates.account_name = body.account_name || null;
+  }
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "No fields to update" }, { status: 400 });

@@ -15,6 +15,9 @@ export interface Database {
           email: string;
           username: string;
           whatsapp_number: string | null;
+          bank_name: string | null;
+          account_number: string | null;
+          account_name: string | null;
           is_premium: boolean;
           premium_until: string | null;
           created_at: string;
@@ -24,6 +27,9 @@ export interface Database {
           email: string;
           username: string;
           whatsapp_number?: string | null;
+          bank_name?: string | null;
+          account_number?: string | null;
+          account_name?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
           created_at?: string;
@@ -33,6 +39,9 @@ export interface Database {
           email?: string;
           username?: string;
           whatsapp_number?: string | null;
+          bank_name?: string | null;
+          account_number?: string | null;
+          account_name?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
           created_at?: string;
@@ -205,6 +214,7 @@ export interface Database {
           amount: number;
           paystack_reference: string;
           paid: boolean;
+          confirmed_by_buyer: boolean;
           fulfilled: boolean;
           created_at: string;
         };
@@ -217,6 +227,7 @@ export interface Database {
           amount: number;
           paystack_reference: string;
           paid?: boolean;
+          confirmed_by_buyer?: boolean;
           fulfilled?: boolean;
           created_at?: string;
         };
@@ -229,6 +240,7 @@ export interface Database {
           amount?: number;
           paystack_reference?: string;
           paid?: boolean;
+          confirmed_by_buyer?: boolean;
           fulfilled?: boolean;
           created_at?: string;
         };

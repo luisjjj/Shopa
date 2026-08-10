@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 type CheckoutSettings = {
   primaryColor: string;
@@ -18,6 +18,10 @@ type Props = {
   productName: string;
   productPrice: number;
   sellerId: string;
+  sellerWhatsapp: string;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
   settings: CheckoutSettings;
 };
 
@@ -37,12 +41,22 @@ export default function CheckoutForm({
   productName,
   productPrice,
   sellerId,
+  sellerWhatsapp,
+  bankName,
+  accountNumber,
+  accountName,
   settings,
 }: Props) {
   const [buyerName, setBuyerName] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+  const [orderId, setOrderId] = useState("");
+  const [reference, setReference] = useState("");
+  const [timeLeft, setTimeLeft] = useState(300);
+  const [copied, setCopied] = useState<string | null>(null);
 
   const s = settings;
   const primaryColor = s?.primaryColor || "#ed7712";
@@ -51,6 +65,21 @@ export default function CheckoutForm({
   const cardRadius = getCardRadius(s?.cardBorderRadius || "md");
   const hasBordered = s?.cardStyle === "bordered" || s?.cardStyle === "outlined";
   const hasShadow = s?.cardStyle === "shadow";
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  useEffect(() => {
+    if (!showModal || timeLeft <= 0) return;
+    const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearInterval(timer);
+  }, [showModal, timeLeft]);
+
+  const copyToClipboard = useCallback((text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(field);
+    setTimeout(() => setCopied(null), 1500);
+  }, []);
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,12 +108,171 @@ export default function CheckoutForm({
         return;
       }
 
-      window.location.href = data.authorization_url;
+      setOrderId(data.orderId);
+      setReference(data.reference);
+      setShowModal(true);
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
+
+  const handleConfirmPayment = async () => {
+    try {
+      await fetch("/api/orders/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+    } catch {}
+
+    const params = new URLSearchParams({
+      status: "success",
+      product: productName,
+      amount: productPrice.toString(),
+      buyer: buyerName,
+      reference,
+      seller: sellerId,
+      whatsapp: sellerWhatsapp,
+    });
+
+    window.location.href = `/confirm?${params.toString()}`;
+  };
+
+  if (showModal) {
+    return (
+      <>
+        <style>{`
+          @keyframes bank-modal-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          .bank-modal-enter { animation: bank-modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+          @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.5); opacity: 0; }
+          }
+          .pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
+        `}</style>
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div
+            className="bank-modal-enter w-full max-w-md rounded-2xl overflow-hidden"
+            style={{
+              background: s ? cardBg : "#fff",
+              borderRadius: cardRadius,
+              boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
+            }}
+          >
+            {/* Timer header */}
+            <div
+              className="px-6 py-4 flex items-center justify-between"
+              style={{ background: `${primaryColor}10` }}
+            >
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ background: timeLeft > 60 ? "#22c55e" : timeLeft > 0 ? "#f59e0b" : "#ef4444" }}
+                  />
+                  {timeLeft > 60 && (
+                    <div
+                      className="absolute inset-0 w-2.5 h-2.5 rounded-full pulse-ring"
+                      style={{ background: "#22c55e" }}
+                    />
+                  )}
+                </div>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: s ? textColor : "#374151" }}
+                >
+                  {timeLeft > 0 ? "Complete payment within" : "Time expired"}
+                </span>
+              </div>
+              <span
+                className="text-lg font-bold font-mono tabular-nums"
+                style={{ color: timeLeft > 60 ? primaryColor : timeLeft > 0 ? "#f59e0b" : "#ef4444" }}
+              >
+                {minutes}:{seconds.toString().padStart(2, "0")}
+              </span>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Amount */}
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-wider font-medium mb-1" style={{ color: s ? `${textColor}60` : "#9ca3af" }}>
+                  Amount to pay
+                </p>
+                <p className="text-3xl font-bold" style={{ color: s ? textColor : "#111827" }}>
+                  ₦{productPrice.toLocaleString()}
+                </p>
+              </div>
+
+              {/* Bank details */}
+              <div
+                className="rounded-xl p-4 space-y-3"
+                style={{
+                  background: s ? `${textColor}05` : "#f9fafb",
+                  border: `1px solid ${s ? `${textColor}10` : "#e5e7eb"}`,
+                }}
+              >
+                <p className="text-xs uppercase tracking-wider font-medium" style={{ color: s ? `${textColor}50` : "#9ca3af" }}>
+                  Transfer to this account
+                </p>
+
+                <BankDetailRow
+                  label="Bank"
+                  value={bankName}
+                  copied={copied === "bank"}
+                  onCopy={() => copyToClipboard(bankName, "bank")}
+                  textColor={textColor}
+                  s={s}
+                />
+                <BankDetailRow
+                  label="Account Number"
+                  value={accountNumber}
+                  copied={copied === "account"}
+                  onCopy={() => copyToClipboard(accountNumber, "account")}
+                  textColor={textColor}
+                  s={s}
+                  mono
+                />
+                <BankDetailRow
+                  label="Account Name"
+                  value={accountName}
+                  copied={copied === "name"}
+                  onCopy={() => copyToClipboard(accountName, "name")}
+                  textColor={textColor}
+                  s={s}
+                />
+              </div>
+
+              {/* Confirm button */}
+              <button
+                onClick={handleConfirmPayment}
+                disabled={timeLeft <= 0}
+                className="w-full py-3.5 rounded-xl font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: timeLeft > 0 ? primaryColor : "#9ca3af",
+                }}
+              >
+                I&apos;ve sent the money
+              </button>
+
+              <p className="text-center text-xs" style={{ color: s ? `${textColor}40` : "#9ca3af" }}>
+                After clicking, you&apos;ll be asked to confirm on WhatsApp
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Original form behind modal (hidden) */}
+        <div className="hidden">
+          <div>Loading...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <form
@@ -201,7 +389,7 @@ export default function CheckoutForm({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Redirecting to payment...
+            Creating order...
           </>
         ) : `Pay ₦${productPrice.toLocaleString()}`}
       </button>
@@ -211,9 +399,52 @@ export default function CheckoutForm({
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
         <p className="text-xs" style={{ color: s ? `${textColor}50` : undefined }}>
-          Secure payment powered by Paystack
+          Secure bank transfer
         </p>
       </div>
     </form>
+  );
+}
+
+function BankDetailRow({
+  label,
+  value,
+  copied,
+  onCopy,
+  textColor,
+  s,
+  mono,
+}: {
+  label: string;
+  value: string;
+  copied: boolean;
+  onCopy: () => void;
+  textColor: string;
+  s: CheckoutSettings;
+  mono?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-[11px]" style={{ color: s ? `${textColor}50` : "#9ca3af" }}>{label}</p>
+        <p
+          className={`text-sm font-semibold ${mono ? "font-mono tracking-wider" : ""}`}
+          style={{ color: s ? textColor : "#111827" }}
+        >
+          {value}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="text-xs px-2.5 py-1 rounded-lg transition-all font-medium"
+        style={{
+          background: copied ? "#dcfce7" : s ? `${textColor}08` : "#f3f4f6",
+          color: copied ? "#16a34a" : s ? `${textColor}60` : "#6b7280",
+        }}
+      >
+        {copied ? "Copied!" : "Copy"}
+      </button>
+    </div>
   );
 }
