@@ -80,7 +80,7 @@ export default function HomePage() {
         </div>
 
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-5">
-          Free to start. 3 product slots. ₦5,000/mo for unlimited.
+          Free to start. 3 product slots. Premium for unlimited. Pro+ for power sellers.
         </p>
       </section>
 
@@ -204,11 +204,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Pricing</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-              Start free, upgrade when ready
+              Start free, scale as you grow
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Free */}
             <div className="bg-white dark:bg-[#141414] border border-gray-200/80 dark:border-white/[0.06] rounded-2xl p-8 transition-all hover:shadow-card dark:hover:shadow-card-dark">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Free</h3>
@@ -290,6 +290,53 @@ export default function HomePage() {
                 className="block text-center bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 active:scale-[0.98]"
               >
                 Start free trial
+              </Link>
+            </div>
+
+            {/* Pro+ */}
+            <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8 relative transition-all hover:shadow-lg hover:shadow-brand-500/10">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Pro+</h3>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-gray-900 dark:text-white">₦10,000</span>
+                <span className="text-sm text-gray-400">/mo</span>
+              </div>
+              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-gray-400 mb-8">
+                <li className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
+                  </div>
+                  Everything in Premium
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
+                  </div>
+                  Multiple stores
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
+                  </div>
+                  Promo / discount codes
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
+                  </div>
+                  Product variants (size, color)
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
+                  </div>
+                  Advanced analytics
+                </li>
+              </ul>
+              <Link
+                href="/signup"
+                className="block text-center border border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl transition-all active:scale-[0.98]"
+              >
+                Get started
               </Link>
             </div>
           </div>
