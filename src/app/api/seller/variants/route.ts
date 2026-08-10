@@ -1,0 +1,143 @@
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+  const supabase = createClient();
+  const { searchParams } = new URL(request.url);
+  const product_id = searchParams.get("product_id");
+
+  if (!product_id) {
+    return NextResponse.json({ error: "Missing product_id" }, { status: 400 });
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { data: product } = await supabase
+    .from("products")
+    .select("id")
+    .eq("id", product_id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!product) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  const { data, error } = await supabase
+    .from("product_variants")
+    .select("*")
+    .eq("product_id", product_id)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ variants: data });
+}
+
+export async function POST(request: Request) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { product_id, name, stock, price_override } = body;
+
+  if (!product_id || !name) {
+    return NextResponse.json(
+      { error: "Missing product_id or name" },
+      { status: 400 }
+    );
+  }
+
+  const { data: product } = await supabase
+    .from("products")
+    .select("id")
+    .eq("id", product_id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!product) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  const { data, error } = await supabase
+    .from("product_variants")
+    .insert({
+      product_id,
+      name,
+      stock: stock != null ? stock : null,
+      price_override: price_override != null && price_override !== "" ? price_override : null,
+      is_active: true,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ variant: data });
+}
+
+export async function DELETE(request: Request) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { id } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing variant id" }, { status: 400 });
+  }
+
+  const { data: variant } = await supabase
+    .from("product_variants")
+    .select("product_id")
+    .eq("id", id)
+    .single();
+
+  if (!variant) {
+    return NextResponse.json({ error: "Variant not found" }, { status: 404 });
+  }
+
+  const { data: product } = await supabase
+    .from("products")
+    .select("id")
+    .eq("id", variant.product_id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!product) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+
+  const { error } = await supabase
+    .from("product_variants")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}

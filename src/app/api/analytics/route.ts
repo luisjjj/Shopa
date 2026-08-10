@@ -53,6 +53,10 @@ export async function GET() {
   const totalPending = allOrders?.filter((o) => !o.paid).length || 0;
   const totalFulfilled = allOrders?.filter((o) => o.fulfilled).length || 0;
 
+  const weekOrderCount = (weekOrders || []).length;
+  const monthOrderCount = (monthOrders || []).length;
+  const avgOrderValue = totalPaid > 0 ? Math.round(totalRevenue / totalPaid) : 0;
+
   const productSales: Record<string, { name: string; count: number; revenue: number }> = {};
   for (const order of allPaidOrders || []) {
     if (!productSales[order.product_id]) {
@@ -95,5 +99,8 @@ export async function GET() {
     productCount: productCount ?? 0,
     topProducts,
     dailyRevenue,
+    weekOrderCount,
+    monthOrderCount,
+    avgOrderValue,
   });
 }

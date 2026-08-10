@@ -2,12 +2,15 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
 import BankPicker from "@/components/BankPicker";
 
 export default function OnboardingPage() {
+  const [existingStore, setExistingStore] = useState<string | null>(null);
+  const [isProPlus, setIsProPlus] = useState(false);
+  const [createNew, setCreateNew] = useState(false);
   const [username, setUsername] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [bankName, setBankName] = useState("");
@@ -20,6 +23,27 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
+
+  useEffect(() => {
+    const checkExisting = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("users")
+        .select("username, is_pro_plus")
+        .eq("email", user.email!)
+        .maybeSingle();
+
+      if (data) {
+        setExistingStore(data.username);
+        setIsProPlus(data.is_pro_plus);
+      }
+    };
+    checkExisting();
+  }, [supabase]);
 
   const checkUsername = async (value: string) => {
     setUsername(value);
@@ -70,6 +94,53 @@ export default function OnboardingPage() {
     router.push("/dashboard");
   };
 
+  if (existingStore && !createNew) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
+        <div className="w-full max-w-md">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={toggle}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+            </button>
+          </div>
+
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-brand-600">Shopa</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">You already have a store</p>
+          </div>
+
+          <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-8 text-center">
+            <p className="text-gray-700 dark:text-gray-300 mb-2">
+              You already have a store:
+            </p>
+            <p className="text-lg font-bold text-brand-600 mb-6">{existingStore}</p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 rounded-xl transition-colors"
+              >
+                Go to dashboard
+              </button>
+              {isProPlus && (
+                <button
+                  onClick={() => setCreateNew(true)}
+                  className="w-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300 font-medium py-3 rounded-xl transition-colors"
+                >
+                  Create another store
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
       <div className="w-full max-w-md">
@@ -85,7 +156,9 @@ export default function OnboardingPage() {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-brand-600">Shopa</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Set up your store</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
+            {createNew ? "Create another store" : "Set up your store"}
+          </p>
         </div>
 
         <form

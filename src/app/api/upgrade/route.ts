@@ -6,6 +6,9 @@ export async function POST(request: Request) {
   const supabase = createClient();
   const { origin } = new URL(request.url);
 
+  const body = await request.json().catch(() => ({}));
+  const plan = body.plan === "pro_plus" ? "pro_plus" : "premium";
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -20,15 +23,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
   }
 
-  const reference = `shopa_upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const reference = `shopa_${plan}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const amount = plan === "pro_plus" ? 10000 : 5000;
 
   const result = await initializeTransaction({
     email,
-    amount: 5000,
+    amount,
     callback_url: `${origin}/api/upgrade/verify?reference=${reference}`,
     reference,
     metadata: {
-      type: "subscription_upgrade",
+      type: plan === "pro_plus" ? "subscription_pro_plus" : "subscription_upgrade",
+      plan,
       userId: user.id,
     },
   });

@@ -14,6 +14,9 @@ interface Analytics {
   productCount: number;
   topProducts: { name: string; count: number; revenue: number }[];
   dailyRevenue: { date: string; revenue: number }[];
+  weekOrderCount: number;
+  monthOrderCount: number;
+  avgOrderValue: number;
 }
 
 export function AnalyticsSection() {
@@ -56,6 +59,26 @@ export function AnalyticsSection() {
           label="Fulfilled"
           value={String(data.totalFulfilled)}
           sub={`of ${data.totalPaid} paid`}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+        <StatCard
+          icon={<WalletIcon size={16} className="text-brand-600" />}
+          label="Avg Order"
+          value={`₦${data.avgOrderValue.toLocaleString()}`}
+        />
+        <StatCard
+          icon={<PackageIcon size={16} className="text-brand-600" />}
+          label="This Week"
+          value={String(data.weekOrderCount)}
+          sub={`of ${data.totalOrders} total`}
+        />
+        <StatCard
+          icon={<PackageIcon size={16} className="text-brand-600" />}
+          label="This Month"
+          value={String(data.monthOrderCount)}
+          sub={`of ${data.totalOrders} total`}
         />
       </div>
 

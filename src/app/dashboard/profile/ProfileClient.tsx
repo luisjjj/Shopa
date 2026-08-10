@@ -23,6 +23,8 @@ interface ProfileProps {
   accountName: string;
   isPremium: boolean;
   premiumUntil: string | null;
+  isProPlus: boolean;
+  proPlusUntil: string | null;
   createdAt: string;
 }
 
@@ -35,6 +37,8 @@ export default function ProfileClient({
   accountName,
   isPremium,
   premiumUntil,
+  isProPlus,
+  proPlusUntil,
   createdAt,
 }: ProfileProps) {
   const [phone, setPhone] = useState(whatsappNumber);
@@ -72,8 +76,12 @@ export default function ProfileClient({
     setSaving(false);
   };
 
-  const daysLeft = premiumUntil
+  const premiumDaysLeft = premiumUntil
     ? Math.max(0, Math.ceil((new Date(premiumUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  const proPlusDaysLeft = proPlusUntil
+    ? Math.max(0, Math.ceil((new Date(proPlusUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
 
   return (
@@ -222,8 +230,33 @@ export default function ProfileClient({
           <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Plan</h2>
           </div>
-          <div className="p-5">
-            {isPremium ? (
+          <div className="p-5 space-y-4">
+            {isProPlus && (
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <SparkleIcon className="text-brand-600" size={16} />
+                    <span className="text-sm font-semibold text-brand-600">Pro+</span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {proPlusUntil && (
+                      <>
+                        Renews {new Date(proPlusUntil).toLocaleDateString("en-NG", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                        {proPlusDaysLeft > 0 && ` (${proPlusDaysLeft} days left)`}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <span className="text-xs px-2.5 py-1 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 font-medium">
+                  Active
+                </span>
+              </div>
+            )}
+            {isPremium && !isProPlus && (
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -238,7 +271,7 @@ export default function ProfileClient({
                           day: "numeric",
                           year: "numeric",
                         })}
-                        {daysLeft > 0 && ` (${daysLeft} days left)`}
+                        {premiumDaysLeft > 0 && ` (${premiumDaysLeft} days left)`}
                       </>
                     )}
                   </p>
@@ -247,7 +280,8 @@ export default function ProfileClient({
                   Active
                 </span>
               </div>
-            ) : (
+            )}
+            {!isPremium && !isProPlus && (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">Free plan</p>
@@ -262,6 +296,14 @@ export default function ProfileClient({
                   Upgrade →
                 </Link>
               </div>
+            )}
+            {(isPremium || isProPlus) && (
+              <Link
+                href="/dashboard/upgrade"
+                className="text-sm font-medium text-brand-600 hover:text-brand-700 block"
+              >
+                Manage plan →
+              </Link>
             )}
           </div>
         </section>

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PackageIcon } from "@/components/Icons";
+import { ProductRating } from "./ProductRating";
 
 type Props = {
   params: { username: string };
@@ -474,6 +475,7 @@ export default async function StorePage({
                   >
                     ₦{product.price.toLocaleString()}
                   </p>
+                  <ProductRating productId={product.id} />
                 </div>
               </a>
             ))}

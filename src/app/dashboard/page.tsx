@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PackageIcon, CheckIcon, PaletteIcon, UserIcon } from "@/components/Icons";
+import { PackageIcon, CheckIcon, PaletteIcon, UserIcon, WarningIcon } from "@/components/Icons";
+import { PromoCodesSection } from "@/components/PromoCodesSection";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBanner } from "@/components/NotificationBanner";
 import { AnalyticsSection } from "@/components/AnalyticsSection";
+import { RemindButton } from "@/components/RemindButton";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -30,7 +32,25 @@ export default async function DashboardPage() {
 
   const productCount = count ?? 0;
   const isPremium = profile.is_premium;
+  const isProPlus = profile.is_pro_plus;
   const canAddProduct = isPremium || productCount < 3;
+
+  let stores: { id: string; username: string }[] = [];
+  if (isProPlus) {
+    const { data } = await supabase
+      .from("users")
+      .select("id, username")
+      .eq("email", profile.email);
+    stores = data || [];
+  }
+
+  const { data: lowStockProducts } = await supabase
+    .from("products")
+    .select("id, name, stock")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .gt("stock", 0)
+    .lte("stock", 3);
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
@@ -47,6 +67,35 @@ export default async function DashboardPage() {
             <span className="text-lg font-bold text-gray-900 dark:text-white">Shopa</span>
           </Link>
           <div className="flex items-center gap-2">
+            {isProPlus && stores.length > 1 && (
+              <div className="relative group">
+                <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] flex items-center gap-1.5">
+                  <span className="max-w-[100px] truncate">{profile.username}</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
+                </button>
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-xl shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-30 min-w-[180px]">
+                  {stores.map((store) => (
+                    <Link
+                      key={store.id}
+                      href="/dashboard"
+                      className={`block px-4 py-2 text-sm transition-colors ${
+                        store.id === user.id
+                          ? "text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-brand-950/30"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
+                      }`}
+                    >
+                      {store.username}
+                    </Link>
+                  ))}
+                  <Link
+                    href="/onboarding"
+                    className="block px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border-t border-gray-100 dark:border-white/10 mt-1"
+                  >
+                    + New store
+                  </Link>
+                </div>
+              </div>
+            )}
             <Link
               href={`/${profile.username}`}
               target="_blank"
@@ -86,6 +135,24 @@ export default async function DashboardPage() {
         </div>
 
         <NotificationBanner />
+
+        {lowStockProducts && lowStockProducts.length > 0 && (
+          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-2xl p-5 mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <WarningIcon className="text-amber-600 dark:text-amber-400" size={16} />
+              <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                Low Stock Warning
+              </p>
+            </div>
+            <div className="space-y-1">
+              {lowStockProducts.map((p) => (
+                <p key={p.id} className="text-xs text-amber-600/80 dark:text-amber-400/70">
+                  {p.name} — {p.stock} remaining
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
 
         <AnalyticsSection />
 
@@ -161,8 +228,24 @@ export default async function DashboardPage() {
 
         {/* Orders Section */}
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Orders</h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Orders</h2>
+            <a
+              href="/api/orders/export"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Export CSV
+            </a>
+          </div>
           <OrderList userId={user.id} />
+        </div>
+
+        {/* Promo Codes Section */}
+        <div className="mt-10">
+          <PromoCodesSection />
         </div>
       </main>
     </div>
@@ -315,6 +398,13 @@ async function OrderList({ userId }: { userId: string }) {
                   {product?.name || "Unknown product"}
                 </span>
               </div>
+              {order.delivery_address && (
+                <div className="mt-0.5">
+                  <span className="text-[10px] text-gray-300 dark:text-gray-600 truncate block">
+                    📍 {order.delivery_address}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="text-right shrink-0">
@@ -341,6 +431,10 @@ async function OrderList({ userId }: { userId: string }) {
                 )}
               </div>
             </div>
+
+            {!order.paid && !order.confirmed_by_buyer && (
+              <RemindButton orderId={order.id} createdAt={order.created_at} buyerPhone={order.buyer_phone} />
+            )}
 
             {order.paid && order.buyer_phone && (
               <a

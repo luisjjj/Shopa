@@ -13,6 +13,13 @@ type CheckoutSettings = {
   cardStyle: string;
 } | null;
 
+type Variant = {
+  id: string;
+  name: string;
+  stock: number | null;
+  price_override: number | null;
+};
+
 type Props = {
   productId: string;
   productName: string;
@@ -22,7 +29,10 @@ type Props = {
   bankName: string;
   accountNumber: string;
   accountName: string;
+  hasVariants: boolean;
+  variants: Variant[];
   settings: CheckoutSettings;
+  onDiscountApplied?: (promoId: string, discount: number) => void;
 };
 
 function getCardRadius(radius: string): string {
@@ -45,12 +55,30 @@ export default function CheckoutForm({
   bankName,
   accountNumber,
   accountName,
+  hasVariants,
+  variants,
   settings,
 }: Props) {
   const [buyerName, setBuyerName] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [showPromo, setShowPromo] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    id: string;
+    code: string;
+    discount_percent: number | null;
+    discount_amount: number | null;
+  } | null>(null);
+
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
+    variants.length > 0 ? variants[0].id : null
+  );
 
   const [showModal, setShowModal] = useState(false);
   const [orderId, setOrderId] = useState("");
@@ -65,6 +93,17 @@ export default function CheckoutForm({
   const cardRadius = getCardRadius(s?.cardBorderRadius || "md");
   const hasBordered = s?.cardStyle === "bordered" || s?.cardStyle === "outlined";
   const hasShadow = s?.cardStyle === "shadow";
+
+  const selectedVariant = hasVariants
+    ? variants.find((v) => v.id === selectedVariantId)
+    : null;
+  const basePrice = selectedVariant?.price_override ?? productPrice;
+  const discountAmount = appliedPromo
+    ? appliedPromo.discount_percent
+      ? Math.round((basePrice * appliedPromo.discount_percent) / 100)
+      : appliedPromo.discount_amount || 0
+    : 0;
+  const displayPrice = Math.max(0, basePrice - discountAmount);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -81,6 +120,40 @@ export default function CheckoutForm({
     setTimeout(() => setCopied(null), 1500);
   }, []);
 
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    setPromoError("");
+
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoCode.trim(), seller_id: sellerId }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setPromoError(data.error);
+        setPromoLoading(false);
+        return;
+      }
+
+      setAppliedPromo(data);
+      setPromoLoading(false);
+    } catch {
+      setPromoError("Failed to validate promo code");
+      setPromoLoading(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode("");
+    setPromoError("");
+  };
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -95,8 +168,11 @@ export default function CheckoutForm({
           sellerId,
           buyerName,
           buyerPhone,
-          amount: productPrice,
+          amount: displayPrice,
           productName,
+          promoCodeId: appliedPromo?.id || null,
+          discount: discountAmount,
+          variantId: selectedVariantId,
         }),
       });
 
@@ -129,7 +205,7 @@ export default function CheckoutForm({
     const params = new URLSearchParams({
       status: "success",
       product: productName,
-      amount: productPrice.toString(),
+      amount: displayPrice.toString(),
       buyer: buyerName,
       reference,
       seller: sellerId,
@@ -203,9 +279,22 @@ export default function CheckoutForm({
                 <p className="text-xs uppercase tracking-wider font-medium mb-1" style={{ color: s ? `${textColor}60` : "#9ca3af" }}>
                   Amount to pay
                 </p>
+                {discountAmount > 0 && (
+                  <p className="text-sm line-through mb-0.5" style={{ color: s ? `${textColor}40` : "#d1d5db" }}>
+                    ₦{productPrice.toLocaleString()}
+                  </p>
+                )}
                 <p className="text-3xl font-bold" style={{ color: s ? textColor : "#111827" }}>
-                  ₦{productPrice.toLocaleString()}
+                  ₦{displayPrice.toLocaleString()}
                 </p>
+                {discountAmount > 0 && (
+                  <p className="text-xs font-medium mt-1" style={{ color: "#16a34a" }}>
+                    {appliedPromo?.discount_percent
+                      ? `${appliedPromo.discount_percent}% off`
+                      : `₦${discountAmount.toLocaleString()} off`}
+                    {" "}&mdash; {appliedPromo?.code}
+                  </p>
+                )}
               </div>
 
               {/* Bank details */}
@@ -293,6 +382,55 @@ export default function CheckoutForm({
         Complete your order
       </h2>
 
+      {/* Variant Selector */}
+      {hasVariants && variants.length > 0 && (
+        <div className="mb-5">
+          <label
+            className="block text-sm font-medium mb-2"
+            style={{ color: s ? `${textColor}bb` : undefined }}
+          >
+            Choose a variant
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {variants.map((v) => {
+              const isSelected = selectedVariantId === v.id;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelectedVariantId(v.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+                    isSelected
+                      ? "border-transparent text-white"
+                      : s
+                        ? "border-current"
+                        : "border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/20"
+                  }`}
+                  style={
+                    s
+                      ? {
+                          background: isSelected ? primaryColor : "transparent",
+                          color: isSelected ? "#fff" : `${textColor}bb`,
+                          borderColor: isSelected ? "transparent" : `${textColor}20`,
+                        }
+                      : isSelected
+                        ? { background: primaryColor }
+                        : undefined
+                  }
+                >
+                  {v.name}
+                  {v.price_override != null && (
+                    <span className="ml-1 opacity-70">
+                      ₦{v.price_override.toLocaleString()}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="mb-4">
         <label
           className="block text-sm font-medium mb-2"
@@ -349,6 +487,112 @@ export default function CheckoutForm({
         />
       </div>
 
+      <div className="mb-6">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: s ? `${textColor}bb` : undefined }}
+        >
+          Delivery address <span className="opacity-50">(optional)</span>
+        </label>
+        <textarea
+          value={deliveryAddress}
+          onChange={(e) => setDeliveryAddress(e.target.value)}
+          rows={2}
+          className={s ? "" : "input-base"}
+          style={s ? {
+            width: "100%",
+            padding: "0.625rem 0.875rem",
+            borderRadius: "0.75rem",
+            border: `1px solid ${textColor}20`,
+            background: `${textColor}05`,
+            color: textColor,
+            fontSize: "inherit",
+            fontFamily: "inherit",
+            outline: "none",
+            resize: "none",
+          } : undefined}
+          placeholder="Where should we deliver?"
+        />
+      </div>
+
+      {/* Promo Code Section */}
+      <div className="mb-5">
+        {!showPromo && !appliedPromo && (
+          <button
+            type="button"
+            onClick={() => setShowPromo(true)}
+            className="text-sm font-medium transition-colors"
+            style={{ color: s ? primaryColor : undefined }}
+          >
+            Have a promo code?
+          </button>
+        )}
+
+        {showPromo && !appliedPromo && (
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoError(""); }}
+              placeholder="Enter code"
+              className={s ? "" : "flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 font-mono tracking-wide"}
+              style={s ? {
+                flex: 1,
+                padding: "0.625rem 0.875rem",
+                borderRadius: "0.75rem",
+                border: `1px solid ${textColor}20`,
+                background: `${textColor}05`,
+                color: textColor,
+                fontSize: "inherit",
+                fontFamily: "monospace",
+                letterSpacing: "0.05em",
+                outline: "none",
+              } : undefined}
+            />
+            <button
+              type="button"
+              onClick={handleApplyPromo}
+              disabled={promoLoading || !promoCode.trim()}
+              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+              style={{
+                background: primaryColor,
+                color: "#fff",
+              }}
+            >
+              {promoLoading ? "..." : "Apply"}
+            </button>
+          </div>
+        )}
+
+        {appliedPromo && (
+          <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 rounded-xl px-3.5 py-2.5">
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 dark:text-green-400 text-sm font-medium">
+                {appliedPromo.code}
+              </span>
+              <span className="text-green-600 dark:text-green-400 text-xs">
+                &mdash; {appliedPromo.discount_percent
+                  ? `${appliedPromo.discount_percent}% off`
+                  : `₦${appliedPromo.discount_amount?.toLocaleString()} off`}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemovePromo}
+              className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {promoError && (
+          <p className="text-xs text-red-500 mt-1.5">{promoError}</p>
+        )}
+      </div>
+
       {error && (
         <div
           className={`rounded-xl px-4 py-3 mb-5 ${s ? "" : "bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50"}`}
@@ -391,7 +635,7 @@ export default function CheckoutForm({
             </svg>
             Creating order...
           </>
-        ) : `Pay ₦${productPrice.toLocaleString()}`}
+        ) : `Pay ₦${displayPrice.toLocaleString()}`}
       </button>
 
       <div className="flex items-center justify-center gap-2 mt-4">

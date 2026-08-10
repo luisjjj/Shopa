@@ -20,6 +20,9 @@ export interface Database {
           account_name: string | null;
           is_premium: boolean;
           premium_until: string | null;
+          is_pro_plus: boolean;
+          pro_plus_until: string | null;
+          store_count: number;
           created_at: string;
         };
         Insert: {
@@ -32,6 +35,9 @@ export interface Database {
           account_name?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
+          is_pro_plus?: boolean;
+          pro_plus_until?: string | null;
+          store_count?: number;
           created_at?: string;
         };
         Update: {
@@ -44,6 +50,9 @@ export interface Database {
           account_name?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
+          is_pro_plus?: boolean;
+          pro_plus_until?: string | null;
+          store_count?: number;
           created_at?: string;
         };
       };
@@ -57,6 +66,8 @@ export interface Database {
           description: string | null;
           is_active: boolean;
           stock: number | null;
+          category: string | null;
+          has_variants: boolean;
           created_at: string;
         };
         Insert: {
@@ -68,6 +79,8 @@ export interface Database {
           description?: string | null;
           is_active?: boolean;
           stock?: number | null;
+          category?: string | null;
+          has_variants?: boolean;
           created_at?: string;
         };
         Update: {
@@ -79,6 +92,104 @@ export interface Database {
           description?: string | null;
           is_active?: boolean;
           stock?: number | null;
+          category?: string | null;
+          has_variants?: boolean;
+          created_at?: string;
+        };
+      };
+      product_variants: {
+        Row: {
+          id: string;
+          product_id: string;
+          name: string;
+          stock: number;
+          price_override: number | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          name: string;
+          stock?: number;
+          price_override?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          name?: string;
+          stock?: number;
+          price_override?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+      };
+      product_reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          order_id: string | null;
+          buyer_name: string;
+          rating: number;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          order_id?: string | null;
+          buyer_name: string;
+          rating: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          order_id?: string | null;
+          buyer_name?: string;
+          rating?: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+      };
+      promo_codes: {
+        Row: {
+          id: string;
+          seller_id: string;
+          code: string;
+          discount_percent: number | null;
+          discount_amount: number | null;
+          max_uses: number;
+          used_count: number;
+          expires_at: string | null;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          seller_id: string;
+          code: string;
+          discount_percent?: number | null;
+          discount_amount?: number | null;
+          max_uses?: number;
+          used_count?: number;
+          expires_at?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          seller_id?: string;
+          code?: string;
+          discount_percent?: number | null;
+          discount_amount?: number | null;
+          max_uses?: number;
+          used_count?: number;
+          expires_at?: string | null;
+          is_active?: boolean;
           created_at?: string;
         };
       };
@@ -216,6 +327,9 @@ export interface Database {
           paid: boolean;
           confirmed_by_buyer: boolean;
           fulfilled: boolean;
+          delivery_address: string | null;
+          promo_code_id: string | null;
+          variant_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -229,6 +343,9 @@ export interface Database {
           paid?: boolean;
           confirmed_by_buyer?: boolean;
           fulfilled?: boolean;
+          delivery_address?: string | null;
+          promo_code_id?: string | null;
+          variant_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -242,6 +359,9 @@ export interface Database {
           paid?: boolean;
           confirmed_by_buyer?: boolean;
           fulfilled?: boolean;
+          delivery_address?: string | null;
+          promo_code_id?: string | null;
+          variant_id?: string | null;
           created_at?: string;
         };
       };

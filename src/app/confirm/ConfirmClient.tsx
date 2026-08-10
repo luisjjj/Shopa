@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircleIcon, XCircleIcon } from "@/components/Icons";
+import { useState } from "react";
+import { CheckCircleIcon, XCircleIcon, StarIcon } from "@/components/Icons";
 
 type Props = {
   status: string | null;
@@ -101,6 +102,15 @@ export default function ConfirmClient({
             <p className="text-xs mt-4" style={{ color: hasSettings ? `${textColor}40` : "#9ca3af" }}>
               Include your name and order reference when messaging
             </p>
+
+            {/* Review Section */}
+            <ReviewSection
+              productId={null}
+              orderId={reference}
+              buyerName={buyer || ""}
+              hasSettings={hasSettings}
+              textColor={textColor}
+            />
           </div>
         ) : (
           <div
@@ -128,6 +138,119 @@ export default function ConfirmClient({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ReviewSection({
+  productId,
+  orderId,
+  buyerName,
+  hasSettings,
+  textColor,
+}: {
+  productId: string | null;
+  orderId: string | null;
+  buyerName: string;
+  hasSettings: boolean;
+  textColor: string;
+}) {
+  const [rating, setRating] = useState(0);
+  const [hovered, setHovered] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (rating === 0) return;
+    setLoading(true);
+    try {
+      await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: productId,
+          order_id: orderId,
+          buyer_name: buyerName,
+          rating,
+          comment: comment || undefined,
+        }),
+      });
+      setSubmitted(true);
+    } catch {}
+    setLoading(false);
+  };
+
+  if (submitted) {
+    return (
+      <div
+        className={`mt-6 pt-6 border-t ${hasSettings ? "" : "border-gray-100 dark:border-white/[0.06]"}`}
+        style={hasSettings ? { borderColor: `${textColor}15` } : undefined}
+      >
+        <p className="text-sm font-medium text-center" style={{ color: hasSettings ? `${textColor}80` : undefined }}>
+          Thanks for your review!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`mt-6 pt-6 border-t ${hasSettings ? "" : "border-gray-100 dark:border-white/[0.06]"}`}
+      style={hasSettings ? { borderColor: `${textColor}15` } : undefined}
+    >
+      <p className="text-sm font-medium mb-3" style={{ color: hasSettings ? textColor : undefined }}>
+        Rate your experience
+      </p>
+
+      <div className="flex items-center gap-1 mb-3">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onMouseEnter={() => setHovered(star)}
+            onMouseLeave={() => setHovered(0)}
+            onClick={() => setRating(star)}
+            className="p-0.5 transition-transform hover:scale-110"
+          >
+            <StarIcon
+              size={24}
+              style={{
+                color: (hovered || rating) >= star ? "#f59e0b" : hasSettings ? `${textColor}25` : "#d1d5db",
+                fill: (hovered || rating) >= star ? "#f59e0b" : "transparent",
+              }}
+            />
+          </button>
+        ))}
+      </div>
+
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Optional comment..."
+        rows={2}
+        className={`w-full text-sm rounded-xl px-3 py-2.5 mb-3 ${hasSettings ? "" : "bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder-gray-400"}`}
+        style={hasSettings ? {
+          background: `${textColor}05`,
+          border: `1px solid ${textColor}15`,
+          color: textColor,
+          outline: "none",
+          resize: "none",
+        } : undefined}
+      />
+
+      <button
+        onClick={handleSubmit}
+        disabled={rating === 0 || loading}
+        className={`text-sm font-semibold px-5 py-2.5 rounded-xl transition-all ${hasSettings ? "" : "bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"}`}
+        style={hasSettings ? {
+          background: rating > 0 ? "#ed7712" : `${textColor}15`,
+          color: rating > 0 ? "#fff" : `${textColor}40`,
+          cursor: rating > 0 ? "pointer" : "not-allowed",
+        } : undefined}
+      >
+        {loading ? "Submitting..." : "Submit review"}
+      </button>
     </div>
   );
 }

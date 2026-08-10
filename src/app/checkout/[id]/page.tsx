@@ -49,12 +49,23 @@ export default async function CheckoutPage({ params }: Props) {
 
   const { data: product } = await supabase
     .from("products")
-    .select("id, name, price, image_url, description, user_id")
+    .select("id, name, price, image_url, description, user_id, has_variants")
     .eq("id", params.id)
     .eq("is_active", true)
     .single();
 
   if (!product) notFound();
+
+  let variants: { id: string; name: string; stock: number | null; price_override: number | null }[] = [];
+  if (product.has_variants) {
+    const { data } = await supabase
+      .from("product_variants")
+      .select("id, name, stock, price_override")
+      .eq("product_id", product.id)
+      .eq("is_active", true)
+      .order("created_at", { ascending: true });
+    variants = data || [];
+  }
 
   const { data: seller } = await supabase
     .from("users")
@@ -148,6 +159,8 @@ export default async function CheckoutPage({ params }: Props) {
           bankName={seller?.bank_name || ""}
           accountNumber={seller?.account_number || ""}
           accountName={seller?.account_name || ""}
+          hasVariants={product.has_variants || false}
+          variants={variants}
           settings={s ? {
             primaryColor,
             bgColor,

@@ -18,24 +18,44 @@ export async function GET(request: Request) {
     const supabase = createClient();
 
     const userId = result.data.metadata?.userId;
+    const plan = result.data.metadata?.plan || "premium";
 
     if (userId) {
-      const premiumUntil = new Date();
-      premiumUntil.setDate(premiumUntil.getDate() + 30);
+      const until = new Date();
+      until.setDate(until.getDate() + 30);
 
-      const { error } = await supabase
-        .from("users")
-        .update({
-          is_premium: true,
-          premium_until: premiumUntil.toISOString(),
-        })
-        .eq("id", userId);
+      if (plan === "pro_plus") {
+        const { error } = await supabase
+          .from("users")
+          .update({
+            is_pro_plus: true,
+            pro_plus_until: until.toISOString(),
+            is_premium: true,
+            premium_until: until.toISOString(),
+          })
+          .eq("id", userId);
 
-      if (error) {
-        console.error("Failed to upgrade user:", error);
-        return NextResponse.redirect(
-          `${origin}/dashboard?upgrade=error&message=Failed+to+update+profile`
-        );
+        if (error) {
+          console.error("Failed to upgrade user:", error);
+          return NextResponse.redirect(
+            `${origin}/dashboard?upgrade=error&message=Failed+to+update+profile`
+          );
+        }
+      } else {
+        const { error } = await supabase
+          .from("users")
+          .update({
+            is_premium: true,
+            premium_until: until.toISOString(),
+          })
+          .eq("id", userId);
+
+        if (error) {
+          console.error("Failed to upgrade user:", error);
+          return NextResponse.redirect(
+            `${origin}/dashboard?upgrade=error&message=Failed+to+update+profile`
+          );
+        }
       }
 
       return NextResponse.redirect(

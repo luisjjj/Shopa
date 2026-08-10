@@ -4,6 +4,13 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 
+type Variant = {
+  id: string;
+  name: string;
+  stock: string;
+  price_override: string;
+};
+
 export default function NewProductPage() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -13,6 +20,8 @@ export default function NewProductPage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variants, setVariants] = useState<Variant[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
@@ -48,6 +57,23 @@ export default function NewProductPage() {
     setUploading(false);
   };
 
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      { id: crypto.randomUUID(), name: "", stock: "", price_override: "" },
+    ]);
+  };
+
+  const updateVariant = (id: string, field: keyof Variant, value: string) => {
+    setVariants((v) =>
+      v.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
+  };
+
+  const removeVariant = (id: string) => {
+    setVariants((v) => v.filter((row) => row.id !== id));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -61,19 +87,40 @@ export default function NewProductPage() {
       return;
     }
 
-    const { error: insertError } = await supabase.from("products").insert({
-      user_id: user.id,
-      name,
-      price: parseInt(price),
-      description: description || null,
-      image_url: imageUrl || null,
-      stock: stock ? parseInt(stock) : null,
-    });
+    const { data: product, error: insertError } = await supabase
+      .from("products")
+      .insert({
+        user_id: user.id,
+        name,
+        price: parseInt(price),
+        description: description || null,
+        image_url: imageUrl || null,
+        stock: stock ? parseInt(stock) : null,
+        has_variants: hasVariants,
+      })
+      .select("id")
+      .single();
 
     if (insertError) {
       setError(insertError.message);
       setSaving(false);
       return;
+    }
+
+    if (hasVariants && variants.length > 0) {
+      for (const v of variants) {
+        if (!v.name) continue;
+        await fetch("/api/seller/variants", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            name: v.name,
+            stock: v.stock ? parseInt(v.stock) : null,
+            price_override: v.price_override ? parseInt(v.price_override) : null,
+          }),
+        });
+      }
     }
 
     router.push("/dashboard");
@@ -185,19 +232,21 @@ export default function NewProductPage() {
           </div>
 
           {/* Stock */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
-            </label>
-            <input
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              className="input-base"
-              placeholder="e.g. 10"
-              min="0"
-            />
-          </div>
+          {!hasVariants && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
+              </label>
+              <input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="input-base"
+                placeholder="e.g. 10"
+                min="0"
+              />
+            </div>
+          )}
 
           {/* Description */}
           <div className="mb-6">
@@ -212,6 +261,86 @@ export default function NewProductPage() {
               placeholder="Tell buyers about this product..."
             />
           </div>
+
+          {/* Variants Toggle */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                setHasVariants(!hasVariants);
+                if (!hasVariants) setStock("");
+              }}
+              className="flex items-center gap-3 w-full text-left"
+            >
+              <div
+                className={`w-11 h-6 rounded-full transition-all relative ${
+                  hasVariants ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                    hasVariants ? "translate-x-5" : ""
+                  }`}
+                />
+              </div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                This product has variants (size, color, etc.)
+              </span>
+            </button>
+          </div>
+
+          {/* Variant Inputs */}
+          {hasVariants && (
+            <div className="mb-6 space-y-3">
+              {variants.map((v) => (
+                <div key={v.id} className="flex items-start gap-2">
+                  <input
+                    type="text"
+                    value={v.name}
+                    onChange={(e) => updateVariant(v.id, "name", e.target.value)}
+                    className="input-base flex-1"
+                    placeholder="e.g. Red / XL"
+                    required
+                  />
+                  <input
+                    type="number"
+                    value={v.stock}
+                    onChange={(e) => updateVariant(v.id, "stock", e.target.value)}
+                    className="input-base w-24"
+                    placeholder="Stock"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    value={v.price_override}
+                    onChange={(e) => updateVariant(v.id, "price_override", e.target.value)}
+                    className="input-base w-32"
+                    placeholder="₦ Override"
+                    min="0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(v.id)}
+                    className="mt-2 text-red-400 hover:text-red-600 transition-colors p-1"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addVariant}
+                className="inline-flex items-center gap-1.5 text-sm text-brand-500 hover:text-brand-600 font-medium transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Add variant
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">

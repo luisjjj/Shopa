@@ -4,6 +4,14 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
+type Variant = {
+  id: string;
+  name: string;
+  stock: string;
+  price_override: string;
+  serverId?: string;
+};
+
 export default function EditProductPage({
   params,
 }: {
@@ -19,6 +27,9 @@ export default function EditProductPage({
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [deletedVariantIds, setDeletedVariantIds] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
@@ -37,7 +48,28 @@ export default function EditProductPage({
         setImageUrl(data.image_url || "");
         setStock(data.stock != null ? String(data.stock) : "");
         setIsActive(data.is_active);
+        setHasVariants(data.has_variants || false);
       }
+
+      const { data: existingVariants } = await supabase
+        .from("product_variants")
+        .select("*")
+        .eq("product_id", params.id)
+        .order("created_at", { ascending: true });
+
+      if (existingVariants) {
+        setVariants(
+          existingVariants.map((v: Record<string, unknown>) => ({
+            id: crypto.randomUUID(),
+            serverId: v.id as string,
+            name: v.name as string,
+            stock: v.stock != null ? String(v.stock) : "",
+            price_override:
+              v.price_override != null ? String(v.price_override) : "",
+          }))
+        );
+      }
+
       setLoading(false);
     };
     load();
@@ -77,6 +109,29 @@ export default function EditProductPage({
     setUploading(false);
   };
 
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      { id: crypto.randomUUID(), name: "", stock: "", price_override: "" },
+    ]);
+  };
+
+  const updateVariant = (id: string, field: keyof Variant, value: string) => {
+    setVariants((v) =>
+      v.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
+  };
+
+  const removeVariant = (id: string) => {
+    setVariants((v) => {
+      const row = v.find((r) => r.id === id);
+      if (row?.serverId) {
+        setDeletedVariantIds((prev) => [...prev, row.serverId!]);
+      }
+      return v.filter((r) => r.id !== id);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -90,7 +145,8 @@ export default function EditProductPage({
         description: description || null,
         image_url: imageUrl || null,
         is_active: isActive,
-        stock: stock ? parseInt(stock) : null,
+        stock: hasVariants ? null : stock ? parseInt(stock) : null,
+        has_variants: hasVariants,
       })
       .eq("id", params.id);
 
@@ -98,6 +154,35 @@ export default function EditProductPage({
       setError(updateError.message);
       setSaving(false);
       return;
+    }
+
+    for (const vid of deletedVariantIds) {
+      await fetch("/api/seller/variants", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: vid }),
+      });
+    }
+
+    for (const v of variants) {
+      if (!v.name) continue;
+      if (v.serverId) {
+        await fetch("/api/seller/variants", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: v.serverId }),
+        });
+      }
+      await fetch("/api/seller/variants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: params.id,
+          name: v.name,
+          stock: v.stock ? parseInt(v.stock) : null,
+          price_override: v.price_override ? parseInt(v.price_override) : null,
+        }),
+      });
     }
 
     router.push("/dashboard");
@@ -227,19 +312,21 @@ export default function EditProductPage({
           </div>
 
           {/* Stock */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
-            </label>
-            <input
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              className="input-base"
-              placeholder="Leave empty for unlimited"
-              min="0"
-            />
-          </div>
+          {!hasVariants && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Stock <span className="text-gray-400 font-normal">(leave empty for unlimited)</span>
+              </label>
+              <input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="input-base"
+                placeholder="Leave empty for unlimited"
+                min="0"
+              />
+            </div>
+          )}
 
           {/* Description */}
           <div className="mb-4">
@@ -255,7 +342,7 @@ export default function EditProductPage({
           </div>
 
           {/* Active toggle */}
-          <div className="mb-6 flex items-center gap-3">
+          <div className="mb-4 flex items-center gap-3">
             <button
               type="button"
               onClick={() => setIsActive(!isActive)}
@@ -273,6 +360,86 @@ export default function EditProductPage({
               {isActive ? "Visible on store" : "Hidden (draft)"}
             </span>
           </div>
+
+          {/* Variants Toggle */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                setHasVariants(!hasVariants);
+                if (!hasVariants) setStock("");
+              }}
+              className="flex items-center gap-3 w-full text-left"
+            >
+              <div
+                className={`w-11 h-6 rounded-full transition-all relative ${
+                  hasVariants ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                    hasVariants ? "translate-x-5" : ""
+                  }`}
+                />
+              </div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                This product has variants (size, color, etc.)
+              </span>
+            </button>
+          </div>
+
+          {/* Variant Inputs */}
+          {hasVariants && (
+            <div className="mb-6 space-y-3">
+              {variants.map((v) => (
+                <div key={v.id} className="flex items-start gap-2">
+                  <input
+                    type="text"
+                    value={v.name}
+                    onChange={(e) => updateVariant(v.id, "name", e.target.value)}
+                    className="input-base flex-1"
+                    placeholder="e.g. Red / XL"
+                    required
+                  />
+                  <input
+                    type="number"
+                    value={v.stock}
+                    onChange={(e) => updateVariant(v.id, "stock", e.target.value)}
+                    className="input-base w-24"
+                    placeholder="Stock"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    value={v.price_override}
+                    onChange={(e) => updateVariant(v.id, "price_override", e.target.value)}
+                    className="input-base w-32"
+                    placeholder="₦ Override"
+                    min="0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(v.id)}
+                    className="mt-2 text-red-400 hover:text-red-600 transition-colors p-1"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addVariant}
+                className="inline-flex items-center gap-1.5 text-sm text-brand-500 hover:text-brand-600 font-medium transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Add variant
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">
