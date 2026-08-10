@@ -200,7 +200,7 @@ export default function HomePage() {
 
       {/* Pricing */}
       <section className="relative z-10 py-28">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Pricing</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
