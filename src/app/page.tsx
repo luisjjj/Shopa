@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BagIcon, ClutchIcon, WalletIcon, CheckIcon, XIcon } from "@/components/Icons";
+import { ShopaLogo, ShopaMark } from "@/components/ShopaLogo";
 
 export default function HomePage() {
   const { theme, toggle } = useTheme();
@@ -18,16 +19,7 @@ export default function HomePage() {
       {/* Nav */}
       <nav className="relative z-10 max-w-6xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 01-8 0" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Shopa</span>
-          </div>
+          <ShopaLogo markClassName="w-8 h-8" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={29} />
           <div className="flex items-center gap-3">
             <button
               onClick={toggle}
@@ -347,12 +339,7 @@ export default function HomePage() {
       <footer className="relative z-10 border-t border-gray-100 dark:border-white/[0.06] py-8">
         <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-brand-500 rounded flex items-center justify-center">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-              </svg>
-            </div>
+            <ShopaMark className="w-5 h-5" />
             <span className="text-sm text-gray-400">
               © 2026 Shopa. Made for Nigerian sellers.
             </span>

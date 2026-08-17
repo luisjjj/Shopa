@@ -3,8 +3,8 @@ self.addEventListener("push", function (event) {
   const title = data.title || "Shopa";
   const options = {
     body: data.body || "",
-    icon: "/favicon.ico",
-    badge: "/favicon.ico",
+    icon: "/icon.svg",
+    badge: "/icon.svg",
     data: data.url || "/",
   };
   event.waitUntil(self.registration.showNotification(title, options));

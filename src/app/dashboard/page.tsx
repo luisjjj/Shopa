@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBanner } from "@/components/NotificationBanner";
 import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
+import { ShopaLogo } from "@/components/ShopaLogo";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -57,14 +58,8 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Shopa</span>
+          <Link href="/" aria-label="Shopa home">
+            <ShopaLogo markClassName="w-7 h-7" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={25} />
           </Link>
           <div className="flex items-center gap-2">
             {isProPlus && stores.length > 1 && (
