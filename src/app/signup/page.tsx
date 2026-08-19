@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "@/components/Icons";
+import { ShopaMark } from "@/components/ShopaLogo";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
@@ -111,13 +112,7 @@ export default function SignupPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-brand-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 01-8 0" />
-            </svg>
-          </div>
+          <ShopaMark className="w-12 h-12 mx-auto mb-4 drop-shadow-lg" title="Shopa" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create your store</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Set up your account in seconds</p>
         </div>

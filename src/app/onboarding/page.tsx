@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
 import BankPicker from "@/components/BankPicker";
+import { ShopaLogo } from "@/components/ShopaLogo";
 
 export default function OnboardingPage() {
   const [existingStore, setExistingStore] = useState<string | null>(null);
@@ -109,7 +110,7 @@ export default function OnboardingPage() {
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-brand-600">Shopa</h1>
+            <ShopaLogo className="justify-center" markClassName="w-10 h-10" textClassName="font-bold text-brand-600 leading-none" size={42} />
             <p className="text-gray-500 dark:text-gray-400 mt-2">You already have a store</p>
           </div>
 
@@ -155,7 +156,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-brand-600">Shopa</h1>
+          <ShopaLogo className="justify-center" markClassName="w-10 h-10" textClassName="font-bold text-brand-600 leading-none" size={42} />
           <p className="text-gray-500 dark:text-gray-400 mt-2">
             {createNew ? "Create another store" : "Set up your store"}
           </p>

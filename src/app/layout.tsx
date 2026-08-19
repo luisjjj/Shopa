@@ -22,7 +22,9 @@ export const metadata: Metadata = {
   description:
     "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
   icons: {
-    icon: "/favicon.svg",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
