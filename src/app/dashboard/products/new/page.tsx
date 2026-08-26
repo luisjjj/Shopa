@@ -166,7 +166,7 @@ export default function NewProductPage() {
                 <img
                   src={imageUrl}
                   alt="Product"
-                  className="w-full h-48 object-cover rounded-xl"
+                  className="w-full h-auto max-h-64 object-contain rounded-xl bg-gray-50 dark:bg-white/[0.02]"
                 />
                 <button
                   type="button"

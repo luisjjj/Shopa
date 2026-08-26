@@ -21,17 +21,22 @@ export async function GET(request: Request) {
     const plan = result.data.metadata?.plan || "premium";
 
     if (userId) {
-      const until = new Date();
-      until.setDate(until.getDate() + 30);
+      const { data: existing } = await supabase.from("users").select("premium_until, pro_plus_until").eq("id", userId).single();
+      const basePremium = existing?.premium_until && new Date(existing.premium_until).getTime() > Date.now() ? new Date(existing.premium_until) : new Date();
+      const basePro = existing?.pro_plus_until && new Date(existing.pro_plus_until).getTime() > Date.now() ? new Date(existing.pro_plus_until) : new Date();
+      const untilPremium = new Date(basePremium);
+      untilPremium.setDate(untilPremium.getDate() + 30);
+      const untilPro = new Date(basePro);
+      untilPro.setDate(untilPro.getDate() + 30);
 
       if (plan === "pro_plus") {
         const { error } = await supabase
           .from("users")
           .update({
             is_pro_plus: true,
-            pro_plus_until: until.toISOString(),
+            pro_plus_until: untilPro.toISOString(),
             is_premium: true,
-            premium_until: until.toISOString(),
+            premium_until: untilPremium.toISOString(),
           })
           .eq("id", userId);
 
@@ -46,7 +51,7 @@ export async function GET(request: Request) {
           .from("users")
           .update({
             is_premium: true,
-            premium_until: until.toISOString(),
+            premium_until: untilPremium.toISOString(),
           })
           .eq("id", userId);
 

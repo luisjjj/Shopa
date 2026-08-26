@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { isPremiumActive } from "@/lib/premium";
 
 export async function GET(request: Request) {
   const supabase = createClient();
@@ -39,12 +40,12 @@ export async function PUT(request: Request) {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("is_premium")
+    .select("is_premium, premium_until")
     .eq("id", user.id)
     .single();
 
-  if (!profile?.is_premium) {
-    return NextResponse.json({ error: "Premium required" }, { status: 403 });
+  if (!profile || !isPremiumActive(profile as never)) {
+    return NextResponse.json({ error: "Premium required — plan expired or not active" }, { status: 403 });
   }
 
   const body = await request.json();

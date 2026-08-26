@@ -8,6 +8,7 @@ import { NotificationBanner } from "@/components/NotificationBanner";
 import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
+import { isPremiumActive, isProPlusActive } from "@/lib/premium";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -32,8 +33,8 @@ export default async function DashboardPage() {
     .eq("is_active", true);
 
   const productCount = count ?? 0;
-  const isPremium = profile.is_premium;
-  const isProPlus = profile.is_pro_plus;
+  const isPremium = isPremiumActive(profile);
+  const isProPlus = isProPlusActive(profile);
   const canAddProduct = isPremium || productCount < 3;
 
   let stores: { id: string; username: string }[] = [];
@@ -276,13 +277,15 @@ async function ProductList({ userId }: { userId: string }) {
           className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark transition-all hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-0.5 group"
         >
           {product.image_url ? (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <div className="w-full bg-gray-50 dark:bg-white/[0.02] flex items-center justify-center overflow-hidden">
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-auto object-contain max-h-64 group-hover:scale-[1.02] transition-transform duration-500"
+              />
+            </div>
           ) : (
-            <div className="w-full aspect-square bg-gray-50 dark:bg-white/[0.02] flex items-center justify-center">
+            <div className="w-full h-48 bg-gray-50 dark:bg-white/[0.02] flex items-center justify-center">
               <PackageIcon className="text-gray-300 dark:text-gray-600" size={32} />
             </div>
           )}

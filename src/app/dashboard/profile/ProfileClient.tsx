@@ -76,10 +76,13 @@ export default function ProfileClient({
     setSaving(false);
   };
 
+  const premiumExpired = isPremium && premiumUntil ? new Date(premiumUntil).getTime() <= Date.now() : false;
+  const proPlusExpired = isProPlus && proPlusUntil ? new Date(proPlusUntil).getTime() <= Date.now() : false;
+  const effectivePremium = isPremium && !premiumExpired;
+  const effectiveProPlus = isProPlus && !proPlusExpired;
   const premiumDaysLeft = premiumUntil
     ? Math.max(0, Math.ceil((new Date(premiumUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
-
   const proPlusDaysLeft = proPlusUntil
     ? Math.max(0, Math.ceil((new Date(proPlusUntil).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
@@ -231,7 +234,7 @@ export default function ProfileClient({
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Plan</h2>
           </div>
           <div className="p-5 space-y-4">
-            {isProPlus && (
+            {effectiveProPlus && (
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -241,12 +244,7 @@ export default function ProfileClient({
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {proPlusUntil && (
                       <>
-                        Renews {new Date(proPlusUntil).toLocaleDateString("en-NG", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                        {proPlusDaysLeft > 0 && ` (${proPlusDaysLeft} days left)`}
+                        {proPlusDaysLeft > 0 ? `Renews ${new Date(proPlusUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${proPlusDaysLeft} days left)` : "Expired — please renew"}
                       </>
                     )}
                   </p>
@@ -256,7 +254,7 @@ export default function ProfileClient({
                 </span>
               </div>
             )}
-            {isPremium && !isProPlus && (
+            {effectivePremium && !effectiveProPlus && (
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -266,12 +264,7 @@ export default function ProfileClient({
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {premiumUntil && (
                       <>
-                        Renews {new Date(premiumUntil).toLocaleDateString("en-NG", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                        {premiumDaysLeft > 0 && ` (${premiumDaysLeft} days left)`}
+                        {premiumDaysLeft > 0 ? `Renews ${new Date(premiumUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${premiumDaysLeft} days left)` : "Expired — please renew"}
                       </>
                     )}
                   </p>
@@ -281,7 +274,13 @@ export default function ProfileClient({
                 </span>
               </div>
             )}
-            {!isPremium && !isProPlus && (
+            {(isProPlus && proPlusExpired) || (isPremium && premiumExpired && !isProPlus) ? (
+              <div className="flex items-center justify-between bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+                <p className="text-xs text-amber-700 dark:text-amber-400">Your plan has expired. Renew to keep premium features.</p>
+                <Link href="/dashboard/upgrade" className="text-xs font-bold text-amber-700 dark:text-amber-400 underline">Renew</Link>
+              </div>
+            ) : null}
+            {!effectivePremium && !effectiveProPlus && (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">Free plan</p>
@@ -297,7 +296,7 @@ export default function ProfileClient({
                 </Link>
               </div>
             )}
-            {(isPremium || isProPlus) && (
+            {(effectivePremium || effectiveProPlus) && (
               <Link
                 href="/dashboard/upgrade"
                 className="text-sm font-medium text-brand-600 hover:text-brand-700 block"

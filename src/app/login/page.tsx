@@ -81,7 +81,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="mb-7">
+          <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Password
             </label>
@@ -93,6 +93,9 @@ export default function LoginPage() {
               placeholder="Your password"
               required
             />
+          </div>
+          <div className="mb-7 text-right">
+            <a href="/forgot-password" className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 font-medium">Forgot password?</a>
           </div>
 
           {error && (

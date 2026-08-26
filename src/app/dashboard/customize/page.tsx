@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import CustomizeClient from "./CustomizeClient";
+import { isPremiumActive } from "@/lib/premium";
 
 export default async function CustomizePage() {
   const supabase = createClient();
@@ -12,7 +13,7 @@ export default async function CustomizePage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("username, is_premium")
+    .select("username, is_premium, premium_until")
     .eq("id", user.id)
     .single();
 
@@ -21,7 +22,7 @@ export default async function CustomizePage() {
   return (
     <CustomizeClient
       username={profile.username}
-      isPremium={profile.is_premium}
+      isPremium={isPremiumActive(profile as never)}
     />
   );
 }

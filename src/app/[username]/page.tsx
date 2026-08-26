@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PackageIcon } from "@/components/Icons";
 import { ProductRating } from "./ProductRating";
+import { isPremiumActive } from "@/lib/premium";
 
 type Props = {
   params: { username: string };
@@ -75,13 +76,14 @@ export default async function StorePage({
 }) {
   const supabase = createClient();
 
-  const { data: profile } = await supabase
+  const { data: profileRaw } = await supabase
     .from("users")
-    .select("id, username, is_premium, whatsapp_number")
+    .select("id, username, is_premium, premium_until, whatsapp_number")
     .eq("username", params.username)
     .single();
 
-  if (!profile) notFound();
+  if (!profileRaw) notFound();
+  const profile = { ...profileRaw, is_premium: isPremiumActive(profileRaw as never) };
 
   const { data: settings } = await supabase
     .from("storefront_settings")
@@ -182,8 +184,9 @@ export default async function StorePage({
         ? "rounded-none"
         : "rounded-xl";
 
-  // Image aspect ratio
+  const isFreeStore = !s;
   const imageAspect = (() => {
+    if (isFreeStore) return "";
     switch (s?.product_image_ratio) {
       case "portrait":
         return "aspect-[3/4]";
@@ -191,10 +194,13 @@ export default async function StorePage({
         return "aspect-[4/3]";
       case "wide":
         return "aspect-video";
+      case "auto":
+        return "";
       default:
         return "aspect-square";
     }
   })();
+  const useDynamicImage = isFreeStore || s?.product_image_ratio === "auto" || !s?.product_image_ratio;
 
   // Card border radius
   const cardRadius = (() => {
@@ -390,19 +396,21 @@ export default async function StorePage({
 
       {/* Store Header */}
       {s?.header_style !== "minimal" ? (
-        <div className="border-b" style={{ borderColor: `${textColor}15` }}>
+        <div className="border-b" style={s ? { borderColor: `${textColor}15` } : { borderColor: "rgb(229 231 235)" }}>
           <div className={`${containerMax} mx-auto px-4 ${sectionPadding} ${headerAlign}`}>
-            {s?.show_store_name && (
-              <h1 className="text-2xl font-bold" style={{ color: textColor }}>
+            {(s ? s.show_store_name : true) && (
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={s ? { color: textColor } : undefined}>
                 {profile.username}
               </h1>
             )}
-            {s?.tagline && (
+            {s?.tagline ? (
               <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
                 {s.tagline}
               </p>
-            )}
-            {!s?.tagline && (
+            ) : !s ? (
+              <p className="text-sm mt-1 text-gray-500 dark:text-gray-400">Shop on WhatsApp</p>
+            ) : null}
+            {s && !s.tagline && (
               <p className="text-sm mt-1" style={{ color: `${textColor}60` }}>
                 Shop on WhatsApp
               </p>
@@ -411,16 +419,18 @@ export default async function StorePage({
         </div>
       ) : (
         <div className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
-          {s?.show_store_name && (
-            <h1 className="text-2xl font-bold" style={{ color: textColor }}>
+          {(s ? s.show_store_name : true) && (
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={s ? { color: textColor } : undefined}>
               {profile.username}
             </h1>
           )}
-          {s?.tagline && (
+          {s?.tagline ? (
             <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
               {s.tagline}
             </p>
-          )}
+          ) : !s ? (
+            <p className="text-sm mt-1 text-gray-500 dark:text-gray-400">Shop on WhatsApp</p>
+          ) : null}
         </div>
       )}
 
@@ -428,8 +438,8 @@ export default async function StorePage({
       <div className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
         {(!products || products.length === 0) ? (
           <div className="text-center py-16">
-            <PackageIcon className="mx-auto mb-3" size={48} style={{ color: `${textColor}30` }} />
-            <p style={{ color: `${textColor}50` }}>No products yet. Check back soon!</p>
+            <PackageIcon className="mx-auto mb-3" size={48} style={s ? { color: `${textColor}30` } : undefined} />
+            <p className={s ? "" : "text-gray-500 dark:text-gray-400"} style={s ? { color: `${textColor}50` } : undefined}>No products yet. Check back soon!</p>
           </div>
         ) : (
           <div
@@ -447,25 +457,25 @@ export default async function StorePage({
                 }}
               >
                 <div
-                  className={`${imageAspect} overflow-hidden ${imageRadius} mb-3`}
-                  style={s ? { background: `${textColor}08` } : { background: "rgb(243 244 246)" }}
+                  className={`${useDynamicImage ? "" : imageAspect} overflow-hidden ${imageRadius} mb-3 flex items-center justify-center ${useDynamicImage ? "" : imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
+                  style={s ? { background: `${textColor}08` } : undefined}
                 >
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <PackageIcon size={40} style={{ color: `${textColor}25` }} />
+                    <div className={`w-full ${useDynamicImage ? "h-48" : "h-full aspect-square"} flex items-center justify-center bg-gray-50 dark:bg-white/[0.04]`}>
+                      <PackageIcon size={40} style={s ? { color: `${textColor}25` } : undefined} className={s ? "" : "text-gray-300 dark:text-gray-600"} />
                     </div>
                   )}
                 </div>
                 <div className={isList ? "flex items-center justify-between" : ""}>
                   <h3
-                    className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"}`}
-                    style={{ color: textColor }}
+                    className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"} ${s ? "" : "text-gray-900 dark:text-white"}`}
+                    style={s ? { color: textColor } : undefined}
                   >
                     {product.name}
                   </h3>
@@ -531,14 +541,13 @@ export default async function StorePage({
         </div>
       )}
 
-      {/* Footer */}
       {!profile.is_premium && (
-        <footer className="border-t py-4" style={{ borderColor: `${textColor}10` }}>
+        <footer className="border-t py-4 border-gray-100 dark:border-white/10" style={s ? { borderColor: `${textColor}10` } : undefined}>
           <div className="text-center">
             <a
               href="/"
-              className="text-xs hover:opacity-80 transition-opacity"
-              style={{ color: `${textColor}40` }}
+              className="text-xs hover:opacity-80 transition-opacity text-gray-400 dark:text-gray-500"
+              style={s ? { color: `${textColor}40` } : undefined}
             >
               Powered by <span className="font-semibold">Shopa</span>
             </a>
