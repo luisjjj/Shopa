@@ -10,13 +10,25 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) setError("Invalid or expired reset link. Please request a new one.");
-    });
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) { setReady(true); return; }
+      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") setReady(true);
+      });
+      setTimeout(async () => {
+        const { data: { session: s2 } } = await supabase.auth.getSession();
+        if (s2) setReady(true);
+        else if (!s2) setError("Recovery link invalid or expired. Request a new one at /forgot-password.");
+      }, 1500);
+      return () => sub.subscription.unsubscribe();
+    };
+    check();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,6 +40,7 @@ export default function ResetPasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
     if (error) { setError(error.message); setLoading(false); return; }
     setSuccess(true);
+    await supabase.auth.signOut();
     setTimeout(() => router.push("/login"), 2000);
   };
 
@@ -42,15 +55,17 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleSubmit} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-base" placeholder="Min 6 characters" required minLength={6} />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-base" placeholder="Min 6 characters" required minLength={6} disabled={!ready && !!error} />
           </div>
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm password</label>
-            <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="input-base" placeholder="Confirm password" required minLength={6} />
+            <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="input-base" placeholder="Confirm password" required minLength={6} disabled={!ready && !!error} />
           </div>
           {error && <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5"><p className="text-red-600 dark:text-red-400 text-sm">{error}</p></div>}
           {success && <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-xl px-4 py-3 mb-5"><p className="text-green-600 dark:text-green-400 text-sm">Password updated! Redirecting to login...</p></div>}
-          <button type="submit" disabled={loading || success} className="btn-primary">{loading ? "Updating..." : "Update password"}</button>
+          {!ready && !error && <p className="text-xs text-gray-400 text-center mb-4">Verifying recovery link...</p>}
+          <button type="submit" disabled={loading || success || (!ready && !!error)} className="btn-primary">{loading ? "Updating..." : "Update password"}</button>
+          <div className="mt-4 text-center"><a href="/forgot-password" className="text-xs text-gray-500 hover:text-brand-600">Need a new link? Resend</a></div>
         </form>
       </div>
     </div>
