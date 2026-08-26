@@ -9,6 +9,7 @@ import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive } from "@/lib/premium";
+import { NotReceivedButton } from "@/components/NotReceivedButton";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -419,12 +420,15 @@ async function OrderList({ userId }: { userId: string }) {
                     <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                   )
                 ) : order.confirmed_by_buyer ? (
-                  <form action="/api/orders/paid" method="post" className="inline">
-                    <input type="hidden" name="order_id" value={order.id} />
-                    <button type="submit" className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all active:scale-95">
-                      Confirm receipt
-                    </button>
-                  </form>
+                  <div className="flex items-center gap-1.5">
+                    <form action="/api/orders/paid" method="post" className="inline">
+                      <input type="hidden" name="order_id" value={order.id} />
+                      <button type="submit" className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all active:scale-95">
+                        Confirm receipt
+                      </button>
+                    </form>
+                    <NotReceivedButton orderId={order.id} buyerPhone={order.buyer_phone} />
+                  </div>
                 ) : (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     Pending
