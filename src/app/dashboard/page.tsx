@@ -419,9 +419,12 @@ async function OrderList({ userId }: { userId: string }) {
                     <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                   )
                 ) : order.confirmed_by_buyer ? (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
-                    Awaiting your confirmation
-                  </span>
+                  <form action="/api/orders/paid" method="post" className="inline">
+                    <input type="hidden" name="order_id" value={order.id} />
+                    <button type="submit" className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all active:scale-95">
+                      Confirm receipt
+                    </button>
+                  </form>
                 ) : (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     Pending
