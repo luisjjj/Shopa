@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TagIcon, XIcon } from "@/components/Icons";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 type Promo = {
   id: string;
@@ -218,12 +219,10 @@ export function PromoCodesSection() {
           ))}
         </div>
       ) : promos.length === 0 ? (
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
-          <div className="w-12 h-12 bg-gray-100 dark:bg-white/[0.05] rounded-full mx-auto mb-3 flex items-center justify-center">
-            <TagIcon className="text-gray-300 dark:text-gray-600" size={24} />
-          </div>
-          <p className="text-gray-400 dark:text-gray-500 font-medium">No promo codes yet</p>
-          <p className="text-sm text-gray-300 dark:text-gray-600 mt-1">Create one to offer discounts to buyers</p>
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
+          <EmptyIllustration variant="promo" className="mb-3 opacity-90" />
+          <p className="text-gray-900 dark:text-white font-semibold">No promo codes yet</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Create one to offer discounts to buyers</p>
         </div>
       ) : (
         <div className="space-y-2">

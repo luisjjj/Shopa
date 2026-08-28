@@ -10,6 +10,7 @@ import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive } from "@/lib/premium";
 import { NotReceivedButton } from "@/components/NotReceivedButton";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -259,12 +260,10 @@ async function ProductList({ userId }: { userId: string }) {
 
   if (!products || products.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
-        <div className="w-14 h-14 bg-gray-100 dark:bg-white/[0.04] rounded-2xl mx-auto mb-4 flex items-center justify-center">
-          <PackageIcon className="text-gray-300 dark:text-gray-600" size={28} />
-        </div>
-        <p className="text-gray-500 dark:text-gray-400 font-medium">No products yet</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add your first product to get started</p>
+      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
+        <EmptyIllustration variant="products" className="mb-4" />
+        <p className="text-gray-900 dark:text-white font-semibold">No products yet</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Add your first product to open your store</p>
       </div>
     );
   }
@@ -343,12 +342,10 @@ async function OrderList({ userId }: { userId: string }) {
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
-        <div className="w-12 h-12 bg-gray-100 dark:bg-white/[0.05] rounded-full mx-auto mb-3 flex items-center justify-center">
-          <PackageIcon className="text-gray-300 dark:text-gray-600" size={24} />
-        </div>
-        <p className="text-gray-400 dark:text-gray-500 font-medium">No orders yet</p>
-        <p className="text-sm text-gray-300 dark:text-gray-600 mt-1">Orders appear here when buyers purchase</p>
+      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
+        <EmptyIllustration variant="orders" className="mb-4 opacity-90" />
+        <p className="text-gray-900 dark:text-white font-semibold">No orders yet</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Orders appear here when buyers purchase</p>
       </div>
     );
   }

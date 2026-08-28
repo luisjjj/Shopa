@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { sendEmail, emailTemplates } from "@/lib/email";
 
 export async function POST(request: Request) {
   const formData = await request.formData().catch(() => null);
@@ -25,20 +26,12 @@ export async function POST(request: Request) {
   const whatsappText = encodeURIComponent(`Hi ${order.buyer_name || ""}, your payment of ₦${order.amount?.toLocaleString()} for "${productName}" was not confirmed by the seller. Please double-check the transfer or contact support.`);
   const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${whatsappText}` : null;
 
-  const smtpHost = process.env.SMTP_HOST;
   const buyerEmail = (order as unknown as { buyer_email?: string }).buyer_email;
-  if (smtpHost && buyerEmail) {
-    try {
-      // SMTP stub — install `nodemailer` and uncomment when ready
-      // const nodemailer = await import("nodemailer");
-      // const transporter = nodemailer.createTransport({ host: smtpHost, port: parseInt(process.env.SMTP_PORT || "587"), auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined });
-      // await transporter.sendMail({ from: process.env.SMTP_FROM || process.env.SMTP_USER, to: buyerEmail, subject: "Payment not confirmed", text: `Hi ${order.buyer_name || ""},\n\nYour payment of ₦${order.amount?.toLocaleString()} for "${productName}" was not confirmed by the seller.\n\n— Shopa` });
-      console.log(`[not-received] SMTP configured — would email ${buyerEmail}`);
-    } catch (e) {
-      console.error("Email send failed", e);
-    }
+  if (buyerEmail) {
+    const t = emailTemplates().orderNotReceived(productName, order.amount);
+    await sendEmail({ to: buyerEmail, subject: t.subject, html: t.html });
   } else {
-    console.log(`[not-received] SMTP not configured — would email buyer: ${order.buyer_name} <${buyerPhone}> amount ₦${order.amount} product "${productName}"` + (buyerEmail ? ` <${buyerEmail}>` : " (no email on file)"));
+    console.log(`[not-received] no buyer email — would notify ${order.buyer_name} <${buyerPhone}> amount ₦${order.amount} product "${productName}"`);
   }
 
   if (formData) return NextResponse.redirect(new URL("/dashboard", request.url));

@@ -85,6 +85,7 @@ export default function SignupPage() {
         setLoading(false);
         return;
       }
+      fetch("/api/email/welcome", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, username }) }).catch(() => {});
     }
 
     router.push("/dashboard");

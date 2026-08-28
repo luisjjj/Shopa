@@ -61,6 +61,7 @@ export default function CheckoutForm({
 }: Props) {
   const [buyerName, setBuyerName] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("");
+  const [buyerEmail, setBuyerEmail] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -168,6 +169,7 @@ export default function CheckoutForm({
           sellerId,
           buyerName,
           buyerPhone,
+          buyerEmail,
           amount: displayPrice,
           productName,
           promoCodeId: appliedPromo?.id || null,
@@ -459,7 +461,7 @@ export default function CheckoutForm({
         />
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <label
           className="block text-sm font-medium mb-2"
           style={{ color: s ? `${textColor}bb` : undefined }}
@@ -484,6 +486,33 @@ export default function CheckoutForm({
           } : undefined}
           placeholder="+234 801 234 5678"
           required
+        />
+      </div>
+
+      <div className="mb-6">
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: s ? `${textColor}bb` : undefined }}
+        >
+          Email <span className="opacity-50">(optional, for receipt)</span>
+        </label>
+        <input
+          type="email"
+          value={buyerEmail}
+          onChange={(e) => setBuyerEmail(e.target.value)}
+          className={s ? "" : "input-base"}
+          style={s ? {
+            width: "100%",
+            padding: "0.625rem 0.875rem",
+            borderRadius: "0.75rem",
+            border: `1px solid ${textColor}20`,
+            background: `${textColor}05`,
+            color: textColor,
+            fontSize: "inherit",
+            fontFamily: "inherit",
+            outline: "none",
+          } : undefined}
+          placeholder="you@example.com"
         />
       </div>
 

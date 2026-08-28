@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PackageIcon } from "@/components/Icons";
 import { ProductRating } from "./ProductRating";
+import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { isPremiumActive } from "@/lib/premium";
 
 type Props = {
@@ -437,9 +438,10 @@ export default async function StorePage({
       {/* Products */}
       <div className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
         {(!products || products.length === 0) ? (
-          <div className="text-center py-16">
-            <PackageIcon className="mx-auto mb-3" size={48} style={s ? { color: `${textColor}30` } : undefined} />
-            <p className={s ? "" : "text-gray-500 dark:text-gray-400"} style={s ? { color: `${textColor}50` } : undefined}>No products yet. Check back soon!</p>
+          <div className="text-center py-12">
+            <EmptyIllustration variant="store" className="opacity-90 mb-2 max-w-[360px] mx-auto" />
+            <p className={s ? "font-medium" : "text-gray-900 dark:text-white font-medium"} style={s ? { color: textColor } : undefined}>No products yet</p>
+            <p className={s ? "text-sm mt-1" : "text-sm mt-1 text-gray-500 dark:text-gray-400"} style={s ? { color: `${textColor}60` } : undefined}>Check back soon!</p>
           </div>
         ) : (
           <div
