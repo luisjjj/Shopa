@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BagIcon, ClutchIcon, WalletIcon, CheckIcon, XIcon } from "@/components/Icons";
 import { ShopaLogo, ShopaMark } from "@/components/ShopaLogo";
-import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 export default function HomePage() {
   const { theme, toggle } = useTheme();
@@ -75,9 +74,6 @@ export default function HomePage() {
         <p className="text-sm text-gray-400 dark:text-gray-500 mt-5">
           Free to start. 3 product slots. Premium for unlimited. Pro+ for power sellers.
         </p>
-        <div className="mt-10 max-w-[420px] mx-auto opacity-[0.85] dark:opacity-60">
-          <EmptyIllustration variant="generic" />
-        </div>
       </section>
 
       {/* Storefront Preview */}
