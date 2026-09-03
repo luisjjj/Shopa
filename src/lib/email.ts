@@ -11,7 +11,9 @@ function getTransporter() {
 
 export async function sendEmail(opts: { to: string; subject: string; html: string; text?: string }) {
   const transporter = getTransporter();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@shopa.store";
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@shopa.store";
+  const fromName = process.env.SMTP_FROM_NAME || "Shopa";
+  const from = `${fromName} <${fromEmail.replace(/^.*<|>.*$/g, "")}>`;
   if (!transporter) {
     console.log(`[email] SMTP not configured — would send to ${opts.to}: ${opts.subject}`);
     return { queued: false };
