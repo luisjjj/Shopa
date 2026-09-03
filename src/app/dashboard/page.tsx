@@ -128,7 +128,7 @@ export default async function DashboardPage() {
             Welcome back, {profile.username}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-            shopa-store.name.ng/<span className="font-medium text-brand-600 dark:text-brand-400">{profile.username}</span>
+            myshopa.com.ng/<span className="font-medium text-brand-600 dark:text-brand-400">{profile.username}</span>
           </p>
         </div>
 

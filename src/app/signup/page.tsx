@@ -129,7 +129,7 @@ export default function SignupPage() {
               Store username
             </label>
             <div className="flex items-center input-base !px-0 overflow-hidden">
-              <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 pl-4 pr-0 border-r-0">shopa-store.name.ng/</span>
+              <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 pl-4 pr-0 border-r-0">myshopa.com.ng/</span>
               <input
                 type="text"
                 value={username}

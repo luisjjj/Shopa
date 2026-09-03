@@ -87,7 +87,7 @@ export default function HomePage() {
               <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
             </div>
             <div className="flex-1 bg-white dark:bg-white/[0.06] border border-gray-200/80 dark:border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-gray-400 mx-4 font-mono">
-              shopa-store.name.ng/amakabags
+              myshopa.com.ng/amakabags
             </div>
           </div>
 

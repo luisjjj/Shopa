@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
   const webPush = (await import("web-push")).default;
   webPush.setVapidDetails(
-    "mailto:hello@shopa-store.name.ng",
+    "mailto:hello@myshopa.com.ng",
     process.env.VAPID_PUBLIC_KEY!,
     process.env.VAPID_PRIVATE_KEY!
   );

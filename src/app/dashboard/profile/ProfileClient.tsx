@@ -154,7 +154,7 @@ export default function ProfileClient({
             <InfoRow
               icon={<GlobeIcon size={16} />}
               label="Store URL"
-              value={`shopa-store.name.ng/${username}`}
+              value={`myshopa.com.ng/${username}`}
               mono
             />
           </div>

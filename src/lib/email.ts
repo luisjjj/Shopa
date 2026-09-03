@@ -32,7 +32,7 @@ export function emailTemplates() {
   return {
     welcome: (name: string) => ({
       subject: `Welcome to ${brand} — your store is ready`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome, ${name}!</h2><p>Your Shopa store is live. Add products, share your link, and start selling on WhatsApp.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://shopa-store.name.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Go to dashboard</a><p style="color:#888;font-size:12px;margin-top:24px">— The Shopa Team</p></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome, ${name}!</h2><p>Your Shopa store is live. Add products, share your link, and start selling on WhatsApp.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Go to dashboard</a><p style="color:#888;font-size:12px;margin-top:24px">— The Shopa Team</p></div>`,
     }),
     passwordReset: (link: string) => ({
       subject: "Reset your Shopa password",
@@ -40,7 +40,7 @@ export function emailTemplates() {
     }),
     orderAwaiting: (buyerName: string, productName: string, amount: number) => ({
       subject: `New order awaiting confirmation — ${productName}`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>New order awaiting confirmation</h2><p><b>${buyerName}</b> placed an order for <b>${productName}</b> — <b>₦${amount.toLocaleString()}</b>.</p><p>The buyer has marked payment as sent. Please confirm receipt in your dashboard.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://shopa-store.name.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>New order awaiting confirmation</h2><p><b>${buyerName}</b> placed an order for <b>${productName}</b> — <b>₦${amount.toLocaleString()}</b>.</p><p>The buyer has marked payment as sent. Please confirm receipt in your dashboard.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a></div>`,
     }),
     orderConfirmed: (productName: string, amount: number) => ({
       subject: `Payment confirmed — your order for ${productName} is being processed`,
