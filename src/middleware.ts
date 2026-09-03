@@ -41,6 +41,14 @@ export async function middleware(request: NextRequest) {
   );
 
   const hostname = request.headers.get("host") || "";
+  const strippedHost = hostname.replace(":3000", "").replace(":80", "").replace(":443", "");
+
+  if (strippedHost === "www.myshopa.com.ng") {
+    const url = request.nextUrl.clone();
+    url.host = "myshopa.com.ng";
+    return NextResponse.redirect(url);
+  }
+
   const subdomain = getSubdomain(hostname);
 
   if (subdomain) {
