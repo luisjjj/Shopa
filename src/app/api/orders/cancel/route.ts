@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -8,12 +9,15 @@ export async function POST(request: Request) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(new URL("/login", request.url));
-  await supabase
+  const service = createServiceRoleClient();
+  const { error } = await service
     .from("orders")
     .delete()
     .eq("id", orderId)
     .eq("seller_id", user.id)
     .eq("paid", false)
     .eq("confirmed_by_buyer", false);
+
+  if (error) console.error("[cancel] delete failed", error);
   return NextResponse.redirect(new URL("/dashboard", request.url));
 }

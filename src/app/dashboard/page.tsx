@@ -10,6 +10,7 @@ import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive } from "@/lib/premium";
 import { NotReceivedButton } from "@/components/NotReceivedButton";
+import { ConfirmReceiptButton } from "@/components/ConfirmReceiptButton";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 export default async function DashboardPage() {
@@ -431,12 +432,7 @@ async function OrderList({ userId }: { userId: string }) {
                   )
                 ) : order.confirmed_by_buyer ? (
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <form action="/api/orders/paid" method="post" className="inline">
-                      <input type="hidden" name="order_id" value={order.id} />
-                      <button type="submit" className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all active:scale-95">
-                        Confirm receipt
-                      </button>
-                    </form>
+                    <ConfirmReceiptButton orderId={order.id} />
                     <NotReceivedButton orderId={order.id} buyerPhone={order.buyer_phone} />
                   </div>
                 ) : (

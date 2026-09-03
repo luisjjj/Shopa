@@ -51,8 +51,14 @@ export async function POST(request: Request) {
 
   const t = emailTemplates().buyerOtp(code);
   const res = await sendEmail({ to: normalized, subject: t.subject, html: t.html });
-  if ((res as { error?: string }).error) {
-    return NextResponse.json({ error: "Could not send email — check the address" }, { status: 500 });
+  const sendError = (res as { error?: string }).error;
+  if (sendError) {
+    console.error("[send-code] brevo send failed", sendError);
+    await supabase.from("buyer_otps").delete().eq("email", normalized);
+    const hint = sendError.includes("sender") || sendError.includes("5.7.8") || sendError.includes("535")
+      ? "Email service rejected the send — seller: verify the sender address in Brevo"
+      : "Could not send email — check the address and try again";
+    return NextResponse.json({ error: hint }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
