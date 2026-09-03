@@ -7,6 +7,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
 import BankPicker from "@/components/BankPicker";
 import { ShopaLogo } from "@/components/ShopaLogo";
+import { AuthSidePanel } from "@/components/AuthSidePanel";
 
 export default function OnboardingPage() {
   const [existingStore, setExistingStore] = useState<string | null>(null);
@@ -144,7 +145,11 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 items-start">
+        <div className="hidden lg:block sticky top-6">
+          <AuthSidePanel />
+        </div>
+        <div className="w-full max-w-md mx-auto lg:mx-0">
         <div className="flex justify-end mb-4">
           <button
             onClick={toggle}
@@ -153,6 +158,14 @@ export default function OnboardingPage() {
           >
             {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
           </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          {["/landing/step-add.jpg", "/landing/step-style.jpg", "/landing/step-paid.jpg"].map((src, i) => (
+            <div key={i} className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 h-20">
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </div>
+          ))}
         </div>
 
         <div className="text-center mb-8">
@@ -268,6 +281,7 @@ export default function OnboardingPage() {
             {saving ? "Creating store..." : "Create my store"}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

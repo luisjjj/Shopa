@@ -123,13 +123,26 @@ export default async function DashboardPage() {
 
       <main className="max-w-5xl mx-auto px-5 py-8">
         {/* Welcome */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Welcome back, {profile.username}
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-            myshopa.com.ng/<span className="font-medium text-brand-600 dark:text-brand-400">{profile.username}</span>
-          </p>
+        <div className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark">
+          <img src="/landing/hero-seller.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
+          <div className="relative p-6 sm:p-8 flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Welcome back, {profile.username}
+              </h1>
+              <p className="text-white/80 mt-1 text-sm">
+                myshopa.com.ng/<span className="font-medium text-white">{profile.username}</span>
+              </p>
+            </div>
+            <Link
+              href={`/${profile.username}`}
+              target="_blank"
+              className="shrink-0 bg-white/95 hover:bg-white text-gray-900 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-[0.98]"
+            >
+              View store ↗
+            </Link>
+          </div>
         </div>
 
         <NotificationBanner />

@@ -48,14 +48,18 @@ export default function UpgradePage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <SparkleIcon className="mx-auto text-brand-500 mb-4" size={40} />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Upgrade your store
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Choose the plan that fits your business
-          </p>
+        <div className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10">
+          <img src="/landing/step-style.jpg" alt="Customized storefront" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-black/10" />
+          <div className="relative p-8 text-center">
+            <SparkleIcon className="mx-auto text-white mb-4" size={40} />
+            <h1 className="text-2xl font-bold text-white mb-2">
+              Upgrade your store
+            </h1>
+            <p className="text-white/80 text-sm">
+              Choose the plan that fits your business
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

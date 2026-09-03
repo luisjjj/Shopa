@@ -129,11 +129,13 @@ export default async function CheckoutPage({ params }: Props) {
           } : undefined}
         >
           {product.image_url && (
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-56 object-cover"
-            />
+            <div className="w-full bg-gray-50 dark:bg-white/[0.02]">
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-auto max-h-72 object-contain"
+              />
+            </div>
           )}
           <div className="p-6">
             <h1 className="text-xl font-bold" style={{ color: s ? textColor : undefined }}>
