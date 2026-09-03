@@ -18,10 +18,6 @@ export default function HomePage() {
         <div className="shape-drift-delayed absolute top-1/3 -right-32 w-[400px] h-[400px] rounded-full bg-gradient-to-bl from-brand-50/50 to-transparent dark:from-brand-950/20 blur-[80px]" />
       </div>
 
-      <div className="relative z-20 bg-brand-500 text-white text-center text-xs sm:text-sm font-medium px-4 py-2.5">
-        myshopa.com.ng is live — free to start, launch your store today.
-      </div>
-
       <nav className="sticky top-0 z-50 border-b border-gray-100/80 dark:border-white/[0.06] bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 supports-[backdrop-filter]:dark:bg-[#0a0a0a]/70">
         <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
@@ -73,7 +69,7 @@ export default function HomePage() {
 
       <section className="relative z-10 max-w-6xl mx-auto px-6 pt-12 sm:pt-20 pb-16 grid lg:grid-cols-2 gap-10 items-center">
         <div className="text-center lg:text-left">
-          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.08] mb-6 animate-slide-up">
+          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.18] mb-6 animate-slide-up">
             Be the next
             <br />
             <RotatingHeadline />
