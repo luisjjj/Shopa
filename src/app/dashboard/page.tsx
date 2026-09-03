@@ -9,8 +9,6 @@ import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive } from "@/lib/premium";
-import { NotReceivedButton } from "@/components/NotReceivedButton";
-import { ConfirmReceiptButton } from "@/components/ConfirmReceiptButton";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 export default async function DashboardPage() {
@@ -167,6 +165,26 @@ export default async function DashboardPage() {
         )}
 
         <AnalyticsSection />
+
+        {/* Payout setup gate — buyers pay via Paystack, no manual fallback */}
+        {!(profile as { paystack_subaccount_code?: string | null }).paystack_subaccount_code && (
+          <div className="bg-brand-50 dark:bg-brand-950/20 border border-brand-200/60 dark:border-brand-900/30 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between shadow-card dark:shadow-card-dark">
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Payouts not set up — you can&apos;t accept payments yet
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Verify your bank account once. Sales then settle automatically (99% you, 1% Shopa).
+              </p>
+            </div>
+            <Link
+              href="/dashboard/payouts"
+              className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm shadow-brand-500/20 active:scale-[0.98] text-center"
+            >
+              Set up payouts
+            </Link>
+          </div>
+        )}
 
         {/* Upgrade Prompt (Free plan only) */}
         {!isPremium && (
@@ -431,10 +449,12 @@ async function OrderList({ userId }: { userId: string }) {
                     <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                   )
                 ) : order.confirmed_by_buyer ? (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <ConfirmReceiptButton orderId={order.id} />
-                    <NotReceivedButton orderId={order.id} buyerPhone={order.buyer_phone} />
-                  </div>
+                  <span
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.05] text-gray-500"
+                    title="Legacy manual-transfer order from before Paystack migration"
+                  >
+                    Awaiting seller (legacy)
+                  </span>
                 ) : (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     Pending

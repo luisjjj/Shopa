@@ -69,9 +69,11 @@ export default async function CheckoutPage({ params }: Props) {
 
   const { data: seller } = await supabase
     .from("users")
-    .select("username, whatsapp_number, bank_name, account_number, account_name")
+    .select("username, whatsapp_number, paystack_subaccount_code")
     .eq("id", product.user_id)
-    .single();
+    .single() as never as {
+    data: { username: string; whatsapp_number: string | null; paystack_subaccount_code: string | null } | null;
+  };
 
   const { data: settings } = await supabase
     .from("storefront_settings")
@@ -157,10 +159,7 @@ export default async function CheckoutPage({ params }: Props) {
           productName={product.name}
           productPrice={product.price}
           sellerId={product.user_id}
-          sellerWhatsapp={seller?.whatsapp_number || ""}
-          bankName={seller?.bank_name || ""}
-          accountNumber={seller?.account_number || ""}
-          accountName={seller?.account_name || ""}
+          sellerPayoutReady={!!seller?.paystack_subaccount_code}
           hasVariants={product.has_variants || false}
           variants={variants}
           settings={s ? {

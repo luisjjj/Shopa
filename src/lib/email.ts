@@ -54,7 +54,7 @@ export function emailTemplates() {
     }),
     orderPlaced: (sellerName: string, productName: string, amount: number) => ({
       subject: `New pending order — ${productName}`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>New pending order</h2><p>You have a new pending order for <b>${productName}</b> — ₦${amount.toLocaleString()}. The buyer will confirm after bank transfer.</p></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>New pending order</h2><p>You have a new pending order for <b>${productName}</b> — ₦${amount.toLocaleString()}. You'll be notified the moment the buyer completes Paystack checkout.</p></div>`,
     }),
     buyerOtp: (code: string) => ({
       subject: `Your Shopa verification code: ${code}`,

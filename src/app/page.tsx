@@ -78,7 +78,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 animate-slide-up text-balance leading-relaxed">
-            Turn your Instagram bio into a real storefront. Add products, accept bank transfers, and let buyers self-serve.
+            Turn your Instagram bio into a real storefront. Add products, get paid through Paystack, and let buyers self-serve.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0 animate-slide-up">
@@ -188,7 +188,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-3 gap-6 items-start">
             {[
               { title: "Instagram bio link", desc: "One link turns followers into buyers with self-serve checkout.", image: "/landing/sell-ig.jpg" },
-              { title: "WhatsApp orders", desc: "Buyers confirm payment, you confirm receipt — all tracked.", image: "/landing/sell-chat.jpg" },
+              { title: "WhatsApp orders", desc: "Buyers pay securely, you get notified — all tracked.", image: "/landing/sell-chat.jpg" },
               { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg" },
             ].map((item, i) => (
               <div key={i} className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1 group">
@@ -218,7 +218,7 @@ export default function HomePage() {
             {[
               { step: "01", title: "Add your first product", desc: "Photo, price, stock — done in a minute.", image: "/landing/step-add.jpg" },
               { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
-              { step: "03", title: "Get paid", desc: "Bank transfer in, confirm receipt, mark fulfilled.", image: "/landing/step-paid.jpg" },
+              { step: "03", title: "Get paid", desc: "Paystack splits every sale straight to your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
             ].map((item, i) => (
               <div key={i} className="relative group">
                 <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#1a1a1a] transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-1">

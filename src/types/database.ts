@@ -18,6 +18,9 @@ export interface Database {
           bank_name: string | null;
           account_number: string | null;
           account_name: string | null;
+          paystack_subaccount_code: string | null;
+          bank_code: string | null;
+          payout_setup_completed_at: string | null;
           is_premium: boolean;
           premium_until: string | null;
           is_pro_plus: boolean;
@@ -33,6 +36,9 @@ export interface Database {
           bank_name?: string | null;
           account_number?: string | null;
           account_name?: string | null;
+          paystack_subaccount_code?: string | null;
+          bank_code?: string | null;
+          payout_setup_completed_at?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
           is_pro_plus?: boolean;
@@ -48,6 +54,9 @@ export interface Database {
           bank_name?: string | null;
           account_number?: string | null;
           account_name?: string | null;
+          paystack_subaccount_code?: string | null;
+          bank_code?: string | null;
+          payout_setup_completed_at?: string | null;
           is_premium?: boolean;
           premium_until?: string | null;
           is_pro_plus?: boolean;

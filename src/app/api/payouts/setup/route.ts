@@ -1,0 +1,106 @@
+import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
+import { createSubaccount, resolveAccount } from "@/lib/paystack";
+import { getPlatformFeePercent, isStarterSafeError } from "@/lib/platform";
+import { NextResponse } from "next/server";
+
+export async function POST(request: Request) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
+  const { bank_code, bank_name, account_number } = await request.json().catch(() => ({}));
+  if (!bank_code || !/^\d{10}$/.test(String(account_number || ""))) {
+    return NextResponse.json(
+      { error: "Select a bank and enter a valid 10-digit account number" },
+      { status: 400 }
+    );
+  }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("id, username, email, paystack_subaccount_code")
+    .eq("id", user.id)
+    .single() as never as { data: { id: string; username: string; email: string; paystack_subaccount_code: string | null } | null };
+
+  if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+  if (profile.paystack_subaccount_code) {
+    return NextResponse.json({ error: "Payouts already set up for this store" }, { status: 400 });
+  }
+
+  // Re-resolve server-side so the stored name always comes from Paystack,
+  // never from freeform user input.
+  const resolved = await resolveAccount({ bank_code, account_number: String(account_number) });
+  if (!resolved.status || !resolved.data?.account_name) {
+    return NextResponse.json(
+      { error: "Could not verify this account with Paystack — try again" },
+      { status: 400 }
+    );
+  }
+
+  const feePct = getPlatformFeePercent();
+  let created;
+  try {
+    created = await createSubaccount({
+      business_name: `${profile.username} (Shopa store)`,
+      bank_code,
+      account_number: String(account_number),
+      percentage_charge: feePct,
+      primary_contact_email: profile.email,
+    });
+  } catch (e) {
+    console.error("[payouts/setup] failed", e);
+    return NextResponse.json({ error: "Payout setup failed — try again" }, { status: 502 });
+  }
+
+  if (!created.status || !created.data?.subaccount_code) {
+    const message = created.message || "Payout setup failed";
+    if (isStarterSafeError(message)) {
+      // Flag immediately per migration spec: Starter Business must allow this.
+      console.error("[payouts/setup] POSSIBLE STARTER-BUSINESS RESTRICTION:", message);
+    }
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+
+  const service = createServiceRoleClient();
+  const { error: saveError } = await service
+    .from("users")
+    .update({
+      paystack_subaccount_code: created.data.subaccount_code,
+      bank_code,
+      bank_name: bank_name || created.data.settlement_bank || null,
+      account_number: String(account_number),
+      account_name: resolved.data.account_name,
+      payout_setup_completed_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (saveError) {
+    console.error("[payouts/setup] save failed", saveError);
+    return NextResponse.json({ error: "Subaccount created but could not be saved — contact support" }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    subaccount_code: created.data.subaccount_code,
+    account_name: resolved.data.account_name,
+  });
+}
+
+export async function GET() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("paystack_subaccount_code, bank_name, account_number, account_name, payout_setup_completed_at")
+    .eq("id", user.id)
+    .single();
+
+  return NextResponse.json({ payout: profile || null });
+}

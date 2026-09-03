@@ -98,6 +98,7 @@ export default async function ConfirmPage({ searchParams }: Props) {
       buyer={typeof searchParams.buyer === "string" ? searchParams.buyer : null}
       reference={typeof searchParams.reference === "string" ? searchParams.reference : null}
       orderId={typeof searchParams.orderId === "string" ? searchParams.orderId : null}
+      paid={searchParams.paid === "1"}
       message={typeof searchParams.message === "string" ? searchParams.message : null}
       sellerWhatsapp={whatsapp}
       pageStyle={pageStyle}

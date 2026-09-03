@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { MIN_ORDER_NAIRA } from "@/lib/platform";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -42,13 +43,24 @@ export async function POST(request: Request) {
 
   const { data: seller } = await supabase
     .from("users")
-    .select("bank_name, account_number, account_name, email, username")
+    .select("bank_name, account_number, account_name, email, username, paystack_subaccount_code")
     .eq("id", sellerId)
-    .single();
+    .single() as never as {
+    data: {
+      bank_name: string | null;
+      account_number: string | null;
+      account_name: string | null;
+      email: string;
+      username: string;
+      paystack_subaccount_code: string | null;
+    } | null;
+  };
 
-  if (!seller || !seller.bank_name || !seller.account_number || !seller.account_name) {
+  // No silent fallback to manual bank transfer: without a payout subaccount,
+  // checkout is blocked until the seller completes payout setup.
+  if (!seller?.paystack_subaccount_code) {
     return NextResponse.json(
-      { error: "Seller has not set up bank details yet" },
+      { error: "SELLER_PAYOUT_NOT_SETUP", message: "This seller hasn't set up payouts yet" },
       { status: 400 }
     );
   }
@@ -111,6 +123,13 @@ export async function POST(request: Request) {
     promoIdToUse = promo.id;
   }
 
+  if (finalAmount < MIN_ORDER_NAIRA) {
+    return NextResponse.json(
+      { error: `This order (₦${finalAmount.toLocaleString()}) is below the ₦${MIN_ORDER_NAIRA} Paystack minimum` },
+      { status: 400 }
+    );
+  }
+
   const reference = `shopa_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
   let order: { id: string } | null = null;
@@ -149,15 +168,12 @@ export async function POST(request: Request) {
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch(() => {});
   }
   {
-    const t = { subject: `Order placed — ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b> — ₦${finalAmount.toLocaleString()} is pending. Transfer to ${seller.bank_name} ${seller.account_number} (${seller.account_name}) then tap "I've sent the money".</p></div>` };
+    const t = { subject: `Order placed — ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b> — ₦${finalAmount.toLocaleString()} is pending. Complete payment on the Paystack checkout page to confirm it.</p></div>` };
     sendEmail({ to: normalizedEmail, subject: t.subject, html: t.html }).catch(() => {});
   }
 
   return NextResponse.json({
     orderId: order.id,
-    bankName: seller.bank_name,
-    accountNumber: seller.account_number,
-    accountName: seller.account_name,
     reference,
   });
 }
