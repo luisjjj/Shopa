@@ -400,12 +400,12 @@ export default async function StorePage({
         <div className="border-b" style={s ? { borderColor: `${textColor}15` } : { borderColor: "rgb(229 231 235)" }}>
           <div className={`${containerMax} mx-auto px-4 ${sectionPadding} ${headerAlign}`}>
             {(s ? s.show_store_name : true) && (
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={s ? { color: textColor } : undefined}>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white break-words" style={s ? { color: textColor } : undefined}>
                 {profile.username}
               </h1>
             )}
             {s?.tagline ? (
-              <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
+              <p className="text-sm mt-1 break-words" style={{ color: `${textColor}80` }}>
                 {s.tagline}
               </p>
             ) : !s ? (
@@ -421,12 +421,12 @@ export default async function StorePage({
       ) : (
         <div className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
           {(s ? s.show_store_name : true) && (
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white" style={s ? { color: textColor } : undefined}>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white break-words" style={s ? { color: textColor } : undefined}>
               {profile.username}
             </h1>
           )}
           {s?.tagline ? (
-            <p className="text-sm mt-1" style={{ color: `${textColor}80` }}>
+            <p className="text-sm mt-1 break-words" style={{ color: `${textColor}80` }}>
               {s.tagline}
             </p>
           ) : !s ? (

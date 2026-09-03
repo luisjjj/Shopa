@@ -97,7 +97,7 @@ export default async function DashboardPage() {
             <Link
               href={`/${profile.username}`}
               target="_blank"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06]"
+              className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06]"
             >
               View store ↗
             </Link>
@@ -126,12 +126,12 @@ export default async function DashboardPage() {
         <div className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark">
           <img src="/landing/dashboard-banner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
-          <div className="relative p-6 sm:p-8 flex items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-white">
+          <div className="relative p-6 sm:p-8 flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-white break-words">
                 Welcome back, {profile.username}
               </h1>
-              <p className="text-white/80 mt-1 text-sm">
+              <p className="text-white/80 mt-1 text-sm break-all">
                 myshopa.com.ng/<span className="font-medium text-white">{profile.username}</span>
               </p>
             </div>
@@ -382,7 +382,7 @@ async function OrderList({ userId }: { userId: string }) {
         return (
           <div
             key={order.id}
-            className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 shadow-card dark:shadow-card-dark flex items-center gap-4"
+            className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 shadow-card dark:shadow-card-dark flex flex-wrap items-center gap-3 sm:gap-4"
           >
             {product?.image_url ? (
               <img src={product.image_url} alt="" className="w-11 h-11 rounded-lg object-cover shrink-0" />
@@ -430,7 +430,7 @@ async function OrderList({ userId }: { userId: string }) {
                     <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                   )
                 ) : order.confirmed_by_buyer ? (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <form action="/api/orders/paid" method="post" className="inline">
                       <input type="hidden" name="order_id" value={order.id} />
                       <button type="submit" className="text-[10px] font-bold px-3 py-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all active:scale-95">

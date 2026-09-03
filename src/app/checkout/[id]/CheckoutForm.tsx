@@ -299,9 +299,9 @@ export default function CheckoutForm({
           .pulse-ring { animation: pulse-ring 1.5s ease-out infinite; }
         `}</style>
 
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div
-            className="bank-modal-enter w-full max-w-md rounded-2xl overflow-hidden"
+            className="bank-modal-enter w-full max-w-md rounded-2xl overflow-hidden m-auto shrink-0"
             style={{
               background: s ? cardBg : "#fff",
               borderRadius: cardRadius,
@@ -821,11 +821,11 @@ function BankDetailRow({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <div>
+    <div className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
         <p className="text-[11px]" style={{ color: s ? `${textColor}50` : "#9ca3af" }}>{label}</p>
         <p
-          className={`text-sm font-semibold ${mono ? "font-mono tracking-wider" : ""}`}
+          className={`text-sm font-semibold break-words ${mono ? "font-mono tracking-wider" : ""}`}
           style={{ color: s ? textColor : "#111827" }}
         >
           {value}
@@ -834,7 +834,7 @@ function BankDetailRow({
       <button
         type="button"
         onClick={onCopy}
-        className="text-xs px-2.5 py-1 rounded-lg transition-all font-medium"
+        className="text-xs px-2.5 py-1 rounded-lg transition-all font-medium shrink-0"
         style={{
           background: copied ? "#dcfce7" : s ? `${textColor}08` : "#f3f4f6",
           color: copied ? "#16a34a" : s ? `${textColor}60` : "#6b7280",
