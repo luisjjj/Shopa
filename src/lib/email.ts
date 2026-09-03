@@ -54,5 +54,9 @@ export function emailTemplates() {
       subject: `New pending order — ${productName}`,
       html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>New pending order</h2><p>You have a new pending order for <b>${productName}</b> — ₦${amount.toLocaleString()}. The buyer will confirm after bank transfer.</p></div>`,
     }),
+    buyerOtp: (code: string) => ({
+      subject: `Your Shopa verification code: ${code}`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Verify your email</h2><p>Your Shopa verification code is:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#ed7712">${code}</p><p>It expires in 10 minutes. If you didn't request this, ignore this email.</p></div>`,
+    }),
   };
 }

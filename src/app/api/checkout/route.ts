@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
@@ -9,6 +10,32 @@ export async function POST(request: Request) {
 
   if (!productId || !sellerId || !buyerName || !buyerPhone || !amount) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  if (!buyerEmail || !String(buyerEmail).includes("@")) {
+    return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+  }
+
+  const normalizedEmail = String(buyerEmail).trim().toLowerCase();
+  const otpClient = createServiceRoleClient();
+  const { data: verified, error: otpError } = await otpClient
+    .from("buyer_otps")
+    .select("id, verified_at")
+    .eq("email", normalizedEmail)
+    .not("verified_at", "is", null)
+    .gt("verified_at", new Date(Date.now() - 30 * 60 * 1000).toISOString())
+    .order("verified_at", { ascending: false })
+    .limit(1)
+    .maybeSingle() as never as { data: { id: string } | null; error: { code?: string; message?: string } | null };
+
+  if (otpError && otpError.code !== "42P01" && !String(otpError.message || "").includes("buyer_otps")) {
+    return NextResponse.json({ error: "Could not verify email — try again" }, { status: 500 });
+  }
+  if (!otpError && !verified) {
+    return NextResponse.json({ error: "Please verify your email first" }, { status: 403 });
+  }
+  if (otpError) {
+    console.warn("[checkout] buyer_otps table missing — skipping email verification. Run supabase/buyer-otps.sql");
   }
 
   const supabase = createClient();
@@ -93,7 +120,7 @@ export async function POST(request: Request) {
     seller_id: sellerId,
     buyer_name: buyerName,
     buyer_phone: buyerPhone,
-    buyer_email: buyerEmail || null,
+    buyer_email: normalizedEmail,
     amount: finalAmount,
     paystack_reference: reference,
     paid: false,
@@ -114,14 +141,16 @@ export async function POST(request: Request) {
   }
   if (!order) return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
 
+  await otpClient.from("buyer_otps").delete().eq("email", normalizedEmail);
+
   const productName = productRow?.name || "your order";
   if (seller?.email) {
     const t = emailTemplates().orderPlaced(seller.username || "seller", productName, finalAmount);
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch(() => {});
   }
-  if (buyerEmail) {
+  {
     const t = { subject: `Order placed — ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b> — ₦${finalAmount.toLocaleString()} is pending. Transfer to ${seller.bank_name} ${seller.account_number} (${seller.account_name}) then tap "I've sent the money".</p></div>` };
-    sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch(() => {});
+    sendEmail({ to: normalizedEmail, subject: t.subject, html: t.html }).catch(() => {});
   }
 
   return NextResponse.json({

@@ -448,7 +448,19 @@ async function OrderList({ userId }: { userId: string }) {
             </div>
 
             {!order.paid && !order.confirmed_by_buyer && (
-              <RemindButton orderId={order.id} createdAt={order.created_at} buyerPhone={order.buyer_phone} />
+              <>
+                <RemindButton orderId={order.id} createdAt={order.created_at} buyerPhone={order.buyer_phone} />
+                <form action="/api/orders/cancel" method="post" className="inline shrink-0">
+                  <input type="hidden" name="order_id" value={order.id} />
+                  <button
+                    type="submit"
+                    title="Cancel this order"
+                    className="text-[10px] font-medium px-2 py-0.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              </>
             )}
 
             {order.paid && order.buyer_phone && (

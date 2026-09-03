@@ -365,6 +365,35 @@ export interface Database {
           created_at?: string;
         };
       };
+      buyer_otps: {
+        Row: {
+          id: string;
+          email: string;
+          code: string;
+          expires_at: string;
+          verified_at: string | null;
+          attempts: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          code: string;
+          expires_at: string;
+          verified_at?: string | null;
+          attempts?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          code?: string;
+          expires_at?: string;
+          verified_at?: string | null;
+          attempts?: number;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;

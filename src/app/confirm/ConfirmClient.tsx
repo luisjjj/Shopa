@@ -9,6 +9,7 @@ type Props = {
   amount: string | null;
   buyer: string | null;
   reference: string | null;
+  orderId: string | null;
   message: string | null;
   sellerWhatsapp: string | null;
   pageStyle: React.CSSProperties;
@@ -25,6 +26,7 @@ export default function ConfirmClient({
   amount,
   buyer,
   reference,
+  orderId,
   message,
   sellerWhatsapp,
   pageStyle,
@@ -62,19 +64,19 @@ export default function ConfirmClient({
             </div>
 
             <h1 className="text-2xl font-bold mb-2" style={{ color: hasSettings ? textColor : undefined }}>
-              Payment confirmed!
+              Transfer claimed!
             </h1>
             <p className="mb-6 text-sm leading-relaxed" style={{ color: hasSettings ? `${textColor}80` : undefined }}>
-              Thank you{buyer ? `, ${buyer}` : ""}! Your order for{" "}
+              Thank you{buyer ? `, ${buyer}` : ""}! Your claim for{" "}
               <strong style={{ color: hasSettings ? textColor : undefined }}>{product}</strong>{" "}
-              has been confirmed. The seller will verify your payment shortly.
+              has been recorded. The seller will verify your transfer shortly — we&apos;ll email you once it&apos;s confirmed.
             </p>
 
             <div
               className={`rounded-xl p-4 mb-6 ${hasSettings ? "" : "bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06]"}`}
               style={hasSettings ? { background: `${textColor}05`, border: `1px solid ${textColor}10` } : undefined}
             >
-              <p className="text-xs uppercase tracking-wider font-medium" style={{ color: hasSettings ? `${textColor}50` : undefined }}>Amount paid</p>
+              <p className="text-xs uppercase tracking-wider font-medium" style={{ color: hasSettings ? `${textColor}50` : undefined }}>Amount to verify</p>
               <p className="text-3xl font-bold mt-1" style={{ color: hasSettings ? textColor : undefined }}>
                 ₦{amount ? parseInt(amount).toLocaleString() : "—"}
               </p>
@@ -105,9 +107,7 @@ export default function ConfirmClient({
 
             {/* Review Section */}
             <ReviewSection
-              productId={null}
-              orderId={reference}
-              buyerName={buyer || ""}
+              orderId={orderId}
               hasSettings={hasSettings}
               textColor={textColor}
             />
@@ -143,15 +143,11 @@ export default function ConfirmClient({
 }
 
 function ReviewSection({
-  productId,
   orderId,
-  buyerName,
   hasSettings,
   textColor,
 }: {
-  productId: string | null;
   orderId: string | null;
-  buyerName: string;
   hasSettings: boolean;
   textColor: string;
 }) {
@@ -160,26 +156,36 @@ function ReviewSection({
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const handleSubmit = async () => {
-    if (rating === 0) return;
+    if (rating === 0 || !orderId) return;
     setLoading(true);
+    setFormError("");
     try {
-      await fetch("/api/reviews", {
+      const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product_id: productId,
           order_id: orderId,
-          buyer_name: buyerName,
           rating,
           comment: comment || undefined,
         }),
       });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFormError(data.error || "Could not submit review");
+        setLoading(false);
+        return;
+      }
       setSubmitted(true);
-    } catch {}
+    } catch {
+      setFormError("Network error — try again");
+    }
     setLoading(false);
   };
+
+  if (!orderId) return null;
 
   if (submitted) {
     return (
@@ -202,6 +208,12 @@ function ReviewSection({
       <p className="text-sm font-medium mb-3" style={{ color: hasSettings ? textColor : undefined }}>
         Rate your experience
       </p>
+      <p className="text-xs mb-3" style={{ color: hasSettings ? `${textColor}60` : "#9ca3af" }}>
+        Available once the seller confirms your payment — one review per order.
+      </p>
+      {formError && (
+        <p className="text-xs mb-3 text-red-500">{formError}</p>
+      )}
 
       <div className="flex items-center gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((star) => (
