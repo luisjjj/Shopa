@@ -22,7 +22,8 @@ export default function HomePage() {
         myshopa.com.ng is live — free to start, launch your store today.
       </div>
 
-      <nav className="relative z-10 max-w-6xl mx-auto px-6 py-5 sticky top-0 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-gray-100/80 dark:border-white/[0.06] bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 supports-[backdrop-filter]:dark:bg-[#0a0a0a]/70">
+        <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <ShopaLogo markClassName="w-8 h-8" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={29} />
           <div className="hidden md:flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -67,6 +68,7 @@ export default function HomePage() {
             <Link href="/login" className="block px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]">Sign in</Link>
           </div>
         )}
+        </div>
       </nav>
 
       <section className="relative z-10 max-w-6xl mx-auto px-6 pt-12 sm:pt-20 pb-16 grid lg:grid-cols-2 gap-10 items-center">
@@ -121,12 +123,16 @@ export default function HomePage() {
       </section>
 
       <section className="relative z-10 border-y border-gray-100 dark:border-white/[0.06] bg-gray-50/60 dark:bg-white/[0.01] py-5 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee gap-10 w-max px-6 text-sm font-medium text-gray-500 dark:text-gray-400">
-          {["Fashion", "Thrift", "Food", "Beauty", "Sneakers", "Hair", "Accessories", "Cakes", "Perfumes", "Home goods"].map((c) => (
-            <span key={c} className="flex items-center gap-10">
-              <span>{c} sellers welcome</span>
-              <span className="text-brand-500">•</span>
-            </span>
+        <div className="flex w-max animate-marquee whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
+          {[0, 1].map((copy) => (
+            <div key={copy} aria-hidden={copy === 1} className="flex items-center">
+              {["Fashion", "Thrift", "Food", "Beauty", "Sneakers", "Hair", "Accessories", "Cakes", "Perfumes", "Home goods"].map((c) => (
+                <span key={c} className="flex items-center">
+                  <span className="px-6">{c}</span>
+                  <span className="text-brand-500">•</span>
+                </span>
+              ))}
+            </div>
           ))}
         </div>
       </section>
@@ -174,7 +180,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="features" className="relative z-10 bg-gray-50/80 dark:bg-[#111] py-24">
+      <section id="features" className="relative z-10 bg-gray-50/80 dark:bg-[#111] py-24 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Sell everywhere</p>
@@ -203,7 +209,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="how" className="relative z-10 py-24">
+      <section id="how" className="relative z-10 py-24 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">How it works</p>
@@ -240,7 +246,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="pricing" className="relative z-10 py-24 bg-gray-50/80 dark:bg-[#111]">
+      <section id="pricing" className="relative z-10 py-24 bg-gray-50/80 dark:bg-[#111] scroll-mt-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Pricing</p>
@@ -433,3 +439,4 @@ export default function HomePage() {
     </div>
   );
 }
+
