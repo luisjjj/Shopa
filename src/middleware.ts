@@ -2,14 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 function getSubdomain(hostname: string): string | null {
-  const bases = ["myshopa.com.ng", "shopa-store.name.ng"];
+  const base = "myshopa.com.ng";
   const stripped = hostname.replace(":3000", "").replace(":80", "").replace(":443", "");
-  for (const base of bases) {
-    if (stripped === base) return null;
-    if (stripped.endsWith("." + base)) {
-      const sub = stripped.replace("." + base, "");
-      if (sub && !sub.includes(".")) return sub;
-    }
+  if (stripped === base) return null;
+  if (stripped.endsWith("." + base)) {
+    const sub = stripped.replace("." + base, "");
+    if (sub && !sub.includes(".")) return sub;
   }
   return null;
 }
