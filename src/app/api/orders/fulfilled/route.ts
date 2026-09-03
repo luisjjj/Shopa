@@ -11,10 +11,13 @@ export async function POST(request: Request) {
   }
 
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.redirect(new URL("/login", request.url));
   await supabase
     .from("orders")
     .update({ fulfilled: fulfilled === "true" })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .eq("seller_id", user.id);
 
   return NextResponse.redirect(new URL("/dashboard", request.url));
 }

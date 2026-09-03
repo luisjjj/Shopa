@@ -26,7 +26,17 @@ export async function POST(request: Request) {
     );
   }
 
-  let finalAmount = amount;
+  const { data: productRow } = await supabase
+    .from("products")
+    .select("id, name, price, stock, is_active")
+    .eq("id", productId)
+    .single();
+
+  if (!productRow || !productRow.is_active) {
+    return NextResponse.json({ error: "Product not available" }, { status: 400 });
+  }
+
+  let finalAmount = productRow.price;
 
   if (variantId) {
     const { data: variant } = await supabase
@@ -47,6 +57,31 @@ export async function POST(request: Request) {
     if (variant.price_override != null) {
       finalAmount = variant.price_override;
     }
+  } else if (productRow.stock != null && productRow.stock <= 0) {
+    return NextResponse.json({ error: "Product is out of stock" }, { status: 400 });
+  }
+
+  let promoIdToUse: string | null = null;
+  if (promoCodeId) {
+    const { data: promo } = await supabase
+      .from("promo_codes")
+      .select("id, seller_id, discount_percent, discount_amount, max_uses, used_count, expires_at, is_active")
+      .eq("id", promoCodeId)
+      .eq("seller_id", sellerId)
+      .single();
+    const promoValid =
+      promo &&
+      promo.is_active &&
+      (!promo.expires_at || new Date(promo.expires_at).getTime() > Date.now()) &&
+      (promo.max_uses === 0 || promo.used_count < promo.max_uses);
+    if (!promoValid) {
+      return NextResponse.json({ error: "Promo code is invalid or expired" }, { status: 400 });
+    }
+    const discount = promo.discount_percent
+      ? Math.round((finalAmount * promo.discount_percent) / 100)
+      : promo.discount_amount || 0;
+    finalAmount = Math.max(0, finalAmount - discount);
+    promoIdToUse = promo.id;
   }
 
   const reference = `shopa_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -63,7 +98,7 @@ export async function POST(request: Request) {
     paystack_reference: reference,
     paid: false,
     confirmed_by_buyer: false,
-    promo_code_id: promoCodeId || null,
+    promo_code_id: promoIdToUse,
     variant_id: variantId || null,
   };
   const res: { data: { id: string } | null; error: { message: string } | null } = await supabase.from("orders").insert(payload).select("id").single() as never;
@@ -79,22 +114,7 @@ export async function POST(request: Request) {
   }
   if (!order) return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
 
-  if (promoCodeId) {
-    const { data: promo } = await supabase
-      .from("promo_codes")
-      .select("used_count")
-      .eq("id", promoCodeId)
-      .single();
-    if (promo) {
-      await supabase
-        .from("promo_codes")
-        .update({ used_count: promo.used_count + 1 })
-        .eq("id", promoCodeId);
-    }
-  }
-
-  const { data: product } = await supabase.from("products").select("name").eq("id", productId).single();
-  const productName = product?.name || "your order";
+  const productName = productRow?.name || "your order";
   if (seller?.email) {
     const t = emailTemplates().orderPlaced(seller.username || "seller", productName, finalAmount);
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch(() => {});

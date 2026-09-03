@@ -15,8 +15,12 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const { data: order } = await supabase.from("orders").select("id, seller_id, buyer_name, buyer_phone, amount, products(name)").eq("id", orderId).eq("seller_id", user.id).single();
+  const { data: order } = await supabase.from("orders").select("id, seller_id, buyer_name, buyer_phone, amount, paid, products(name)").eq("id", orderId).eq("seller_id", user.id).single();
   if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  if ((order as unknown as { paid: boolean }).paid) {
+    if (formData) return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.json({ error: "Order already confirmed as paid" }, { status: 400 });
+  }
 
   await supabase.from("orders").update({ confirmed_by_buyer: false, paid: false }).eq("id", orderId);
 

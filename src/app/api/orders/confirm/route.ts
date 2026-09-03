@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     .from("orders")
     .update({ confirmed_by_buyer: true })
     .eq("id", orderId)
+    .eq("paid", false)
     .select("seller_id, buyer_name, amount, product_id, buyer_email")
     .single();
 

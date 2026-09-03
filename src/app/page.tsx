@@ -102,8 +102,8 @@ export default function HomePage() {
         </div>
 
         <div className="relative animate-slide-up">
-          <div className="rounded-2xl overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06]">
-            <img src="/landing/hero-seller.jpg" alt="Seller in traditional Nigerian attire" className="w-full h-auto" />
+          <div className="rounded-2xl overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] aspect-[4/3]">
+            <img src="/landing/hero-seller.jpg" alt="Seller in traditional Nigerian attire" className="w-full h-full object-cover object-top" />
           </div>
           <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
             <img src="/landing/hero-whatsapp.jpg" alt="Buyer chat" className="w-11 h-11 rounded-xl object-cover shrink-0" />
@@ -164,8 +164,8 @@ export default function HomePage() {
                 { name: "Clutch", price: "₦8,000", image: "/landing/showcase-3.jpg" },
               ].map((item, i) => (
                 <div key={i} className="text-center group">
-                  <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03]">
-                    <img src={item.image} alt={item.name} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
+                  <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03] aspect-square">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <p className="text-xs font-medium text-gray-900 dark:text-white">{item.name}</p>
                   <p className="text-xs font-semibold text-brand-600">{item.price}</p>
@@ -192,8 +192,8 @@ export default function HomePage() {
               { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg" },
             ].map((item, i) => (
               <div key={i} className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1 group">
-                <div className="overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
+                <div className="overflow-hidden aspect-[4/3]">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
@@ -222,8 +222,8 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="relative group">
                 <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#1a1a1a] transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-1">
-                  <div className="relative overflow-hidden">
-                    <img src={item.image} alt={item.title} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
+                  <div className="relative overflow-hidden aspect-[4/3]">
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                     <span className="absolute top-3 left-3 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full">{item.step}</span>
                   </div>
                   <div className="p-6">
