@@ -150,7 +150,7 @@ export default function HomePage() {
             <div className="text-center sm:text-left">
               <h3 className="font-bold text-xl text-gray-900 dark:text-white">amakabags</h3>
               <p className="text-sm text-gray-400 mt-0.5 mb-5">Premium leather bags</p>
-              <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-400 text-left">
+              <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-400 text-left w-fit mx-auto sm:mx-0">
                 <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Live in minutes, no code</li>
                 <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Bank transfer checkout</li>
                 <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> WhatsApp order alerts</li>

@@ -100,9 +100,9 @@ export default function SignupPage() {
         <div className="absolute bottom-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-brand-50/40 dark:bg-brand-950/10 blur-[80px]" />
       </div>
 
-      <div className="w-full max-w-5xl relative z-10 grid lg:grid-cols-2 gap-6 items-stretch">
+      <div className="w-full max-w-5xl relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <AuthSidePanel />
-        <div className="w-full max-w-md mx-auto lg:mx-0 flex flex-col justify-center">
+        <div className="w-full max-w-md min-w-0 mx-auto lg:mx-0 flex flex-col justify-center">
         {/* Theme toggle */}
         <div className="flex justify-end mb-6">
           <button

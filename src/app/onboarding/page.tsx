@@ -145,11 +145,11 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 items-start">
-        <div className="hidden lg:block sticky top-6">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="hidden lg:block sticky top-6 min-w-0">
           <AuthSidePanel />
         </div>
-        <div className="w-full max-w-md mx-auto lg:mx-0">
+        <div className="w-full max-w-md min-w-0 mx-auto lg:mx-0">
         <div className="flex justify-end mb-4">
           <button
             onClick={toggle}

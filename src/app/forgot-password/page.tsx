@@ -23,9 +23,9 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50 dark:bg-[#0a0a0a]">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 items-stretch">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         <AuthSidePanel />
-        <div className="w-full max-w-md mx-auto lg:mx-0 flex flex-col justify-center">
+        <div className="w-full max-w-md min-w-0 mx-auto lg:mx-0 flex flex-col justify-center">
         <div className="text-center mb-8">
           <ShopaMark className="w-12 h-12 mx-auto mb-4" title="Shopa" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reset password</h1>
