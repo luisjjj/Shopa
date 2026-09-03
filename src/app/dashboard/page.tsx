@@ -124,7 +124,7 @@ export default async function DashboardPage() {
       <main className="max-w-5xl mx-auto px-5 py-8">
         {/* Welcome */}
         <div className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark">
-          <img src="/landing/hero-seller.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <img src="/landing/dashboard-banner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
           <div className="relative p-6 sm:p-8 flex items-center justify-between gap-4">
             <div>

@@ -103,7 +103,7 @@ export default function HomePage() {
 
         <div className="relative animate-slide-up">
           <div className="rounded-2xl overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06]">
-            <img src="/landing/hero-seller.jpg" alt="Seller packing orders" className="w-full h-[320px] sm:h-[420px] object-cover" />
+            <img src="/landing/hero-seller.jpg" alt="Seller in traditional Nigerian attire" className="w-full h-auto" />
           </div>
           <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
             <img src="/landing/hero-whatsapp.jpg" alt="Buyer chat" className="w-11 h-11 rounded-xl object-cover shrink-0" />
@@ -157,15 +157,15 @@ export default function HomePage() {
               </ul>
               <Link href="/signup" className="inline-block mt-6 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all">Open yours free</Link>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 items-start">
               {[
                 { name: "Tote Bag", price: "₦15,000", image: "/landing/showcase-1.jpg" },
                 { name: "Crossbody", price: "₦12,000", image: "/landing/showcase-2.jpg" },
                 { name: "Clutch", price: "₦8,000", image: "/landing/showcase-3.jpg" },
               ].map((item, i) => (
                 <div key={i} className="text-center group">
-                  <div className="aspect-square rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03]">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03]">
+                    <img src={item.image} alt={item.name} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <p className="text-xs font-medium text-gray-900 dark:text-white">{item.name}</p>
                   <p className="text-xs font-semibold text-brand-600">{item.price}</p>
@@ -185,15 +185,15 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-3 gap-6 items-start">
             {[
               { title: "Instagram bio link", desc: "One link turns followers into buyers with self-serve checkout.", image: "/landing/sell-ig.jpg" },
               { title: "WhatsApp orders", desc: "Buyers confirm payment, you confirm receipt — all tracked.", image: "/landing/sell-chat.jpg" },
               { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg" },
             ].map((item, i) => (
               <div key={i} className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1 group">
-                <div className="h-48 overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="overflow-hidden">
+                  <img src={item.image} alt={item.title} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
@@ -214,7 +214,7 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-3 gap-6 items-start">
             {[
               { step: "01", title: "Add your first product", desc: "Photo, price, stock — done in a minute.", image: "/landing/step-add.jpg" },
               { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
@@ -222,8 +222,8 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="relative group">
                 <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#1a1a1a] transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-1">
-                  <div className="relative h-52 overflow-hidden">
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="relative overflow-hidden">
+                    <img src={item.image} alt={item.title} className="w-full h-auto group-hover:scale-105 transition-transform duration-500" />
                     <span className="absolute top-3 left-3 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full">{item.step}</span>
                   </div>
                   <div className="p-6">
@@ -435,4 +435,5 @@ export default function HomePage() {
     </div>
   );
 }
+
 

@@ -162,8 +162,8 @@ export default function OnboardingPage() {
 
         <div className="grid grid-cols-3 gap-2 mb-6">
           {["/landing/step-add.jpg", "/landing/step-style.jpg", "/landing/step-paid.jpg"].map((src, i) => (
-            <div key={i} className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 h-20">
-              <img src={src} alt="" className="w-full h-full object-cover" />
+            <div key={i} className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10">
+              <img src={src} alt="" className="w-full h-auto" />
             </div>
           ))}
         </div>
