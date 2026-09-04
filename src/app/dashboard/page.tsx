@@ -9,6 +9,7 @@ import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive } from "@/lib/premium";
+import { formatSettlementDate, nextSettlementDate } from "@/lib/settlement";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 
 export default async function DashboardPage() {
@@ -446,7 +447,15 @@ async function OrderList({ userId }: { userId: string }) {
                       Fulfilled
                     </span>
                   ) : (
-                    <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
+                    <>
+                      <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
+                      <span
+                        className="block text-[10px] text-gray-400 dark:text-gray-500 mt-1"
+                        title="Paystack settles to your bank on the next business day"
+                      >
+                        Settles {formatSettlementDate(nextSettlementDate(new Date(order.created_at)))}
+                      </span>
+                    </>
                   )
                 ) : order.confirmed_by_buyer ? (
                   <span
