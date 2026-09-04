@@ -57,6 +57,17 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // Self-healing OAuth landing: if Supabase's redirect allowlist doesn't
+  // include our /auth/callback URL, it falls back to the Site URL and drops
+  // the auth ?code= on "/". Forward it to the callback instead of stranding
+  // the user on the homepage.
+  if (pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    if (!url.searchParams.has("next")) url.searchParams.set("next", "/dashboard");
+    return NextResponse.redirect(url);
+  }
+
   // Public pages skip the Supabase auth round-trip entirely (faster TTFB).
   // Only /dashboard and /onboarding require a session.
   const isProtected = pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname === "/onboarding";
