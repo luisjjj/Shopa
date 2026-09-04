@@ -127,7 +127,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
       <main className="max-w-2xl mx-auto px-5 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Payout setup</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Buyers pay through Paystack and money settles straight to this account. Shopa takes 1% per sale.
+          Shopa takes 1% per sale.
         </p>
 
         {done ? (
@@ -157,8 +157,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
               </div>
             </dl>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-5">
-              Split: 99% settles to you, 1% to Shopa, automatically on every sale. To change payout
-              details, contact support.
+              You keep 99% of every sale. To change payout details, contact support.
             </p>
           </div>
         ) : (

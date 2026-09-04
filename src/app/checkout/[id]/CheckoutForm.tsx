@@ -273,9 +273,6 @@ export default function CheckoutForm({
                   <span>Paystack fee</span>
                   <span className="font-medium">₦{feePreview.paystackFee.toLocaleString()}</span>
                 </div>
-                <p className="text-[11px] pt-1" style={{ color: s ? `${textColor}60` : "#9ca3af" }}>
-                  Fees go on top — the seller receives the full ₦{feePreview.product.toLocaleString()}.
-                </p>
               </div>
 
               {payError && (

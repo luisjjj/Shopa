@@ -218,7 +218,7 @@ export default function HomePage() {
             {[
               { step: "01", title: "Add your first product", desc: "Photo, price, stock — done in a minute.", image: "/landing/step-add.jpg" },
               { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
-              { step: "03", title: "Get paid", desc: "Paystack splits every sale straight to your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
+              { step: "03", title: "Get paid", desc: "Get paid straight to your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
             ].map((item, i) => (
               <div key={i} className="relative group">
                 <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#1a1a1a] transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-1">

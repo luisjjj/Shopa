@@ -74,7 +74,7 @@ export default function ProfileClient({
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
         if (data.payout?.ok) {
-          setPayoutNote("Payouts activated — sales will settle to this account automatically.");
+          setPayoutNote("Payouts activated.");
         } else if (data.payout?.message) {
           setPayoutNote(data.payout.message);
         }
@@ -192,7 +192,7 @@ export default function ProfileClient({
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bank Details</h2>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Sales settle here automatically via Paystack. Saving verifies the account and activates payouts.
+              Saving verifies the account and activates payouts.
             </p>
           </div>
           <div className="p-5 space-y-4">
