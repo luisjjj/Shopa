@@ -259,6 +259,7 @@ export default async function DashboardPage() {
 
         {/* Orders Section */}
         <div>
+          <PayoutSummary userId={user.id} />
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Orders</h2>
             <a
@@ -352,6 +353,37 @@ async function ProductList({ userId }: { userId: string }) {
           </div>
         </Link>
       ))}
+    </div>
+  );
+}
+
+async function PayoutSummary({ userId }: { userId: string }) {
+  const supabase = createClient();
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await supabase
+    .from("orders")
+    .select("amount")
+    .eq("seller_id", userId)
+    .eq("paid", true)
+    .gte("created_at", weekAgo);
+
+  if (!data || data.length === 0) return null;
+
+  const total = data.reduce((sum, o) => sum + (o.amount || 0), 0);
+  const next = formatSettlementDate(nextSettlementDate(new Date()));
+
+  return (
+    <div className="mb-5 rounded-2xl border border-green-200/60 dark:border-green-900/30 bg-green-50 dark:bg-green-950/20 px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 sm:justify-between">
+      <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+        ₦{total.toLocaleString()} paid in the last 7 days
+        <span className="font-normal text-green-700/80 dark:text-green-400/80"> · from {data.length} order{data.length === 1 ? "" : "s"}</span>
+      </p>
+      <p
+        className="text-[11px] text-green-700/70 dark:text-green-400/70"
+        title="Paystack settles confirmed payments to your bank every business day"
+      >
+        Cash lands next business day ({next}) — ship on the Paid badge, not the bank alert
+      </p>
     </div>
   );
 }
