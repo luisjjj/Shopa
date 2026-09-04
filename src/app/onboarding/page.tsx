@@ -8,6 +8,7 @@ import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
 import BankPicker from "@/components/BankPicker";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
+import { isProPlusActive } from "@/lib/premium";
 
 export default function OnboardingPage() {
   const [existingStore, setExistingStore] = useState<string | null>(null);
@@ -35,13 +36,17 @@ export default function OnboardingPage() {
 
       const { data } = await supabase
         .from("users")
-        .select("username, is_pro_plus")
+        .select("username, is_pro_plus, pro_plus_until")
         .eq("email", user.email!)
         .maybeSingle();
 
       if (data) {
         setExistingStore(data.username);
-        setIsProPlus(data.is_pro_plus);
+        setIsProPlus(
+          isProPlusActive(
+            data as { is_pro_plus: boolean; pro_plus_until: string | null }
+          )
+        );
         return;
       }
 

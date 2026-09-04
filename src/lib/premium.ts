@@ -12,3 +12,30 @@ export function daysLeft(until: string | null): number {
   if (!until) return 0;
   return Math.max(0, Math.ceil((new Date(until).getTime() - Date.now()) / 86400000));
 }
+
+export const FREE_PRODUCT_LIMIT = 3;
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export type PlanQueryClient = SupabaseClient;
+
+export async function fetchPlanStatus(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ isPremium: boolean; isProPlus: boolean }> {
+  const { data } = await supabase
+    .from("users")
+    .select("is_premium, premium_until, is_pro_plus, pro_plus_until")
+    .eq("id", userId)
+    .single();
+  const p = data || {
+    is_premium: false,
+    premium_until: null,
+    is_pro_plus: false,
+    pro_plus_until: null,
+  };
+  return {
+    isPremium: isPremiumActive(p),
+    isProPlus: isProPlusActive(p),
+  };
+}

@@ -1,5 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { fetchPlanStatus, type PlanQueryClient } from "@/lib/premium";
+
+async function requireProPlus(supabase: PlanQueryClient, userId: string) {
+  const { isProPlus } = await fetchPlanStatus(supabase, userId);
+  if (!isProPlus) {
+    return NextResponse.json(
+      { error: "Pro+ required — upgrade to create promo codes" },
+      { status: 403 }
+    );
+  }
+  return null;
+}
 
 export async function GET() {
   const supabase = createClient();
@@ -33,6 +45,9 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const gated = await requireProPlus(supabase, user.id);
+  if (gated) return gated;
 
   const body = await request.json().catch(() => ({}));
   const { code, discount_percent, discount_amount, max_uses, expires_at } = body;
@@ -98,6 +113,9 @@ export async function DELETE(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const gated = await requireProPlus(supabase, user.id);
+  if (gated) return gated;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");

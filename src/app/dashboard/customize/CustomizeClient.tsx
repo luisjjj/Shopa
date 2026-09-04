@@ -52,6 +52,12 @@ interface StorefrontSettings {
   card_shadow: string;
   container_width: string;
   product_image_ratio: string;
+  announcement_text: string | null;
+  show_announcement: boolean;
+  featured_product_id: string | null;
+  whatsapp_cta: boolean;
+  show_stock_badge: boolean;
+  footer_text: string | null;
 }
 
 const DEFAULTS: StorefrontSettings = {
@@ -91,6 +97,12 @@ const DEFAULTS: StorefrontSettings = {
   card_shadow: "none",
   container_width: "normal",
   product_image_ratio: "square",
+  announcement_text: null,
+  show_announcement: false,
+  featured_product_id: null,
+  whatsapp_cta: false,
+  show_stock_badge: false,
+  footer_text: null,
 };
 
 export default function CustomizeClient({
@@ -111,6 +123,7 @@ export default function CustomizeClient({
   const previewRef = useRef<HTMLIFrameElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewKey, setPreviewKey] = useState(0);
+  const [myProducts, setMyProducts] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
     fetch("/api/storefront-settings")
@@ -154,6 +167,12 @@ export default function CustomizeClient({
             card_shadow: data.card_shadow || DEFAULTS.card_shadow,
             container_width: data.container_width || DEFAULTS.container_width,
             product_image_ratio: data.product_image_ratio || DEFAULTS.product_image_ratio,
+            announcement_text: data.announcement_text || null,
+            show_announcement: data.show_announcement || false,
+            featured_product_id: data.featured_product_id || null,
+            whatsapp_cta: data.whatsapp_cta || false,
+            show_stock_badge: data.show_stock_badge || false,
+            footer_text: data.footer_text || null,
           });
         }
         setLoading(false);
@@ -165,6 +184,22 @@ export default function CustomizeClient({
     setSettings((prev) => ({ ...prev, [key]: value }));
     setSaved(false);
   };
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("products")
+        .select("id, name")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          if (data) setMyProducts(data as { id: string; name: string }[]);
+        });
+    });
+  }, []);
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -282,6 +317,12 @@ export default function CustomizeClient({
           card_shadow: refreshed.card_shadow || DEFAULTS.card_shadow,
           container_width: refreshed.container_width || DEFAULTS.container_width,
           product_image_ratio: refreshed.product_image_ratio || DEFAULTS.product_image_ratio,
+          announcement_text: refreshed.announcement_text || null,
+          show_announcement: refreshed.show_announcement || false,
+          featured_product_id: refreshed.featured_product_id || null,
+          whatsapp_cta: refreshed.whatsapp_cta || false,
+          show_stock_badge: refreshed.show_stock_badge || false,
+          footer_text: refreshed.footer_text || null,
         });
       }
 
@@ -830,6 +871,57 @@ export default function CustomizeClient({
                       </div>
                     </>
                   )}
+                </Section>
+
+                {/* Store Sections — builder-style blocks */}
+                <Section icon={<LayoutIcon size={16} />} title="Store Sections">
+                  <ToggleField
+                    label="Announcement bar"
+                    checked={settings.show_announcement}
+                    onChange={(v) => update("show_announcement", v)}
+                  />
+                  {settings.show_announcement && (
+                    <TextField
+                      label="Announcement text"
+                      value={settings.announcement_text || ""}
+                      placeholder="e.g. Free delivery on orders over ₦20,000"
+                      onChange={(v) => update("announcement_text", v || null)}
+                    />
+                  )}
+                  <div>
+                    <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Featured product</label>
+                    <select
+                      value={settings.featured_product_id || ""}
+                      onChange={(e) => update("featured_product_id", e.target.value || null)}
+                      className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300"
+                    >
+                      <option value="">None — show all products equally</option>
+                      {myProducts.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                      Spotlight one product in a hero card above the grid.
+                    </p>
+                  </div>
+                  <ToggleField
+                    label="WhatsApp chat button"
+                    checked={settings.whatsapp_cta}
+                    onChange={(v) => update("whatsapp_cta", v)}
+                  />
+                  <ToggleField
+                    label="Low-stock badges"
+                    checked={settings.show_stock_badge}
+                    onChange={(v) => update("show_stock_badge", v)}
+                  />
+                  <TextField
+                    label="Footer text"
+                    value={settings.footer_text || ""}
+                    placeholder="e.g. Thanks for shopping with us!"
+                    onChange={(v) => update("footer_text", v || null)}
+                  />
                 </Section>
 
                 {/* Mobile preview link */}

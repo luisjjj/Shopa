@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 type Variant = {
   id: string;
@@ -22,9 +22,19 @@ export default function NewProductPage() {
   const [error, setError] = useState("");
   const [hasVariants, setHasVariants] = useState(false);
   const [variants, setVariants] = useState<Variant[]>([]);
+  const [isProPlus, setIsProPlus] = useState<boolean | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    fetch("/api/subscription/status")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.error) setIsProPlus(!!data.isProPlus);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,25 +97,27 @@ export default function NewProductPage() {
       return;
     }
 
-    const { data: product, error: insertError } = await supabase
-      .from("products")
-      .insert({
-        user_id: user.id,
+    const createRes = await fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name,
         price: parseInt(price),
         description: description || null,
         image_url: imageUrl || null,
         stock: stock ? parseInt(stock) : null,
         has_variants: hasVariants,
-      })
-      .select("id")
-      .single();
+      }),
+    });
+    const createData = await createRes.json().catch(() => ({}));
 
-    if (insertError) {
-      setError(insertError.message);
+    if (!createRes.ok) {
+      setError(createData.error || "Could not create product");
       setSaving(false);
       return;
     }
+
+    const product = { id: createData.id as string };
 
     if (hasVariants && variants.length > 0) {
       for (const v of variants) {
@@ -262,32 +274,49 @@ export default function NewProductPage() {
             />
           </div>
 
-          {/* Variants Toggle */}
-          <div className="mb-4">
-            <button
-              type="button"
-              onClick={() => {
-                setHasVariants(!hasVariants);
-                if (!hasVariants) setStock("");
-              }}
-              className="flex items-center gap-3 w-full text-left"
+          {/* Variants Toggle (Pro+ only) */}
+          {isProPlus === false ? (
+            <a
+              href="/dashboard/upgrade"
+              className="flex items-center gap-3 w-full text-left bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 mb-4 transition-all hover:shadow-card-hover group"
             >
-              <div
-                className={`w-11 h-6 rounded-full transition-all relative ${
-                  hasVariants ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
-                    hasVariants ? "translate-x-5" : ""
-                  }`}
-                />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                  Product variants are a Pro+ feature
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  Offer sizes, colors and more — upgrade to unlock
+                </p>
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                This product has variants (size, color, etc.)
-              </span>
-            </button>
-          </div>
+              <span className="text-gray-300 dark:text-gray-600 group-hover:text-brand-500 transition-colors">→</span>
+            </a>
+          ) : (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setHasVariants(!hasVariants);
+                  if (!hasVariants) setStock("");
+                }}
+                className="flex items-center gap-3 w-full text-left"
+              >
+                <div
+                  className={`w-11 h-6 rounded-full transition-all relative ${
+                    hasVariants ? "bg-brand-500" : "bg-gray-200 dark:bg-gray-700"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${
+                      hasVariants ? "translate-x-5" : ""
+                    }`}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  This product has variants (size, color, etc.)
+                </span>
+              </button>
+            </div>
+          )}
 
           {/* Variant Inputs */}
           {hasVariants && (

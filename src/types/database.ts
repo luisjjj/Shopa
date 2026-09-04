@@ -241,6 +241,12 @@ export interface Database {
           card_shadow: string;
           container_width: string;
           product_image_ratio: string;
+          announcement_text: string | null;
+          show_announcement: boolean;
+          featured_product_id: string | null;
+          whatsapp_cta: boolean;
+          show_stock_badge: boolean;
+          footer_text: string | null;
           updated_at: string;
         };
         Insert: {
@@ -281,6 +287,12 @@ export interface Database {
           card_shadow?: string;
           container_width?: string;
           product_image_ratio?: string;
+          announcement_text?: string | null;
+          show_announcement?: boolean;
+          featured_product_id?: string | null;
+          whatsapp_cta?: boolean;
+          show_stock_badge?: boolean;
+          footer_text?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -321,6 +333,12 @@ export interface Database {
           card_shadow?: string;
           container_width?: string;
           product_image_ratio?: string;
+          announcement_text?: string | null;
+          show_announcement?: boolean;
+          featured_product_id?: string | null;
+          whatsapp_cta?: boolean;
+          show_stock_badge?: boolean;
+          footer_text?: string | null;
           updated_at?: string;
         };
       };

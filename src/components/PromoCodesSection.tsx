@@ -16,7 +16,7 @@ type Promo = {
   is_active: boolean;
 };
 
-export function PromoCodesSection() {
+export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -92,7 +92,7 @@ export function PromoCodesSection() {
     <div>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">Promo Codes</h2>
-        {!showForm && (
+        {isProPlus && !showForm && (
           <button
             onClick={() => setShowForm(true)}
             className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98]"
@@ -101,6 +101,23 @@ export function PromoCodesSection() {
           </button>
         )}
       </div>
+
+      {!isProPlus && (
+        <a
+          href="/dashboard/upgrade"
+          className="flex items-center gap-4 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-4 shadow-card dark:shadow-card-dark transition-all hover:shadow-card-hover hover:-translate-y-0.5 group"
+        >
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+              Promo codes are a Pro+ feature
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              Upgrade to offer discounts to buyers
+            </p>
+          </div>
+          <span className="text-gray-300 dark:text-gray-600 group-hover:text-brand-500 transition-colors">→</span>
+        </a>
+      )}
 
       {showForm && (
         <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-4 shadow-card dark:shadow-card-dark">

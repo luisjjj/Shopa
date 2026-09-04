@@ -1,5 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { fetchPlanStatus, type PlanQueryClient } from "@/lib/premium";
+
+async function requireProPlus(supabase: PlanQueryClient, userId: string) {
+  const { isProPlus } = await fetchPlanStatus(supabase, userId);
+  if (!isProPlus) {
+    return NextResponse.json(
+      { error: "Pro+ required — upgrade to use product variants" },
+      { status: 403 }
+    );
+  }
+  return null;
+}
 
 export async function GET(request: Request) {
   const supabase = createClient();
@@ -62,6 +74,9 @@ export async function POST(request: Request) {
     );
   }
 
+  const gated = await requireProPlus(supabase, user.id);
+  if (gated) return gated;
+
   // Prices feed checkout totals directly: non-negative whole naira only,
   // otherwise a negative override could zero out an order.
   const stockNum = stock == null || stock === "" ? null : Number(stock);
@@ -112,6 +127,9 @@ export async function DELETE(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  const gated = await requireProPlus(supabase, user.id);
+  if (gated) return gated;
 
   const body = await request.json();
   const { id } = body;

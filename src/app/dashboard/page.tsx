@@ -273,9 +273,9 @@ export default async function DashboardPage() {
           <OrderList userId={user.id} />
         </div>
 
-        {/* Promo Codes Section */}
+        {/* Promo Codes Section (Pro+ only) */}
         <div className="mt-10">
-          <PromoCodesSection />
+          <PromoCodesSection isProPlus={isProPlus} />
         </div>
       </main>
     </div>

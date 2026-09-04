@@ -1,16 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SparkleIcon, CheckIcon } from "@/components/Icons";
 
+type PlanStatus = {
+  isPremium: boolean;
+  premiumUntil: string | null;
+  isProPlus: boolean;
+  proPlusUntil: string | null;
+};
+
 export default function UpgradePage() {
-  const [loading, setLoading] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<"premium" | "pro_plus" | null>(null);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState<PlanStatus | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    fetch("/api/subscription/status")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.error) setStatus(data);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleUpgrade = async (plan: "premium" | "pro_plus") => {
-    setLoading(true);
+    setLoadingPlan(plan);
     setError("");
 
     try {
@@ -23,14 +40,14 @@ export default function UpgradePage() {
 
       if (data.error) {
         setError(data.error);
-        setLoading(false);
+        setLoadingPlan(null);
         return;
       }
 
       window.location.href = data.authorization_url;
     } catch {
       setError("Something went wrong. Please try again.");
-      setLoading(false);
+      setLoadingPlan(null);
     }
   };
 
@@ -62,6 +79,36 @@ export default function UpgradePage() {
           </div>
         </div>
 
+        {status && (status.isProPlus || status.isPremium) && (
+          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-5 mb-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+            <div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">
+                Current plan
+              </p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mt-1">
+                {status.isProPlus ? "Pro+" : "Premium"}
+                <span className="font-normal text-gray-500 dark:text-gray-400">
+                  {" "}·{" "}
+                  {(() => {
+                    const until = status.isProPlus ? status.proPlusUntil : status.premiumUntil;
+                    if (!until) return "active";
+                    const days = Math.max(
+                      0,
+                      Math.ceil((new Date(until).getTime() - Date.now()) / 86400000)
+                    );
+                    return days > 0
+                      ? `renews in ${days} day${days === 1 ? "" : "s"}`
+                      : "expired — renew below";
+                  })()}
+                </span>
+              </p>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 max-w-xs">
+              Plans are prepaid for 30 days. Pay again below to extend — extra time stacks on top.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Premium */}
           <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl p-6 flex flex-col">
@@ -80,10 +127,10 @@ export default function UpgradePage() {
             </div>
             <button
               onClick={() => handleUpgrade("premium")}
-              disabled={loading}
+              disabled={loadingPlan !== null}
               className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
             >
-              {loading ? "Redirecting..." : "Upgrade to Premium"}
+              {loadingPlan === "premium" ? "Redirecting..." : "Upgrade to Premium"}
             </button>
           </div>
 
@@ -111,10 +158,10 @@ export default function UpgradePage() {
             </div>
             <button
               onClick={() => handleUpgrade("pro_plus")}
-              disabled={loading}
+              disabled={loadingPlan !== null}
               className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors shadow-lg shadow-brand-500/20"
             >
-              {loading ? "Redirecting..." : "Upgrade to Pro+"}
+              {loadingPlan === "pro_plus" ? "Redirecting..." : "Upgrade to Pro+"}
             </button>
           </div>
         </div>

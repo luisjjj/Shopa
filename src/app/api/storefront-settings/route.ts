@@ -95,6 +95,13 @@ export async function PUT(request: Request) {
     card_shadow: body.card_shadow || "none",
     container_width: body.container_width || "normal",
     product_image_ratio: body.product_image_ratio || "square",
+    announcement_text: sanitizeText(body.announcement_text, 120),
+    show_announcement: body.show_announcement === true,
+    featured_product_id:
+      typeof body.featured_product_id === "string" && body.featured_product_id ? body.featured_product_id.slice(0, 64) : null,
+    whatsapp_cta: body.whatsapp_cta === true,
+    show_stock_badge: body.show_stock_badge === true,
+    footer_text: sanitizeText(body.footer_text, 160),
     updated_at: new Date().toISOString(),
   };
 
@@ -105,6 +112,21 @@ export async function PUT(request: Request) {
     .single();
 
   if (error) {
+    // Graceful path if supabase/storefront-sections.sql hasn't been run yet:
+    // save everything except the new section columns instead of failing.
+    if (String(error.message || "").match(/announcement_text|featured_product_id|whatsapp_cta|show_stock_badge|footer_text|show_announcement/)) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { announcement_text, show_announcement, featured_product_id, whatsapp_cta, show_stock_badge, footer_text, ...legacy } = settings;
+      const retry = await supabase
+        .from("storefront_settings")
+        .upsert(legacy, { onConflict: "user_id" })
+        .select()
+        .single();
+      if (retry.error) {
+        return NextResponse.json({ error: retry.error.message }, { status: 500 });
+      }
+      return NextResponse.json({ ...retry.data, _sectionsPendingMigration: true });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
