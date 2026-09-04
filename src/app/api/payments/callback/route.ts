@@ -1,6 +1,7 @@
 import { verifyTransaction } from "@/lib/paystack";
 import { findOrderByReference, markOrderPaid } from "@/lib/orders";
 import { getAppBaseUrl } from "@/lib/security";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 
 // Client-side redirect landing after Paystack checkout. This is UX only —
@@ -29,9 +30,42 @@ export async function GET(request: Request) {
       if (target) {
         const settled = await markOrderPaid(target, "callback");
         if (settled.ok) {
-          return NextResponse.redirect(
-            `${origin}/confirm?status=success&paid=1&orderId=${target}&reference=${reference}`
-          );
+          // Look up display details so the receipt shows amount + product.
+          let amount = "";
+          let product = "";
+          let buyer = "";
+          try {
+            const svc = createServiceRoleClient();
+            const { data: order } = (await svc
+              .from("orders")
+              .select("amount, buyer_name, product_id")
+              .eq("id", target)
+              .single()) as unknown as {
+              data: { amount: number; buyer_name: string | null; product_id: string } | null;
+            };
+            if (order) {
+              amount = String(order.amount);
+              buyer = order.buyer_name || "";
+              const { data: prod } = (await svc
+                .from("products")
+                .select("name")
+                .eq("id", order.product_id)
+                .single()) as unknown as { data: { name: string } | null };
+              if (prod) product = prod.name;
+            }
+          } catch (e) {
+            console.error("[payments/callback] receipt lookup failed", e);
+          }
+          const params = new URLSearchParams({
+            status: "success",
+            paid: "1",
+            orderId: target,
+            reference,
+            amount,
+            product,
+            buyer,
+          });
+          return NextResponse.redirect(`${origin}/confirm?${params.toString()}`);
         }
       }
     }
