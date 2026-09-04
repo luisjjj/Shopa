@@ -13,6 +13,7 @@ import {
   SparkleIcon,
 } from "@/components/Icons";
 import Link from "next/link";
+import { contrastRatio } from "@/lib/contrast";
 
 interface StorefrontSettings {
   primary_color: string;
@@ -445,6 +446,12 @@ export default function CustomizeClient({
                     value={settings.card_background}
                     onChange={(v) => update("card_background", v)}
                   />
+                  {(contrastRatio(settings.card_background, settings.text_color) ?? 99) < 3 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      Heads up: your text color is hard to read on this card background. Storefronts
+                      auto-adjust it for readability.
+                    </p>
+                  )}
                   <div className="pt-2">
                     <p className="text-xs text-gray-400 mb-2">Presets</p>
                     <div className="flex flex-wrap gap-2">

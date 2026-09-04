@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { readableTextOn } from "@/lib/contrast";
 import CheckoutForm from "./CheckoutForm";
 
 type Props = {
@@ -140,14 +141,14 @@ export default async function CheckoutPage({ params }: Props) {
             </div>
           )}
           <div className="p-4">
-            <h1 className="text-lg font-bold" style={{ color: s ? textColor : undefined }}>
+            <h1 className="text-lg font-bold" style={{ color: s ? readableTextOn(cardBg, textColor) : undefined }}>
               {product.name}
             </h1>
             <p className="text-xl font-bold mt-1" style={{ color: primaryColor }}>
               ₦{product.price.toLocaleString()}
             </p>
             {product.description && (
-              <p className="text-sm mt-2 leading-relaxed line-clamp-2" style={{ color: s ? `${textColor}80` : undefined }}>
+              <p className="text-sm mt-2 leading-relaxed line-clamp-2" style={{ color: s ? `${readableTextOn(cardBg, textColor)}b3` : undefined }}>
                 {product.description}
               </p>
             )}

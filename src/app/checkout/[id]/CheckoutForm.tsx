@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { readableTextOn } from "@/lib/contrast";
 
 type CheckoutSettings = {
   primaryColor: string;
@@ -82,8 +83,12 @@ export default function CheckoutForm({
 
   const s = settings;
   const primaryColor = s?.primaryColor || "#ed7712";
-  const textColor = s?.textColor || "";
   const cardBg = s?.cardBg || "";
+  // Everything in this form sits on the card surface: guarantee the seller's
+  // text color is actually readable on it (falls back to dark/light).
+  const textColor = s?.textColor
+    ? readableTextOn(s.cardBg || "#ffffff", s.textColor)
+    : "";
   const cardRadius = getCardRadius(s?.cardBorderRadius || "md");
   const hasBordered = s?.cardStyle === "bordered" || s?.cardStyle === "outlined";
   const hasShadow = s?.cardStyle === "shadow";

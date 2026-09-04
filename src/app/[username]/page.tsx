@@ -5,6 +5,7 @@ import { PackageIcon } from "@/components/Icons";
 import { ProductRating } from "./ProductRating";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { isPremiumActive } from "@/lib/premium";
+import { readableTextOn } from "@/lib/contrast";
 
 type Props = {
   params: { username: string };
@@ -477,7 +478,7 @@ export default async function StorePage({
                 <div className={isList ? "flex items-center justify-between" : ""}>
                   <h3
                     className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"} ${s ? "" : "text-gray-900 dark:text-white"}`}
-                    style={s ? { color: textColor } : undefined}
+                    style={s ? { color: readableTextOn(cardBg, textColor) } : undefined}
                   >
                     {product.name}
                   </h3>
