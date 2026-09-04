@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { hashOtp } from "@/lib/security";
 
 export async function POST(request: Request) {
   const { email, code } = await request.json().catch(() => ({}));
@@ -26,7 +27,8 @@ export async function POST(request: Request) {
   if (new Date(row.expires_at).getTime() < Date.now()) {
     return NextResponse.json({ error: "Code expired — request a new one" }, { status: 400 });
   }
-  if (String(code).trim() !== row.code) {
+  // Codes are stored hashed; compare hashes only.
+  if (hashOtp(String(code)) !== row.code) {
     await supabase.from("buyer_otps").update({ attempts: (row.attempts || 0) + 1 }).eq("id", row.id);
     return NextResponse.json({ error: "Wrong code — check and try again" }, { status: 400 });
   }

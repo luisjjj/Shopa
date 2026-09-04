@@ -39,6 +39,13 @@ export async function POST(request: Request) {
   if (r < 1 || r > 5) {
     return NextResponse.json({ error: "Rating must be between 1 and 5" }, { status: 400 });
   }
+  if (typeof order_id !== "string" || order_id.length > 64) {
+    return NextResponse.json({ error: "Invalid order" }, { status: 400 });
+  }
+  // Strip markup — comments render in dashboards and must not carry HTML.
+  const cleanComment = typeof comment === "string"
+    ? comment.replace(/[<>"']/g, "").trim().slice(0, 500) || null
+    : null;
 
   const supabase = createClient();
 
@@ -76,7 +83,7 @@ export async function POST(request: Request) {
       order_id: order.id,
       buyer_name: order.buyer_name,
       rating: r,
-      comment: comment || null,
+      comment: cleanComment,
     })
     .select()
     .single();

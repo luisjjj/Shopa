@@ -34,10 +34,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const { code, discount_percent, discount_amount, max_uses, expires_at } = body;
 
-  if (!code || (!discount_percent && !discount_amount)) {
+  if (typeof code !== "string" || !code.trim() || code.trim().length > 24 || (!discount_percent && !discount_amount)) {
     return NextResponse.json(
       { error: "Code and discount (percent or amount) are required" },
       { status: 400 }
@@ -49,6 +49,18 @@ export async function POST(request: Request) {
       { error: "Discount percent must be between 1 and 100" },
       { status: 400 }
     );
+  }
+
+  // A fixed-amount discount must be a positive whole naira value.
+  if (discount_amount != null && (!Number.isInteger(discount_amount) || discount_amount < 1)) {
+    return NextResponse.json(
+      { error: "Discount amount must be at least ₦1" },
+      { status: 400 }
+    );
+  }
+
+  if (expires_at && Number.isNaN(Date.parse(expires_at))) {
+    return NextResponse.json({ error: "Invalid expiry date" }, { status: 400 });
   }
 
   const { data, error } = await supabase

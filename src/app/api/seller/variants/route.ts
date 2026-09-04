@@ -52,14 +52,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const { product_id, name, stock, price_override } = body;
 
-  if (!product_id || !name) {
+  if (!product_id || typeof name !== "string" || !name.trim() || name.trim().length > 60) {
     return NextResponse.json(
       { error: "Missing product_id or name" },
       { status: 400 }
     );
+  }
+
+  // Prices feed checkout totals directly: non-negative whole naira only,
+  // otherwise a negative override could zero out an order.
+  const stockNum = stock == null || stock === "" ? null : Number(stock);
+  const priceNum = price_override == null || price_override === "" ? null : Number(price_override);
+  if (stockNum != null && (!Number.isInteger(stockNum) || stockNum < 0)) {
+    return NextResponse.json({ error: "Stock must be a whole number ≥ 0" }, { status: 400 });
+  }
+  if (priceNum != null && (!Number.isInteger(priceNum) || priceNum < 0)) {
+    return NextResponse.json({ error: "Price override must be a whole naira amount ≥ 0" }, { status: 400 });
   }
 
   const { data: product } = await supabase
@@ -77,9 +88,9 @@ export async function POST(request: Request) {
     .from("product_variants")
     .insert({
       product_id,
-      name,
-      stock: stock != null ? stock : null,
-      price_override: price_override != null && price_override !== "" ? price_override : null,
+      name: name.trim().slice(0, 60),
+      stock: stockNum,
+      price_override: priceNum,
       is_active: true,
     })
     .select()

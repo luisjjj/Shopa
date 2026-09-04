@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { sanitizeCsvCell } from "@/lib/security";
 
 export async function GET() {
   const supabase = createClient();
@@ -29,12 +30,12 @@ export async function GET() {
     });
     return [
       date,
-      `"${(o.buyer_name || "Anonymous").replace(/"/g, '""')}"`,
-      o.buyer_phone,
-      `"${(product?.name || "Unknown").replace(/"/g, '""')}"`,
+      sanitizeCsvCell(o.buyer_name || "Anonymous"),
+      sanitizeCsvCell(o.buyer_phone),
+      sanitizeCsvCell(product?.name || "Unknown"),
       o.amount,
       status,
-      `"${(o.delivery_address || "").replace(/"/g, '""')}"`,
+      sanitizeCsvCell(o.delivery_address || ""),
     ].join(",");
   });
 

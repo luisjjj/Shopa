@@ -4,6 +4,13 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const { createClient } = await import("@/lib/supabase/server");
+  const authed = createClient();
+  const {
+    data: { user },
+  } = await authed.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
   const supabase = createServiceRoleClient();
 
   const body = await request.json();
@@ -12,6 +19,13 @@ export async function POST(request: Request) {
   if (!userId || !title || !messageBody) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
+
+  // Users may only push to their own devices. Allowlist the target URL so
+  // a compromised session can't turn notifications into phishing links.
+  if (userId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const target = typeof url === "string" && url.startsWith("/") && !url.startsWith("//") ? url : "/dashboard";
 
   const { data: subscriptions, error: fetchError } = await supabase
     .from("push_subscriptions")
@@ -30,9 +44,9 @@ export async function POST(request: Request) {
   );
 
   const payload = JSON.stringify({
-    title,
-    body: messageBody,
-    url: url || "/dashboard",
+    title: String(title).slice(0, 120),
+    body: String(messageBody).slice(0, 300),
+    url: target,
   });
 
   let sent = 0;

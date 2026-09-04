@@ -1,12 +1,15 @@
 import { verifyTransaction } from "@/lib/paystack";
 import { findOrderByReference, markOrderPaid } from "@/lib/orders";
+import { getAppBaseUrl } from "@/lib/security";
 import { NextResponse } from "next/server";
 
 // Client-side redirect landing after Paystack checkout. This is UX only —
 // the webhook (/api/webhooks/paystack) is the source of truth for paid state,
 // so this handler re-verifies server-side and both paths are idempotent.
+// Redirects use the allowlisted base URL, never the request Host.
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  const origin = getAppBaseUrl();
   const reference = searchParams.get("reference");
 
   if (!reference) {

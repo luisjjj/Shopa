@@ -1,11 +1,14 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { initializeSplitTransaction } from "@/lib/paystack";
 import { computePlatformFeeKobo, isStarterSafeError, MIN_ORDER_KOBO, MIN_ORDER_NAIRA, nairaToKobo } from "@/lib/platform";
+import { getAppBaseUrl } from "@/lib/security";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const { orderId } = await request.json().catch(() => ({}));
-  if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+  if (!orderId || typeof orderId !== "string") {
+    return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+  }
 
   const supabase = createServiceRoleClient();
 
@@ -51,7 +54,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const { origin } = new URL(request.url);
+  // Callback target comes from allowlisted config, never the request Host
+  // (Host-header poisoning could otherwise mint attacker callbacks).
+  const origin = getAppBaseUrl();
   const feeKobo = computePlatformFeeKobo(amountKobo);
 
   let result;

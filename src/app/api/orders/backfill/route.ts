@@ -1,8 +1,12 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { verifyTransaction } from "@/lib/paystack";
+import { requireCronSecret } from "@/lib/security";
 import { NextResponse } from "next/server";
 
-export async function POST() {
+export async function POST(request: Request) {
+  if (!requireCronSecret(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const supabase = createServiceRoleClient();
 
   const { data: unpaidOrders, error } = await supabase

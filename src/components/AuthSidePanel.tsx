@@ -2,7 +2,7 @@
 export function AuthSidePanel() {
   return (
     <div className="hidden lg:flex flex-col relative rounded-2xl overflow-hidden min-h-[560px] shadow-card dark:shadow-card-dark border border-gray-100 dark:border-white/[0.06]">
-      <img src="/landing/auth-side.jpg" alt="Seller arranging products" className="absolute inset-0 w-full h-full object-cover" />
+      <img src="/landing/auth-side.jpg" alt="Perfume on sale" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
       <div className="relative mt-auto p-8">
         <p className="text-white text-xl font-bold leading-snug">Open your store in minutes.</p>

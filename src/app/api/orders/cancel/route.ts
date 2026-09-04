@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { requireSameOrigin } from "@/lib/security";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  if (!requireSameOrigin(request)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
   const formData = await request.formData();
   const orderId = formData.get("order_id") as string;
   if (!orderId) return NextResponse.redirect(new URL("/dashboard", request.url));

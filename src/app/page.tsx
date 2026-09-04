@@ -103,7 +103,7 @@ export default function HomePage() {
 
         <div className="relative animate-slide-up">
           <div className="rounded-2xl overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] aspect-[4/3]">
-            <img src="/landing/hero-seller.jpg" alt="Seller in traditional Nigerian attire" className="w-full h-full object-cover object-top" />
+            <img src="/landing/hero-seller.jpg" alt="Sneakers on sale" className="w-full h-full object-cover object-top" />
           </div>
           <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
             <img src="/landing/hero-whatsapp.jpg" alt="Buyer chat" className="w-11 h-11 rounded-xl object-cover shrink-0" />

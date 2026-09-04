@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { requireCronSecret } from "@/lib/security";
 
 export async function GET(request: Request) {
-  const auth = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && auth !== `Bearer ${cronSecret}`) {
+  if (!requireCronSecret(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const supabase = createServiceRoleClient();

@@ -2,10 +2,13 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const { code, seller_id } = body;
 
-  if (!code || !seller_id) {
+  if (
+    typeof code !== "string" || code.trim().length === 0 || code.trim().length > 32 ||
+    typeof seller_id !== "string" || seller_id.length > 64
+  ) {
     return NextResponse.json(
       { error: "Code and seller_id are required" },
       { status: 400 }
