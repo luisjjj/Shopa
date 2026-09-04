@@ -322,7 +322,7 @@ export default function CheckoutForm({
               </button>
 
               <p className="text-center text-xs" style={{ color: s ? `${textColor}40` : "#9ca3af" }}>
-                You&apos;ll be redirected to Paystack to pay by card, bank transfer or USSD
+                You&apos;ll be redirected to Paystack to complete payment securely
               </p>
             </div>
           </div>

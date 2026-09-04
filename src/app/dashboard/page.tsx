@@ -451,7 +451,7 @@ async function OrderList({ userId }: { userId: string }) {
                 ) : order.confirmed_by_buyer ? (
                   <span
                     className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.05] text-gray-500"
-                    title="Legacy manual-transfer order from before Paystack migration"
+                    title="Order from before the Paystack migration"
                   >
                     Awaiting seller (legacy)
                   </span>

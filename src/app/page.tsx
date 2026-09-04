@@ -152,7 +152,7 @@ export default function HomePage() {
               <p className="text-sm text-gray-400 mt-0.5 mb-5">Premium leather bags</p>
               <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-400 text-left w-fit mx-auto sm:mx-0">
                 <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Live in minutes, no code</li>
-                <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Bank transfer checkout</li>
+                <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Paystack checkout</li>
                 <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> WhatsApp order alerts</li>
               </ul>
               <Link href="/signup" className="inline-block mt-6 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all">Open yours free</Link>
@@ -269,7 +269,7 @@ export default function HomePage() {
                   <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
                     <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
                   </div>
-                  Bank transfer checkout
+                  Paystack checkout
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
@@ -312,7 +312,7 @@ export default function HomePage() {
                   <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
                     <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
                   </div>
-                  Bank transfer checkout
+                  Paystack checkout
                 </li>
                 <li className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">

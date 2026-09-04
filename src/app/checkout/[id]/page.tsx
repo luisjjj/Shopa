@@ -109,7 +109,7 @@ export default async function CheckoutPage({ params }: Props) {
 
   return (
     <div className={`min-h-screen ${s ? "" : "bg-gray-50/80 dark:bg-[#0a0a0a]"}`} style={pageStyle}>
-      <div className={`${containerMax} mx-auto px-5 py-8`}>
+      <div className={`${containerMax} mx-auto px-5 py-6`}>
         <a
           href={`/${seller?.username}`}
           className="inline-flex items-center gap-1.5 text-sm hover:opacity-80 transition-opacity mb-8 group"
@@ -122,7 +122,7 @@ export default async function CheckoutPage({ params }: Props) {
         </a>
 
         <div
-          className={`overflow-hidden mb-6 ${s ? "" : "bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark"}`}
+          className={`overflow-hidden mb-4 ${s ? "" : "bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark"}`}
           style={s ? {
             background: cardBg,
             borderRadius: cardRadius,
@@ -135,19 +135,19 @@ export default async function CheckoutPage({ params }: Props) {
               <img
                 src={product.image_url}
                 alt={product.name}
-                className="w-full h-auto max-h-72 object-contain"
+                className="w-full h-auto max-h-40 object-contain"
               />
             </div>
           )}
-          <div className="p-6">
-            <h1 className="text-xl font-bold" style={{ color: s ? textColor : undefined }}>
+          <div className="p-4">
+            <h1 className="text-lg font-bold" style={{ color: s ? textColor : undefined }}>
               {product.name}
             </h1>
-            <p className="text-2xl font-bold mt-2" style={{ color: primaryColor }}>
+            <p className="text-xl font-bold mt-1" style={{ color: primaryColor }}>
               ₦{product.price.toLocaleString()}
             </p>
             {product.description && (
-              <p className="text-sm mt-3 leading-relaxed" style={{ color: s ? `${textColor}80` : undefined }}>
+              <p className="text-sm mt-2 leading-relaxed line-clamp-2" style={{ color: s ? `${textColor}80` : undefined }}>
                 {product.description}
               </p>
             )}

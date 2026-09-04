@@ -48,10 +48,12 @@ export default function ProfileClient({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [payoutNote, setPayoutNote] = useState("");
 
   const handleSave = async () => {
     setSaving(true);
     setError("");
+    setPayoutNote("");
     try {
       const res = await fetch("/api/profile", {
         method: "PUT",
@@ -69,6 +71,11 @@ export default function ProfileClient({
       } else {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
+        if (data.payout?.ok) {
+          setPayoutNote("Payouts activated — sales will settle to this account automatically.");
+        } else if (data.payout?.message) {
+          setPayoutNote(data.payout.message);
+        }
       }
     } catch {
       setError("Failed to save");
@@ -168,7 +175,7 @@ export default function ProfileClient({
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bank Details</h2>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Buyers will see this when they checkout
+              Sales settle here automatically via Paystack. Saving verifies the account and activates payouts.
             </p>
           </div>
           <div className="p-5 space-y-4">
@@ -226,6 +233,7 @@ export default function ProfileClient({
             )}
           </button>
           {error && <p className="text-sm text-red-500">{error}</p>}
+          {payoutNote && <p className="text-sm text-amber-600 dark:text-amber-400">{payoutNote}</p>}
         </div>
 
         {/* Plan */}

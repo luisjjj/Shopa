@@ -45,7 +45,6 @@ function getCardRadius(radius?: string): string {
 
 export default async function ConfirmPage({ searchParams }: Props) {
   const sellerId = typeof searchParams.seller === "string" ? searchParams.seller : null;
-  const whatsapp = typeof searchParams.whatsapp === "string" ? searchParams.whatsapp : null;
 
   let settings = null;
 
@@ -100,7 +99,6 @@ export default async function ConfirmPage({ searchParams }: Props) {
       orderId={typeof searchParams.orderId === "string" ? searchParams.orderId : null}
       paid={searchParams.paid === "1"}
       message={typeof searchParams.message === "string" ? searchParams.message : null}
-      sellerWhatsapp={whatsapp}
       pageStyle={pageStyle}
       containerMax={containerMax}
       cardStyle={cardStyle}
