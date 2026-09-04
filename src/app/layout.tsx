@@ -37,8 +37,11 @@ export default function RootLayout({
   const themeCookie = cookieStore.get("shopa-theme")?.value;
   const initialTheme = themeCookie === "dark" ? "dark" : "light";
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+
   return (
     <html lang="en" className={initialTheme === "dark" ? "dark" : ""}>
+      {supabaseUrl ? <link rel="preconnect" href={supabaseUrl} crossOrigin="anonymous" /> : null}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
