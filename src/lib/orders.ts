@@ -30,8 +30,8 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     .update({ paid: true, confirmed_by_buyer: true })
     .eq("id", orderId)
     .eq("paid", false)
-    .select("id, product_id, seller_id, buyer_name, buyer_email, amount, promo_code_id, variant_id, paid")
-    .single()) as unknown as { data: OrderRow | null; error: { message: string } | null };
+    .select("id, product_id, seller_id, buyer_name, amount, promo_code_id, variant_id, paid")
+    .single()) as unknown as { data: Omit<OrderRow, "buyer_email"> | null; error: { message: string } | null };
 
   if (error || !order) {
     const { data: existing } = (await supabase
@@ -42,6 +42,20 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     if (existing) return { ok: true, alreadySettled: true, orderId };
     console.error(`[orders] markOrderPaid(${source}) failed:`, error);
     return { ok: false, error: error?.message || "Order not found" };
+  }
+
+  // buyer_email column may not exist yet (migration pending) — fetch
+  // defensively so settling never breaks on schema lag; receipt just skips.
+  let buyerEmail: string | null = null;
+  try {
+    const { data: emailRow } = (await supabase
+      .from("orders")
+      .select("buyer_email")
+      .eq("id", orderId)
+      .single()) as unknown as { data: { buyer_email: string | null } | null };
+    buyerEmail = emailRow?.buyer_email || null;
+  } catch {
+    buyerEmail = null;
   }
 
   const { data: product } = await supabase
@@ -98,9 +112,9 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     );
   }
 
-  if (order.buyer_email) {
+  if (buyerEmail) {
     const t = emailTemplates().orderConfirmed(productName, order.amount);
-    sendEmail({ to: order.buyer_email, subject: t.subject, html: t.html }).catch((e) =>
+    sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch((e) =>
       console.error("[orders] buyer receipt email failed", e)
     );
   }

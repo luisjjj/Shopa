@@ -12,24 +12,41 @@ export async function POST(request: Request) {
 
   const supabase = createServiceRoleClient();
 
-  const { data: order } = (await supabase
+  const { data: order, error: orderError } = (await supabase
     .from("orders")
-    .select("id, amount, buyer_email, paid, paystack_reference, seller_id")
+    .select("id, amount, paid, paystack_reference, seller_id")
     .eq("id", orderId)
     .single()) as unknown as {
     data: {
       id: string;
       amount: number;
-      buyer_email: string | null;
       paid: boolean;
       paystack_reference: string;
       seller_id: string;
     } | null;
+    error: { message: string } | null;
   };
 
-  if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  if (orderError || !order) {
+    console.error("[checkout/pay] order lookup failed", orderError);
+    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  }
   if (order.paid) return NextResponse.json({ error: "Order already paid" }, { status: 400 });
-  if (!order.buyer_email) {
+
+  // buyer_email column may not exist yet (migration pending) — fetch
+  // defensively so checkout never breaks on schema lag.
+  let buyerEmail: string | null = null;
+  try {
+    const { data: emailRow } = (await supabase
+      .from("orders")
+      .select("buyer_email")
+      .eq("id", orderId)
+      .single()) as unknown as { data: { buyer_email: string | null } | null };
+    buyerEmail = emailRow?.buyer_email || null;
+  } catch {
+    buyerEmail = null;
+  }
+  if (!buyerEmail) {
     return NextResponse.json({ error: "Buyer email missing — restart checkout" }, { status: 400 });
   }
 
@@ -62,7 +79,7 @@ export async function POST(request: Request) {
   let result;
   try {
     result = await initializeSplitTransaction({
-      email: order.buyer_email,
+      email: buyerEmail,
       amountKobo,
       subaccount: seller.paystack_subaccount_code,
       transactionChargeKobo: feeKobo,

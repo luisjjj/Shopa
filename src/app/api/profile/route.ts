@@ -18,6 +18,25 @@ export async function PUT(request: Request) {
 
   const updates: Record<string, unknown> = {};
 
+  if (body.username !== undefined) {
+    const clean = String(body.username).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+    if (clean.length < 3) {
+      return NextResponse.json({ error: "Store name must be at least 3 characters" }, { status: 400 });
+    }
+    // Uniqueness check excluding self (service role: RLS hides other rows).
+    const service = createServiceRoleClient();
+    const { data: taken } = await service
+      .from("users")
+      .select("id")
+      .eq("username", clean)
+      .neq("id", user.id)
+      .maybeSingle();
+    if (taken) {
+      return NextResponse.json({ error: "That store name is taken" }, { status: 409 });
+    }
+    updates.username = clean;
+  }
+
   if (body.whatsapp_number !== undefined) {
     updates.whatsapp_number = body.whatsapp_number || null;
   }

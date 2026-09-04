@@ -42,6 +42,35 @@ export default function OnboardingPage() {
       if (data) {
         setExistingStore(data.username);
         setIsProPlus(data.is_pro_plus);
+        return;
+      }
+
+      // First-time OAuth signup (e.g. Google): suggest a store name from
+      // their name or email so the form isn't blank. Still fully editable.
+      const metaName =
+        (user.user_metadata?.full_name as string | undefined) ||
+        (user.user_metadata?.name as string | undefined) ||
+        "";
+      const emailPrefix = (user.email || "").split("@")[0] || "";
+      const sanitize = (v: string) => v.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+      let base = sanitize(metaName) || sanitize(emailPrefix);
+      if (base.length < 3) base = `store${Math.floor(100 + Math.random() * 900)}`;
+
+      const candidates = [base];
+      for (let i = 0; i < 3; i++) {
+        candidates.push(`${base}${Math.floor(100 + Math.random() * 900)}`);
+      }
+      for (const candidate of candidates) {
+        const { data: taken } = await supabase
+          .from("users")
+          .select("username")
+          .eq("username", candidate)
+          .maybeSingle();
+        if (!taken) {
+          setUsername(candidate);
+          setAvailable(true);
+          break;
+        }
       }
     };
     checkExisting();

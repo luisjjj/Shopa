@@ -42,6 +42,7 @@ export default function ProfileClient({
   createdAt,
 }: ProfileProps) {
   const [phone, setPhone] = useState(whatsappNumber);
+  const [storeName, setStoreName] = useState(username);
   const [bank, setBank] = useState(bankName);
   const [accountNum, setAccountNum] = useState(accountNumber);
   const [accountNm, setAccountNm] = useState(accountName);
@@ -59,6 +60,7 @@ export default function ProfileClient({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          username: storeName !== username ? storeName : undefined,
           whatsapp_number: phone || null,
           bank_name: bank || null,
           account_number: accountNum || null,
@@ -121,21 +123,36 @@ export default function ProfileClient({
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Account</h2>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-white/10">
-            <InfoRow
-              icon={<UserIcon size={16} />}
-              label="Username"
-              value={username}
-              badge={
-                <a
-                  href={`/${username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-brand-600 hover:text-brand-700"
-                >
-                  View store ↗
-                </a>
-              }
-            />
+            <div className="px-5 py-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="text-gray-400 shrink-0">
+                  <UserIcon size={16} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Store name</p>
+                  <input
+                    type="text"
+                    value={storeName}
+                    onChange={(e) =>
+                      setStoreName(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20))
+                    }
+                    minLength={3}
+                    className="text-sm text-gray-900 dark:text-white bg-transparent outline-none mt-0.5 w-full font-medium placeholder:text-gray-400"
+                  />
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                    Changing this changes your store link
+                  </p>
+                </div>
+              </div>
+              <a
+                href={`/${storeName}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-brand-600 hover:text-brand-700 shrink-0"
+              >
+                View store ↗
+              </a>
+            </div>
             <InfoRow
               icon={<MailIcon size={16} />}
               label="Email"
@@ -161,7 +178,7 @@ export default function ProfileClient({
             <InfoRow
               icon={<GlobeIcon size={16} />}
               label="Store URL"
-              value={`myshopa.com.ng/${username}`}
+              value={`myshopa.com.ng/${storeName}`}
               mono
             />
           </div>

@@ -16,6 +16,9 @@ export async function GET(request: Request) {
       }
       return NextResponse.redirect(`${origin}${next}`);
     }
+    return NextResponse.redirect(
+      `${origin}/auth/auth-code-error?error=exchange_failed&error_description=${encodeURIComponent(error.message)}`
+    );
   }
 
   const token_hash = searchParams.get("token_hash");
