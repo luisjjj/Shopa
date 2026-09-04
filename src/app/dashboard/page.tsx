@@ -451,9 +451,9 @@ async function OrderList({ userId }: { userId: string }) {
                       <FulfilledToggle orderId={order.id} fulfilled={order.fulfilled} paid={order.paid} />
                       <span
                         className="block text-[10px] text-gray-400 dark:text-gray-500 mt-1"
-                        title="Paystack settles to your bank on the next business day"
+                        title="Payment confirmed instantly — ship now. Cash lands in your bank on the next business day."
                       >
-                        Settles {formatSettlementDate(nextSettlementDate(new Date(order.created_at)))}
+                        Ship now · settles {formatSettlementDate(nextSettlementDate(new Date(order.created_at)))}
                       </span>
                     </>
                   )
