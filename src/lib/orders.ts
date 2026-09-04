@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { computeBuyerTotal } from "@/lib/platform";
 
 export type SettleResult =
   | { ok: true; alreadySettled: boolean; orderId: string }
@@ -113,7 +114,8 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
   }
 
   if (buyerEmail) {
-    const t = emailTemplates().orderConfirmed(productName, order.amount);
+    const b = computeBuyerTotal(order.amount);
+    const t = emailTemplates().orderConfirmed(productName, b.total);
     sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch((e) =>
       console.error("[orders] buyer receipt email failed", e)
     );

@@ -1,6 +1,7 @@
 import { verifyTransaction } from "@/lib/paystack";
 import { findOrderByReference, markOrderPaid } from "@/lib/orders";
 import { getAppBaseUrl } from "@/lib/security";
+import { computeBuyerTotal } from "@/lib/platform";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 
@@ -30,10 +31,14 @@ export async function GET(request: Request) {
       if (target) {
         const settled = await markOrderPaid(target, "callback");
         if (settled.ok) {
-          // Look up display details so the receipt shows amount + product.
+          // Look up display details so the receipt shows the full breakdown.
+          // amount = TOTAL charged (product + fees); productPrice = seller revenue.
           let amount = "";
           let product = "";
           let buyer = "";
+          let productPrice = "";
+          let shopaFee = "";
+          let paystackFee = "";
           try {
             const svc = createServiceRoleClient();
             const { data: order } = (await svc
@@ -44,7 +49,11 @@ export async function GET(request: Request) {
               data: { amount: number; buyer_name: string | null; product_id: string } | null;
             };
             if (order) {
-              amount = String(order.amount);
+              const b = computeBuyerTotal(order.amount);
+              amount = String(b.total);
+              productPrice = String(b.product);
+              shopaFee = String(b.shopaFee);
+              paystackFee = String(b.paystackFee);
               buyer = order.buyer_name || "";
               const { data: prod } = (await svc
                 .from("products")
@@ -64,6 +73,9 @@ export async function GET(request: Request) {
             amount,
             product,
             buyer,
+            productPrice,
+            shopaFee,
+            paystackFee,
           });
           return NextResponse.redirect(`${origin}/confirm?${params.toString()}`);
         }

@@ -11,6 +11,9 @@ type Props = {
   reference: string | null;
   orderId: string | null;
   paid: boolean;
+  productPrice: string | null;
+  shopaFee: string | null;
+  paystackFee: string | null;
   message: string | null;
   pageStyle: React.CSSProperties;
   containerMax: string;
@@ -28,12 +31,16 @@ export default function ConfirmClient({
   reference,
   orderId,
   paid,
+  productPrice,
+  shopaFee,
+  paystackFee,
   message,
   pageStyle,
   containerMax,
   cardStyle,
   textColor,
   cardBg,
+  primaryColor,
 }: Props) {
   const isSuccess = status === "success";
   const hasSettings = Object.keys(pageStyle).length > 2;
@@ -79,7 +86,42 @@ export default function ConfirmClient({
               <p className="text-xs mt-2 font-mono" style={{ color: hasSettings ? `${textColor}40` : undefined }}>
                 Ref: {reference}
               </p>
+              {paid && (productPrice || shopaFee || paystackFee) && (
+                <div className="mt-3 pt-3 space-y-1 text-sm text-left" style={{ borderTop: `1px dashed ${hasSettings ? `${textColor}20` : "#e5e7eb"}` }}>
+                  {productPrice && (
+                    <div className="flex justify-between" style={{ color: hasSettings ? `${textColor}90` : "#374151" }}>
+                      <span>{product || "Product"}</span>
+                      <span>₦{parseInt(productPrice).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {shopaFee && (
+                    <div className="flex justify-between" style={{ color: hasSettings ? `${textColor}90` : "#374151" }}>
+                      <span>Shopa fee (1%)</span>
+                      <span>₦{parseInt(shopaFee).toLocaleString()}</span>
+                    </div>
+                  )}
+                  {paystackFee && (
+                    <div className="flex justify-between" style={{ color: hasSettings ? `${textColor}90` : "#374151" }}>
+                      <span>Paystack fee</span>
+                      <span>₦{parseInt(paystackFee).toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            {paid && (
+              <ReceiptActions
+                product={product}
+                amount={amount}
+                productPrice={productPrice}
+                shopaFee={shopaFee}
+                paystackFee={paystackFee}
+                buyer={buyer}
+                reference={reference}
+                primaryColor={hasSettings ? primaryColor : "#ed7712"}
+              />
+            )}
 
             {!paid && (
               <p className="text-sm" style={{ color: hasSettings ? `${textColor}80` : undefined }}>
@@ -120,6 +162,190 @@ export default function ConfirmClient({
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function drawReceiptImage(details: {
+  product: string;
+  amount: string;
+  productPrice: string | null;
+  shopaFee: string | null;
+  paystackFee: string | null;
+  buyer: string;
+  reference: string;
+}): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const W = 640;
+    const H = 860;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      reject(new Error("Canvas unavailable"));
+      return;
+    }
+    const fmt = (v: string | null) => (v ? `₦${parseInt(v).toLocaleString()}` : "—");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#ed7712";
+    ctx.fillRect(0, 0, W, 150);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 44px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Shopa", W / 2, 70);
+    ctx.font = "24px system-ui, sans-serif";
+    ctx.fillText("Payment Receipt", W / 2, 110);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#111827";
+    let y = 230;
+    const row = (label: string, value: string, bold = false) => {
+      ctx.font = "22px system-ui, sans-serif";
+      ctx.fillStyle = "#6b7280";
+      ctx.fillText(label, 60, y);
+      ctx.fillStyle = "#111827";
+      ctx.font = `${bold ? "bold" : "normal"} 24px system-ui, sans-serif`;
+      const w = ctx.measureText(value).width;
+      ctx.fillText(value, W - 60 - w, y);
+      y += 56;
+    };
+    row("Product", (details.product || "Order").slice(0, 28));
+    if (details.productPrice) row("Price", fmt(details.productPrice));
+    if (details.shopaFee) row("Shopa fee (1%)", fmt(details.shopaFee));
+    if (details.paystackFee) row("Paystack fee", fmt(details.paystackFee));
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(60, y - 18);
+    ctx.lineTo(W - 60, y - 18);
+    ctx.stroke();
+    row("Total paid", fmt(details.amount), true);
+    if (details.buyer) row("Buyer", details.buyer.slice(0, 28));
+    ctx.font = "20px ui-monospace, monospace";
+    ctx.fillStyle = "#6b7280";
+    const ref = `Ref: ${details.reference || "—"}`;
+    const rw = ctx.measureText(ref).width;
+    ctx.fillText(ref, W - 60 - rw, y + 8);
+    ctx.font = "20px system-ui, sans-serif";
+    const date = new Date().toLocaleString("en-NG");
+    ctx.fillText(date, 60, y + 8);
+    ctx.textAlign = "center";
+    ctx.font = "20px system-ui, sans-serif";
+    ctx.fillStyle = "#9ca3af";
+    ctx.fillText("Thank you for shopping with Shopa", W / 2, H - 50);
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not render receipt"));
+    }, "image/png");
+  });
+}
+
+function ReceiptActions({
+  product,
+  amount,
+  productPrice,
+  shopaFee,
+  paystackFee,
+  buyer,
+  reference,
+  primaryColor,
+}: {
+  product: string | null;
+  amount: string | null;
+  productPrice: string | null;
+  shopaFee: string | null;
+  paystackFee: string | null;
+  buyer: string | null;
+  reference: string | null;
+  primaryColor: string;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+
+  const details = {
+    product: product || "Order",
+    amount: amount || "",
+    productPrice,
+    shopaFee,
+    paystackFee,
+    buyer: buyer || "",
+    reference: reference || "",
+  };
+  const fileName = `shopa-receipt-${reference || "order"}.png`;
+
+  const handleDownload = async () => {
+    setBusy(true);
+    setNote("");
+    try {
+      const blob = await drawReceiptImage(details);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch {
+      setNote("Could not generate receipt — try again");
+    }
+    setBusy(false);
+  };
+
+  const handleShare = async () => {
+    setBusy(true);
+    setNote("");
+    try {
+      const blob = await drawReceiptImage(details);
+      const file = new File([blob], fileName, { type: "image/png" });
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files: File[] }) => boolean;
+      };
+      if (nav.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Shopa receipt",
+          text: `My Shopa receipt for ${details.product} — ₦${details.amount ? parseInt(details.amount).toLocaleString() : ""}`,
+        });
+      } else if (navigator.share) {
+        await navigator.share({
+          title: "Shopa receipt",
+          text: `I just paid ₦${details.amount ? parseInt(details.amount).toLocaleString() : ""} for ${details.product} on Shopa (Ref: ${details.reference})`,
+          url: window.location.href,
+        });
+      } else {
+        await handleDownload();
+      }
+    } catch (e) {
+      if ((e as Error)?.name !== "AbortError") setNote("Sharing isn't supported here — receipt downloaded instead");
+    }
+    setBusy(false);
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={handleDownload}
+          disabled={busy}
+          className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
+          style={{ background: primaryColor, color: "#fff" }}
+        >
+          {busy ? "Working..." : "Download receipt"}
+        </button>
+        <button
+          type="button"
+          onClick={handleShare}
+          disabled={busy}
+          className="flex-1 py-3 rounded-xl font-semibold text-sm border transition-all active:scale-[0.98] disabled:opacity-50"
+          style={{ borderColor: primaryColor, color: primaryColor }}
+        >
+          Share
+        </button>
+      </div>
+      {note && <p className="text-xs mt-2 text-gray-500">{note}</p>}
     </div>
   );
 }

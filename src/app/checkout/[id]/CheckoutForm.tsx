@@ -104,6 +104,18 @@ export default function CheckoutForm({
     : 0;
   const displayPrice = Math.max(0, basePrice - discountAmount);
 
+  // Display-only mirror of computeBuyerTotal (server recomputes authoritatively).
+  const feePreview = (() => {
+    const P = Math.max(0, Math.round(displayPrice));
+    const shopaFee = Math.round(P / 100);
+    let T = P + shopaFee;
+    for (let i = 0; i < 4; i++) {
+      const fee = T >= 2500 ? Math.min(Math.round(T * 0.015) + 100, 2000) : Math.round(T * 0.015);
+      T = P + shopaFee + fee;
+    }
+    return { total: T, product: P, shopaFee, paystackFee: T - P - shopaFee };
+  })();
+
   const handlePayWithPaystack = async () => {
     setPayLoading(true);
     setPayError("");
@@ -230,7 +242,7 @@ export default function CheckoutForm({
                   </p>
                 )}
                 <p className="text-3xl font-bold" style={{ color: s ? textColor : "#111827" }}>
-                  ₦{displayPrice.toLocaleString()}
+                  ₦{feePreview.total.toLocaleString()}
                 </p>
                 {discountAmount > 0 && (
                   <p className="text-xs font-medium mt-1" style={{ color: "#16a34a" }}>
@@ -240,6 +252,30 @@ export default function CheckoutForm({
                     {" "}&mdash; {appliedPromo?.code}
                   </p>
                 )}
+              </div>
+
+              <div
+                className="rounded-xl px-4 py-3 space-y-1.5 text-sm"
+                style={{
+                  background: s ? `${textColor}05` : "#f9fafb",
+                  border: `1px solid ${s ? `${textColor}10` : "#e5e7eb"}`,
+                }}
+              >
+                <div className="flex justify-between" style={{ color: s ? `${textColor}90` : "#374151" }}>
+                  <span>{productName}</span>
+                  <span className="font-medium">₦{feePreview.product.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between" style={{ color: s ? `${textColor}90` : "#374151" }}>
+                  <span>Shopa fee (1%)</span>
+                  <span className="font-medium">₦{feePreview.shopaFee.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between" style={{ color: s ? `${textColor}90` : "#374151" }}>
+                  <span>Paystack fee</span>
+                  <span className="font-medium">₦{feePreview.paystackFee.toLocaleString()}</span>
+                </div>
+                <p className="text-[11px] pt-1" style={{ color: s ? `${textColor}60` : "#9ca3af" }}>
+                  Fees go on top — the seller receives the full ₦{feePreview.product.toLocaleString()}.
+                </p>
               </div>
 
               {payError && (
@@ -257,7 +293,7 @@ export default function CheckoutForm({
                 className="w-full py-3.5 rounded-xl font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: primaryColor }}
               >
-                {payLoading ? "Starting secure payment..." : `Pay ₦${displayPrice.toLocaleString()} securely`}
+                {payLoading ? "Starting secure payment..." : `Pay ₦${feePreview.total.toLocaleString()} securely`}
               </button>
 
               <p className="text-center text-xs" style={{ color: s ? `${textColor}40` : "#9ca3af" }}>
