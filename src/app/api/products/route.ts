@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { name, price, description, image_url, stock, has_variants } = body;
+  const { name, price, description, image_url, stock, has_variants, category } = body;
 
   if (typeof name !== "string" || !name.trim() || name.trim().length > 120) {
     return NextResponse.json({ error: "Product name is required" }, { status: 400 });
@@ -42,6 +42,8 @@ export async function POST(request: Request) {
   if (stockNum != null && (!Number.isInteger(stockNum) || stockNum < 0)) {
     return NextResponse.json({ error: "Stock must be a whole number ≥ 0" }, { status: 400 });
   }
+  const categoryClean =
+    typeof category === "string" && category.trim() ? category.trim().slice(0, 40) : null;
 
   const { data, error } = await supabase
     .from("products")
@@ -53,6 +55,7 @@ export async function POST(request: Request) {
       image_url: typeof image_url === "string" && image_url ? image_url.slice(0, 2000) : null,
       stock: stockNum,
       has_variants: !!has_variants,
+      category: categoryClean,
       is_active: true,
     })
     .select("id")
@@ -76,7 +79,7 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { id, name, price, description, image_url, stock, has_variants, is_active } = body;
+  const { id, name, price, description, image_url, stock, has_variants, is_active, category } = body;
 
   if (!id) {
     return NextResponse.json({ error: "Product id is required" }, { status: 400 });
@@ -122,6 +125,9 @@ export async function PUT(request: Request) {
     updates.stock = stock == null || stock === "" ? null : Number(stock);
   if (has_variants !== undefined) updates.has_variants = !!has_variants;
   if (is_active !== undefined) updates.is_active = !!is_active;
+  if (category !== undefined)
+    updates.category =
+      typeof category === "string" && category.trim() ? category.trim().slice(0, 40) : null;
 
   if (updates.stock != null && (!Number.isInteger(updates.stock as number) || (updates.stock as number) < 0)) {
     return NextResponse.json({ error: "Stock must be a whole number ≥ 0" }, { status: 400 });

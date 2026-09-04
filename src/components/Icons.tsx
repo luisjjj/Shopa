@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  House,
   ShoppingBag as Bag,
   ShoppingCartSimple as Cart,
   Tag,
@@ -48,6 +49,7 @@ function wrap(Icon: any) {
   };
 }
 
+export const HomeIcon = wrap(House);
 export const BagIcon = wrap(Bag);
 export const CartIcon = wrap(Cart);
 export const TagIcon = wrap(Tag);

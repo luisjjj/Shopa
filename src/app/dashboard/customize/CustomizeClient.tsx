@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { contrastRatio } from "@/lib/contrast";
 import { SECTION_META, type SectionType, type StoreSection } from "@/lib/sections";
+import { STORE_TEMPLATES, type StoreTemplate } from "@/lib/store-templates";
 
 interface StorefrontSettings {
   primary_color: string;
@@ -259,6 +260,27 @@ export default function CustomizeClient({
       ];
       return next;
     });
+    setSaved(false);
+  };
+
+  const applyTemplate = (tpl: StoreTemplate) => {
+    setSettings({ ...DEFAULTS, ...tpl.settings } as StorefrontSettings);
+    setSections((prev) => {
+      const texts = (prev || []).filter((s) => s.type === "text");
+      const built: StoreSection[] = tpl.sections.map((t, i) => ({
+        id: `tpl-${tpl.id}-${t.type}-${Date.now()}-${i}`,
+        type: t.type,
+        position: i,
+        visible: t.visible,
+        settings: {},
+      }));
+      const anchor = built.findIndex((s) => s.type === "products");
+      const footerAt = built.findIndex((s) => s.type === "footer");
+      const at = anchor >= 0 ? anchor + 1 : footerAt >= 0 ? footerAt : built.length;
+      built.splice(at, 0, ...texts);
+      return built.map((s, i) => ({ ...s, position: i }));
+    });
+    setExpandedSection(null);
     setSaved(false);
   };
 
@@ -545,6 +567,46 @@ export default function CustomizeClient({
               <div className="p-8 text-center text-gray-400">Loading...</div>
             ) : (
               <div className="p-4 md:p-5 space-y-5 md:space-y-6">
+
+                {/* Templates — one-tap themes */}
+                <Section icon={<SparkleIcon size={16} />} title="Templates">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
+                    Start from a professionally designed look. Applies theme + layout — your products and text blocks stay.
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {STORE_TEMPLATES.map((tpl) => (
+                      <div
+                        key={tpl.id}
+                        className="border border-gray-200 dark:border-white/10 rounded-xl p-3 flex items-center gap-3"
+                      >
+                        <div className="flex -space-x-1.5 shrink-0">
+                          {[tpl.swatches.primary, tpl.swatches.bg, tpl.swatches.text].map((c) => (
+                            <span
+                              key={c}
+                              className="w-5 h-5 rounded-full border-2 border-white dark:border-[#1a1a1a]"
+                              style={{ background: c }}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+                            {tpl.name}
+                          </p>
+                          <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 truncate">
+                            {tpl.blurb}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => applyTemplate(tpl)}
+                          className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-85 transition-all active:scale-95"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
 
                 {/* Page Sections — drag to arrange your storefront */}
                 {sections && (

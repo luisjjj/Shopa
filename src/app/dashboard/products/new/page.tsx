@@ -16,6 +16,7 @@ export default function NewProductPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -107,6 +108,7 @@ export default function NewProductPage() {
         image_url: imageUrl || null,
         stock: stock ? parseInt(stock) : null,
         has_variants: hasVariants,
+        category: category.trim() || null,
       }),
     });
     const createData = await createRes.json().catch(() => ({}));
@@ -240,6 +242,21 @@ export default function NewProductPage() {
               placeholder="e.g. 15000"
               min="100"
               required
+            />
+          </div>
+
+          {/* Category */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Category <span className="text-gray-400 font-normal">(optional — groups products on your store)</span>
+            </label>
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="input-base"
+              placeholder="e.g. Shoes, Hair, Thrift"
+              maxLength={40}
             />
           </div>
 

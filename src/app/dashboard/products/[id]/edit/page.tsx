@@ -21,6 +21,7 @@ export default function EditProductPage({
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -56,6 +57,7 @@ export default function EditProductPage({
         setPrice(String(data.price));
         setDescription(data.description || "");
         setImageUrl(data.image_url || "");
+        setCategory(data.category || "");
         setStock(data.stock != null ? String(data.stock) : "");
         setIsActive(data.is_active);
         setHasVariants(data.has_variants || false);
@@ -159,6 +161,7 @@ export default function EditProductPage({
         is_active: isActive,
         stock: hasVariants ? null : stock ? parseInt(stock) : null,
         has_variants: hasVariants,
+        category: category.trim() || null,
       }),
     });
     const updateData = await updateRes.json().catch(() => ({}));
@@ -321,6 +324,21 @@ export default function EditProductPage({
               className="input-base"
               min="100"
               required
+            />
+          </div>
+
+          {/* Category */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Category <span className="text-gray-400 font-normal">(optional — groups products on your store)</span>
+            </label>
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="input-base"
+              placeholder="e.g. Shoes, Hair, Thrift"
+              maxLength={40}
             />
           </div>
 

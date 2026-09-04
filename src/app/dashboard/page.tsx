@@ -8,8 +8,9 @@ import { NotificationBanner } from "@/components/NotificationBanner";
 import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { RemindButton } from "@/components/RemindButton";
 import { ShopaLogo } from "@/components/ShopaLogo";
-import { isPremiumActive, isProPlusActive } from "@/lib/premium";
+import { isPremiumActive, isProPlusActive, daysLeft } from "@/lib/premium";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
+import DashboardSidebar from "@/components/DashboardSidebar";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -38,6 +39,17 @@ export default async function DashboardPage() {
   const isProPlus = isProPlusActive(profile);
   const canAddProduct = isPremium || productCount < 3;
 
+  const planName = isProPlus ? "Pro+" : isPremium ? "Premium" : "Free plan";
+  const planDetail = isProPlus
+    ? profile.pro_plus_until
+      ? `${daysLeft(profile.pro_plus_until)} days left`
+      : "Active"
+    : isPremium
+      ? profile.premium_until
+        ? `${daysLeft(profile.premium_until)} days left`
+        : "Active"
+      : `${productCount}/3 product slots`;
+
   let stores: { id: string; username: string }[] = [];
   if (isProPlus) {
     const { data } = await supabase
@@ -57,6 +69,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
+      <DashboardSidebar
+        username={profile.username}
+        planName={planName}
+        planDetail={planDetail}
+        showUpgrade={!isPremium}
+      />
+      <div className="lg:pl-60 min-w-0">
       {/* Header */}
       <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
@@ -120,9 +139,9 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-5 py-8">
+      <main className="max-w-5xl mx-auto px-5 py-8 pb-24 lg:pb-8">
         {/* Welcome */}
-        <div className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark">
+        <div id="overview" className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark scroll-mt-24">
           <img src="/landing/dashboard-banner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/10" />
           <div className="relative p-6 sm:p-8 flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -240,7 +259,7 @@ export default async function DashboardPage() {
         )}
 
         {/* Products Section */}
-        <div className="mb-10">
+        <div id="products" className="mb-10 scroll-mt-24">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Products</h2>
             {canAddProduct && (
@@ -257,7 +276,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Orders Section */}
-        <div>
+        <div id="orders" className="scroll-mt-24">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Orders</h2>
             <a
@@ -274,10 +293,11 @@ export default async function DashboardPage() {
         </div>
 
         {/* Promo Codes Section (Pro+ only) */}
-        <div className="mt-10">
+        <div id="promos" className="mt-10 scroll-mt-24">
           <PromoCodesSection isProPlus={isProPlus} />
         </div>
       </main>
+      </div>
     </div>
   );
 }
