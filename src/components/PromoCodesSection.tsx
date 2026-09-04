@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { TagIcon, XIcon } from "@/components/Icons";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
+import DateTimePicker from "@/components/DateTimePicker";
 
 type Promo = {
   id: string;
@@ -188,11 +189,10 @@ export function PromoCodesSection() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Expires (optional)
                 </label>
-                <input
-                  type="datetime-local"
+                <DateTimePicker
                   value={expiresAt}
-                  onChange={(e) => setExpiresAt(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                  onChange={setExpiresAt}
+                  placeholder="No expiry"
                 />
               </div>
             </div>

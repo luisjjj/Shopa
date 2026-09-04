@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CheckIcon } from "@/components/Icons";
+import PaystackBankSelect, { PaystackBankOption } from "@/components/PaystackBankSelect";
 
-type Bank = { name: string; code: string };
+type Bank = PaystackBankOption;
 
 type Payout = {
   paystack_subaccount_code: string | null;
@@ -23,6 +24,8 @@ export default function PayoutsClient({ username, payout }: { username: string; 
   const [bankCode, setBankCode] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [resolvedName, setResolvedName] = useState<string | null>(null);
+  const [manualMode, setManualMode] = useState(false);
+  const [typedName, setTypedName] = useState("");
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState("");
@@ -54,7 +57,14 @@ export default function PayoutsClient({ username, payout }: { username: string; 
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Could not verify account");
+        // Paystack verification unavailable (limits) — fall back to the
+        // seller confirming their own typed details instead of hard failing.
+        if (data.error === "RESOLVE_UNAVAILABLE") {
+          setManualMode(true);
+          setLoading(false);
+          return;
+        }
+        setError(data.error || data.message || "Could not verify account");
         setLoading(false);
         return;
       }
@@ -65,18 +75,27 @@ export default function PayoutsClient({ username, payout }: { username: string; 
     setLoading(false);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (manual = false) => {
+    if (manual && !typedName.trim()) {
+      setError("Type the account name exactly as your bank shows it");
+      return;
+    }
     setConfirming(true);
     setError("");
     try {
       const res = await fetch("/api/payouts/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bank_code: bankCode, bank_name: bankName, account_number: accountNumber }),
+        body: JSON.stringify({
+          bank_code: bankCode,
+          bank_name: bankName,
+          account_number: accountNumber,
+          ...(manual ? { manual_confirm: true, account_name: typedName.trim() } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Payout setup failed");
+        setError(data.error || data.message || "Payout setup failed");
         setConfirming(false);
         return;
       }
@@ -151,18 +170,13 @@ export default function PayoutsClient({ username, payout }: { username: string; 
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Bank
               </label>
-              <select
+              <PaystackBankSelect
+                banks={banks}
                 value={bankCode}
-                onChange={(e) => { setBankCode(e.target.value); setResolvedName(null); setError(""); }}
-                className="input-base"
-                required
-                disabled={banksLoading}
-              >
-                <option value="">{banksLoading ? "Loading banks..." : "Select your bank"}</option>
-                {banks.map((b) => (
-                  <option key={b.code} value={b.code}>{b.name}</option>
-                ))}
-              </select>
+                onChange={(code) => { setBankCode(code); setResolvedName(null); setManualMode(false); setError(""); }}
+                disabled={banksLoading && banks.length === 0}
+                loading={banksLoading}
+              />
             </div>
 
             <div className="mb-6">
@@ -173,7 +187,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
                 type="text"
                 inputMode="numeric"
                 value={accountNumber}
-                onChange={(e) => { setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setResolvedName(null); setError(""); }}
+                onChange={(e) => { setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setResolvedName(null); setManualMode(false); setError(""); }}
                 placeholder="0123456789"
                 maxLength={10}
                 className="input-base font-mono tracking-widest"
@@ -197,11 +211,47 @@ export default function PayoutsClient({ username, payout }: { username: string; 
               </div>
             )}
 
-            {!resolvedName ? (
+            {manualMode && !resolvedName ? (
+              <div className="rounded-xl px-4 py-4 mb-5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-1">
+                  Automatic verification is unavailable right now
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  Confirm these details are exactly right — {bankName}, {accountNumber}. Type the
+                  account name as your bank shows it:
+                </p>
+                <input
+                  type="text"
+                  value={typedName}
+                  onChange={(e) => setTypedName(e.target.value)}
+                  placeholder="e.g. ADAEZE OKONKWO"
+                  className="input-base mb-3"
+                />
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setManualMode(false); setTypedName(""); }}
+                    className="flex-1 border border-gray-200 dark:border-white/[0.08] text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl transition-all"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleConfirm(true)}
+                    disabled={confirming || !typedName.trim()}
+                    className="flex-1 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all"
+                  >
+                    {confirming ? "Setting up..." : "Confirm details & activate"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {!resolvedName && !manualMode ? (
               <button type="submit" disabled={loading || !bankCode || accountNumber.length !== 10} className="btn-primary">
                 {loading ? "Verifying with Paystack..." : "Verify account"}
               </button>
-            ) : (
+            ) : resolvedName ? (
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -212,14 +262,14 @@ export default function PayoutsClient({ username, payout }: { username: string; 
                 </button>
                 <button
                   type="button"
-                  onClick={handleConfirm}
+                  onClick={() => handleConfirm(false)}
                   disabled={confirming}
                   className="flex-1 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-all"
                 >
                   {confirming ? "Setting up..." : "Yes, this is my account"}
                 </button>
               </div>
-            )}
+            ) : null}
           </form>
         )}
       </main>
