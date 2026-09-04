@@ -60,12 +60,6 @@ export default function CheckoutForm({
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [otpStep, setOtpStep] = useState<"details" | "code" | "verified">("details");
-  const [otpCode, setOtpCode] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [otpError, setOtpError] = useState("");
-  const [otpMessage, setOtpMessage] = useState("");
-
   const [showPromo, setShowPromo] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
@@ -161,68 +155,8 @@ export default function CheckoutForm({
     setPromoError("");
   };
 
-  const handleSendCode = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    setOtpLoading(true);
-    setOtpError("");
-    setOtpMessage("");
-    try {
-      const res = await fetch("/api/buyer/send-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: buyerEmail }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setOtpError(data.error || "Could not send code");
-        setOtpLoading(false);
-        return;
-      }
-      setOtpStep("code");
-      setOtpMessage(`Code sent to ${buyerEmail}`);
-    } catch {
-      setOtpError("Network error — try again");
-    }
-    setOtpLoading(false);
-  };
-
-  const handleVerifyCode = async () => {
-    setOtpLoading(true);
-    setOtpError("");
-    try {
-      const res = await fetch("/api/buyer/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: buyerEmail, code: otpCode }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setOtpError(data.error || "Verification failed");
-        setOtpLoading(false);
-        return;
-      }
-      setOtpStep("verified");
-      setOtpMessage("");
-    } catch {
-      setOtpError("Network error — try again");
-    }
-    setOtpLoading(false);
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    if (otpStep === "verified") handleCheckout(e);
-    else if (otpStep === "code") {
-      e.preventDefault();
-      if (otpCode.length === 6) handleVerifyCode();
-    } else handleSendCode(e);
-  };
-
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otpStep !== "verified") {
-      setError("Please verify your email first");
-      return;
-    }
     setLoading(true);
     setError("");
 
@@ -364,7 +298,7 @@ export default function CheckoutForm({
 
   return (
     <form
-      onSubmit={handleFormSubmit}
+      onSubmit={handleCheckout}
       className={s ? "" : "bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark"}
       style={s ? {
         background: cardBg,
@@ -491,13 +425,13 @@ export default function CheckoutForm({
           className="block text-sm font-medium mb-2"
           style={{ color: s ? `${textColor}bb` : undefined }}
         >
-          Email <span className="opacity-50">(we&apos;ll send a verification code)</span>
+          Email <span className="opacity-50">(for receipt)</span>
         </label>
         <input
           type="email"
           value={buyerEmail}
-          onChange={(e) => { setBuyerEmail(e.target.value); setOtpStep("details"); setOtpCode(""); setOtpError(""); }}
-          disabled={otpStep === "verified"}
+          onChange={(e) => setBuyerEmail(e.target.value)}
+          required
           className={s ? "" : "input-base"}
           style={s ? {
             width: "100%",
@@ -631,66 +565,9 @@ export default function CheckoutForm({
         </div>
       )}
 
-      {otpStep === "code" && (
-        <div
-          className={`rounded-xl px-4 py-4 mb-5 ${s ? "" : "bg-brand-50 dark:bg-brand-950/20 border border-brand-200 dark:border-brand-900/40"}`}
-          style={s ? { background: `${primaryColor}0d`, border: `1px solid ${primaryColor}30` } : undefined}
-        >
-          <p className="text-sm font-medium mb-1" style={{ color: s ? textColor : undefined }}>
-            Enter the 6-digit code
-          </p>
-          <p className="text-xs mb-3" style={{ color: s ? `${textColor}60` : undefined }}>
-            {otpMessage || `Sent to ${buyerEmail}`}
-          </p>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={otpCode}
-              onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6)); setOtpError(""); }}
-              placeholder="123456"
-              maxLength={6}
-              className="flex-1 text-center tracking-[0.4em] font-mono font-bold text-lg px-3 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-300"
-            />
-            <button
-              type="button"
-              onClick={handleVerifyCode}
-              disabled={otpLoading || otpCode.length !== 6}
-              className="px-5 py-2 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
-              style={{ background: primaryColor }}
-            >
-              {otpLoading ? "..." : "Verify"}
-            </button>
-          </div>
-          {otpError && <p className="text-xs text-red-500 mt-2">{otpError}</p>}
-          <button
-            type="button"
-            onClick={() => handleSendCode()}
-            disabled={otpLoading}
-            className="text-xs mt-3 font-medium transition-colors"
-            style={{ color: s ? primaryColor : undefined }}
-          >
-            Resend code
-          </button>
-        </div>
-      )}
-
-      {otpStep === "verified" && (
-        <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-5 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30">
-          <svg className="w-4 h-4 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-          </svg>
-          <p className="text-xs text-green-700 dark:text-green-400 font-medium">Email verified — {buyerEmail}</p>
-        </div>
-      )}
-
-      {otpStep !== "code" && otpError && (
-        <p className="text-xs text-red-500 mb-4">{otpError}</p>
-      )}
-
       <button
         type="submit"
-        disabled={otpStep === "verified" ? (loading || !buyerName || !buyerPhone) : otpStep === "code" ? (otpLoading || otpCode.length !== 6) : (otpLoading || !buyerName || !buyerPhone || !buyerEmail)}
+        disabled={loading || !buyerName || !buyerPhone || !buyerEmail}
         className={s ? "" : "btn-primary flex items-center justify-center gap-2"}
         style={s ? {
           width: "100%",
@@ -702,8 +579,8 @@ export default function CheckoutForm({
           fontSize: "inherit",
           fontFamily: "inherit",
           border: "none",
-          cursor: (otpStep === "verified" ? (loading || !buyerName || !buyerPhone) : (otpLoading || !buyerName || !buyerPhone || !buyerEmail)) ? "not-allowed" : "pointer",
-          opacity: (otpStep === "verified" ? (loading || !buyerName || !buyerPhone) : (otpLoading || !buyerName || !buyerPhone || !buyerEmail)) ? 0.5 : 1,
+          cursor: (loading || !buyerName || !buyerPhone || !buyerEmail) ? "not-allowed" : "pointer",
+          opacity: (loading || !buyerName || !buyerPhone || !buyerEmail) ? 0.5 : 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -719,7 +596,7 @@ export default function CheckoutForm({
             </svg>
             Creating order...
           </>
-        ) : otpStep === "verified" ? `Pay ₦${displayPrice.toLocaleString()}` : otpStep === "code" ? "Verify code to continue" : "Continue — verify email"}
+        ) : `Pay ₦${displayPrice.toLocaleString()}`}
       </button>
 
       <div className="flex items-center justify-center gap-2 mt-4">

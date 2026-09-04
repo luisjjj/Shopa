@@ -7,6 +7,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "@/components/Icons";
 import { ShopaMark } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -122,6 +123,14 @@ export default function LoginPage() {
               </span>
             ) : "Sign in"}
           </button>
+
+          <div className="flex items-center gap-3 my-5">
+            <span className="flex-1 h-px bg-gray-100 dark:bg-white/[0.06]" />
+            <span className="text-xs text-gray-400 dark:text-gray-500">or</span>
+            <span className="flex-1 h-px bg-gray-100 dark:bg-white/[0.06]" />
+          </div>
+
+          <GoogleAuthButton mode="signin" />
 
           <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">

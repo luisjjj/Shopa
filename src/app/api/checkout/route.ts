@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { MIN_ORDER_NAIRA } from "@/lib/platform";
@@ -18,26 +17,6 @@ export async function POST(request: Request) {
   }
 
   const normalizedEmail = String(buyerEmail).trim().toLowerCase();
-  const otpClient = createServiceRoleClient();
-  const { data: verified, error: otpError } = await otpClient
-    .from("buyer_otps")
-    .select("id, verified_at")
-    .eq("email", normalizedEmail)
-    .not("verified_at", "is", null)
-    .gt("verified_at", new Date(Date.now() - 30 * 60 * 1000).toISOString())
-    .order("verified_at", { ascending: false })
-    .limit(1)
-    .maybeSingle() as never as { data: { id: string } | null; error: { code?: string; message?: string } | null };
-
-  if (otpError && otpError.code !== "42P01" && !String(otpError.message || "").includes("buyer_otps")) {
-    return NextResponse.json({ error: "Could not verify email — try again" }, { status: 500 });
-  }
-  if (!otpError && !verified) {
-    return NextResponse.json({ error: "Please verify your email first" }, { status: 403 });
-  }
-  if (otpError) {
-    console.warn("[checkout] buyer_otps table missing — skipping email verification. Run supabase/buyer-otps.sql");
-  }
 
   const supabase = createClient();
 
@@ -159,8 +138,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: (insertError as { message: string }).message }, { status: 500 });
   }
   if (!order) return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
-
-  await otpClient.from("buyer_otps").delete().eq("email", normalizedEmail);
 
   const productName = productRow?.name || "your order";
   if (seller?.email) {
