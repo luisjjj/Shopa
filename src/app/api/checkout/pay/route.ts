@@ -98,6 +98,21 @@ export async function POST(request: Request) {
     if (isStarterSafeError(message)) {
       console.error("[checkout/pay] POSSIBLE STARTER-BUSINESS RESTRICTION:", message);
     }
+    // Self-healing: a definitively invalid subaccount (e.g. test-mode code
+    // left over from before the live switch, or deleted in the dashboard)
+    // is cleared so the seller is routed back through payout setup instead
+    // of every buyer hitting this error forever.
+    if (/invalid subaccount/i.test(message)) {
+      console.error("[checkout/pay] clearing dead subaccount for seller", order.seller_id);
+      await supabase
+        .from("users")
+        .update({ paystack_subaccount_code: null, payout_setup_completed_at: null })
+        .eq("id", order.seller_id);
+      return NextResponse.json(
+        { error: "SELLER_PAYOUT_NOT_SETUP", message: "This seller hasn't set up payouts yet" },
+        { status: 400 }
+      );
+    }
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
