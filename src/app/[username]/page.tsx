@@ -123,6 +123,240 @@ export default async function StorePage({
     ? `https://wa.me/${String(profile.whatsapp_number || s?.whatsapp_store || "").replace("+", "")}`
     : null;
 
+  type SectionRow = {
+    id: string;
+    type: string;
+    visible: boolean;
+    settings: Record<string, unknown>;
+  };
+
+  let sectionList: SectionRow[] = [];
+  try {
+    const { data: sectionRows } = await supabase
+      .from("storefront_sections")
+      .select("id, type, position, visible, settings")
+      .eq("user_id", profile.id)
+      .order("position", { ascending: true });
+    if (sectionRows) sectionList = sectionRows as SectionRow[];
+  } catch {
+    sectionList = [];
+  }
+  const hasSections = sectionList.length > 0;
+
+  function productCard(p: {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string | null;
+    description?: string | null;
+    stock?: number | null;
+  }) {
+    return (
+      <a
+        key={p.id}
+        href={`/checkout/${p.id}`}
+        className={cardClasses}
+        style={{
+          ...cardBgStyle,
+          ...cardInlineStyle,
+          ...(isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" as const } : {}),
+        }}
+      >
+        <div
+          className={`${useDynamicImage ? "" : imageAspect} overflow-hidden ${imageRadius} mb-3 flex items-center justify-center ${useDynamicImage ? "" : imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
+          style={s ? { background: `${textColor}08` } : undefined}
+        >
+          {p.image_url ? (
+            <div className="relative w-full">
+              <img
+                src={p.image_url}
+                alt={p.name}
+                className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
+              />
+              {s?.show_stock_badge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
+                <span
+                  className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
+                  style={{ background: accentColor }}
+                >
+                  Only {p.stock} left
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className={`w-full ${useDynamicImage ? "h-48" : "h-full aspect-square"} flex items-center justify-center bg-gray-50 dark:bg-white/[0.04]`}>
+              <PackageIcon size={40} style={s ? { color: `${textColor}25` } : undefined} className={s ? "" : "text-gray-300 dark:text-gray-600"} />
+            </div>
+          )}
+        </div>
+        <div className={isList ? "flex items-center justify-between" : ""}>
+          <h3
+            className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"} ${s ? "" : "text-gray-900 dark:text-white"}`}
+            style={s ? { color: cardText } : undefined}
+          >
+            {p.name}
+          </h3>
+          <p className={priceClasses} style={priceStyle}>
+            ₦{p.price.toLocaleString()}
+          </p>
+          <ProductRating productId={p.id} />
+        </div>
+      </a>
+    );
+  }
+
+  function renderSection(sec: SectionRow) {
+    if (!sec.visible) return null;
+    switch (sec.type) {
+      case "announcement":
+        return showAnnouncement ? (
+          <div
+            key={sec.id}
+            className="w-full text-center text-xs sm:text-sm font-medium px-4 py-2.5"
+            style={{ background: accentColor, color: readableTextOn(accentColor, "#ffffff") }}
+          >
+            {s?.announcement_text}
+          </div>
+        ) : null;
+      case "banner":
+        return s?.banner_url ? (
+          <div key={sec.id} className={`w-full ${bannerHeight} overflow-hidden relative`}>
+            <img src={s.banner_url} alt="Store banner" className="w-full h-full object-cover" />
+            {s.banner_overlay && <div className="absolute inset-0 bg-black/40" />}
+          </div>
+        ) : null;
+      case "header":
+        return (
+          <div key={sec.id} className="border-b" style={{ borderColor: `${textColor}15` }}>
+            <div className={`${containerMax} mx-auto px-4 ${sectionPadding} ${headerAlign}`}>
+              {(s ? s.show_store_name : true) && (
+                <h1 className="text-2xl font-bold break-words" style={{ color: textColor }}>
+                  {profile.username}
+                </h1>
+              )}
+              {s?.tagline ? (
+                <p className="text-sm mt-1 break-words" style={{ color: `${textColor}80` }}>
+                  {s.tagline}
+                </p>
+              ) : (
+                <p className="text-sm mt-1" style={{ color: `${textColor}60` }}>
+                  Shop on WhatsApp
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      case "featured":
+        return featured ? (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding} pb-0`}>
+            <div className={`grid sm:grid-cols-2 gap-4 items-center overflow-hidden ${cardRadius} ${cardPadding} ${cardBorder} ${cardShadow}`} style={{ ...cardBgStyle, ...cardInlineStyle }}>
+              <div className="overflow-hidden rounded-xl flex items-center justify-center" style={{ background: `${textColor}08` }}>
+                {featured.image_url ? (
+                  <img src={featured.image_url} alt={featured.name} className="w-full h-auto max-h-72 object-contain" />
+                ) : (
+                  <div className="w-full h-48 flex items-center justify-center">
+                    <PackageIcon size={40} style={{ color: `${textColor}25` }} />
+                  </div>
+                )}
+              </div>
+              <div className="py-2">
+                <p className="text-[11px] font-bold uppercase tracking-widest mb-2 inline-block px-2 py-0.5 rounded-md" style={{ background: `${accentColor}15`, color: accentColor }}>
+                  Featured
+                </p>
+                <h2 className="text-xl sm:text-2xl font-bold break-words" style={{ color: cardText }}>
+                  {featured.name}
+                </h2>
+                <p className="text-xl font-bold mt-3" style={{ color: accentColor }}>
+                  ₦{featured.price.toLocaleString()}
+                </p>
+                <a href={`/checkout/${featured.id}`} className="inline-block mt-4 text-sm font-semibold px-6 py-3 rounded-xl text-white" style={{ background: accentColor }}>
+                  Shop now →
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : null;
+      case "products":
+        return (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
+            {!products || products.length === 0 ? (
+              <div className="text-center py-12">
+                <EmptyIllustration variant="store" className="opacity-90 mb-2 max-w-[360px] mx-auto" />
+                <p className="font-medium" style={{ color: textColor }}>No products yet</p>
+                <p className="text-sm mt-1" style={{ color: `${textColor}60` }}>Check back soon!</p>
+              </div>
+            ) : (
+              <div className={`${isHorizontal ? "flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" : `grid ${gridCols} ${gapSize}`}`}>
+                {products.map((p) => productCard(p))}
+              </div>
+            )}
+          </div>
+        );
+      case "text": {
+        const heading = String(sec.settings.heading || "");
+        const body = String(sec.settings.body || "");
+        if (!heading && !body) return null;
+        const align = sec.settings.align === "left" ? "text-left" : sec.settings.align === "right" ? "text-right" : "text-center";
+        return (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding} pt-0`}>
+            <div className={`overflow-hidden ${cardRadius} ${cardBorder} ${cardShadow} p-6`} style={{ ...cardBgStyle, ...cardInlineStyle }}>
+              <div className={align}>
+                {heading && (
+                  <h2 className="text-xl font-bold break-words" style={{ color: cardText }}>{heading}</h2>
+                )}
+                {body && (
+                  <p className="text-sm mt-2 leading-relaxed break-words" style={{ color: `${cardText}90` }}>{body}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      case "socials":
+        return socials.length > 0 ? (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding} border-t`} style={{ borderColor: `${textColor}10` }}>
+            <div className={`flex flex-wrap gap-3 ${s?.text_align === "left" ? "justify-start" : s?.text_align === "right" ? "justify-end" : "justify-center"}`}>
+              {socials.map((item) => {
+                if (!item) return null;
+                const social = item as { type: string; value: string };
+                let href = "#";
+                let label = social.type;
+                if (social.type === "instagram") { href = `https://instagram.com/${social.value.replace("@", "")}`; label = social.value; }
+                else if (social.type === "twitter") { href = `https://x.com/${social.value.replace("@", "")}`; label = social.value; }
+                else if (social.type === "tiktok") { href = `https://tiktok.com/${social.value.replace("@", "")}`; label = social.value; }
+                else if (social.type === "facebook") { href = social.value; label = "Facebook"; }
+                else if (social.type === "whatsapp") { href = `https://wa.me/${social.value.replace("+", "")}`; label = "WhatsApp"; }
+                else if (social.type === "phone") { href = `tel:${social.value}`; label = social.value; }
+                else if (social.type === "email") { href = `mailto:${social.value}`; label = social.value; }
+                return (
+                  <a key={social.type} href={href} target={social.type !== "phone" && social.type !== "email" ? "_blank" : undefined} rel="noopener noreferrer" className={socialClasses}
+                    style={s?.social_style === "minimal" ? { color: `${textColor}80` } : { color: textColor, borderColor: `${textColor}20` }}>
+                    {label}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        ) : null;
+      case "footer":
+        return (
+          <footer key={sec.id} className="border-t py-6" style={{ borderColor: `${textColor}10` }}>
+            <div className="text-center px-4">
+              {s?.footer_text && (
+                <p className="text-sm mb-2" style={{ color: `${textColor}70` }}>{s.footer_text}</p>
+              )}
+              {!profile.is_premium && (
+                <a href="/" className="text-xs hover:opacity-80 transition-opacity" style={{ color: `${textColor}40` }}>
+                  Powered by <span className="font-semibold">Shopa</span>
+                </a>
+              )}
+            </div>
+          </footer>
+        );
+      default:
+        return null;
+    }
+  }
+
   const fontFamily = getFontFamily(s?.font_style);
   const fontSize = getFontSize(s?.font_size);
   const primaryColor = s?.primary_color || "#ed7712";
@@ -397,11 +631,35 @@ export default async function StorePage({
       ].filter(Boolean)
     : [];
 
+  const cardText = readableTextOn(cardBg, textColor);
+
   return (
     <div
       className={`min-h-screen ${s ? "" : "bg-white dark:bg-[#0f0f0f]"}`}
       style={storeStyles}
     >
+      {hasSections ? (
+        <>
+          {sectionList
+            .filter((sec) => sec.visible)
+            .map((sec) => renderSection(sec))}
+          {showWhatsappCta && whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat on WhatsApp"
+              className="fixed bottom-5 right-5 z-40 p-3.5 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95"
+              style={{ background: "#25D366" }}
+            >
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+            </a>
+          )}
+        </>
+      ) : (
+      <>
       {/* Announcement bar */}
       {showAnnouncement && (
         <div
@@ -674,6 +932,8 @@ export default async function StorePage({
           )}
         </div>
       </footer>
+      </>
+      )}
     </div>
   );
 }

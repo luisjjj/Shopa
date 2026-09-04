@@ -14,6 +14,7 @@ import {
 } from "@/components/Icons";
 import Link from "next/link";
 import { contrastRatio } from "@/lib/contrast";
+import { SECTION_META, type SectionType, type StoreSection } from "@/lib/sections";
 
 interface StorefrontSettings {
   primary_color: string;
@@ -124,6 +125,10 @@ export default function CustomizeClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewKey, setPreviewKey] = useState(0);
   const [myProducts, setMyProducts] = useState<{ id: string; name: string }[]>([]);
+  const [sections, setSections] = useState<StoreSection[] | null>(null);
+  const [sectionsError, setSectionsError] = useState("");
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/storefront-settings")
@@ -199,7 +204,73 @@ export default function CustomizeClient({
           if (data) setMyProducts(data as { id: string; name: string }[]);
         });
     });
+    fetch("/api/storefront-sections")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.sections) setSections(data.sections as StoreSection[]);
+        else if (!data.missingTable) setSectionsError(data.error || "Could not load sections");
+        // missingTable: builder stays hidden, legacy settings still work.
+      })
+      .catch(() => setSectionsError("Could not load sections"));
   }, []);
+
+  const moveSection = (from: number, to: number) => {
+    setSections((prev) => {
+      if (!prev) return prev;
+      if (to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next.map((s, i) => ({ ...s, position: i }));
+    });
+    setSaved(false);
+  };
+
+  const toggleSection = (id: string) => {
+    setSections((prev) =>
+      prev ? prev.map((s) => (s.id === id ? { ...s, visible: !s.visible } : s)) : prev
+    );
+    setSaved(false);
+  };
+
+  const updateSectionSettings = (id: string, patch: Record<string, unknown>) => {
+    setSections((prev) =>
+      prev
+        ? prev.map((s) =>
+            s.id === id ? { ...s, settings: { ...s.settings, ...patch } } : s
+          )
+        : prev
+    );
+    setSaved(false);
+  };
+
+  const addTextBlock = () => {
+    setSections((prev) => {
+      if (!prev) return prev;
+      const next: StoreSection[] = [
+        ...prev,
+        {
+          id: `new-${Date.now()}`,
+          type: "text" as SectionType,
+          position: prev.length,
+          visible: true,
+          settings: { heading: "New heading", body: "", align: "center" },
+        },
+      ];
+      return next;
+    });
+    setSaved(false);
+  };
+
+  const removeSection = (id: string) => {
+    setSections((prev) => {
+      if (!prev) return prev;
+      const target = prev.find((s) => s.id === id);
+      if (!target || !SECTION_META[target.type].repeatable) return prev;
+      return prev.filter((s) => s.id !== id).map((s, i) => ({ ...s, position: i }));
+    });
+    setSaved(false);
+  };
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -324,6 +395,21 @@ export default function CustomizeClient({
           show_stock_badge: refreshed.show_stock_badge || false,
           footer_text: refreshed.footer_text || null,
         });
+      }
+
+      if (sections) {
+        const secRes = await fetch("/api/storefront-sections", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sections }),
+        });
+        const secData = await secRes.json().catch(() => ({}));
+        if (!secRes.ok) {
+          setSaveError(secData.error || "Failed to save sections");
+          setSaving(false);
+          return;
+        }
+        if (secData.sections) setSections(secData.sections as StoreSection[]);
       }
 
       setPreviewKey((k) => k + 1);
@@ -459,6 +545,189 @@ export default function CustomizeClient({
               <div className="p-8 text-center text-gray-400">Loading...</div>
             ) : (
               <div className="p-4 md:p-5 space-y-5 md:space-y-6">
+
+                {/* Page Sections — drag to arrange your storefront */}
+                {sections && (
+                  <Section icon={<LayoutIcon size={16} />} title="Page Sections">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
+                      Drag blocks to reorder. Tap a block to edit it, use the eye to hide it.
+                    </p>
+                    <div className="space-y-2">
+                      {sections.map((sec, idx) => {
+                        const meta = SECTION_META[sec.type];
+                        const locked = !!meta.locked;
+                        const expanded = expandedSection === sec.id;
+                        return (
+                          <div
+                            key={sec.id}
+                            draggable={!locked}
+                            onDragStart={() => setDragIndex(idx)}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={() => {
+                              if (dragIndex != null && dragIndex !== idx) {
+                                moveSection(dragIndex, idx);
+                              }
+                              setDragIndex(null);
+                            }}
+                            onDragEnd={() => setDragIndex(null)}
+                            className={`border rounded-xl overflow-hidden transition-colors ${
+                              dragIndex === idx
+                                ? "border-brand-500 opacity-60"
+                                : "border-gray-200 dark:border-white/10"
+                            } ${sec.visible ? "bg-white dark:bg-white/[0.02]" : "bg-gray-50 dark:bg-white/[0.01] opacity-70"}`}
+                          >
+                            <div className="flex items-center gap-2 px-3 py-2.5">
+                              <span
+                                className={`cursor-${locked ? "default" : "grab"} text-gray-300 dark:text-gray-600 shrink-0`}
+                                title={locked ? "Always on" : "Drag to reorder"}
+                              >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                  <circle cx="7" cy="5" r="1.5" />
+                                  <circle cx="13" cy="5" r="1.5" />
+                                  <circle cx="7" cy="10" r="1.5" />
+                                  <circle cx="13" cy="10" r="1.5" />
+                                  <circle cx="7" cy="15" r="1.5" />
+                                  <circle cx="13" cy="15" r="1.5" />
+                                </svg>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedSection(expanded ? null : sec.id)}
+                                className="flex-1 text-left min-w-0"
+                              >
+                                <span className="block text-sm font-medium text-gray-900 dark:text-white truncate">
+                                  {sec.type === "text"
+                                    ? String(sec.settings.heading || meta.label)
+                                    : meta.label}
+                                </span>
+                                <span className="block text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                                  {meta.hint}
+                                </span>
+                              </button>
+                              {!locked && (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSection(sec.id)}
+                                  aria-label={sec.visible ? "Hide section" : "Show section"}
+                                  className={`p-1.5 rounded-lg transition-colors shrink-0 ${
+                                    sec.visible
+                                      ? "text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30"
+                                      : "text-gray-300 dark:text-gray-600 hover:bg-gray-100 dark:hover:bg-white/5"
+                                  }`}
+                                >
+                                  {sec.visible ? (
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                  ) : (
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                  )}
+                                </button>
+                              )}
+                              {meta.repeatable && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeSection(sec.id)}
+                                  aria-label="Remove section"
+                                  className="p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors shrink-0"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916" />
+                                  </svg>
+                                </button>
+                              )}
+                            </div>
+                            {expanded && (
+                              <div className="px-3 pb-3 pt-1 space-y-3 border-t border-gray-100 dark:border-white/5">
+                                {sec.type === "announcement" && (
+                                  <TextField
+                                    label="Announcement text"
+                                    value={settings.announcement_text || ""}
+                                    placeholder="e.g. Free delivery on orders over ₦20,000"
+                                    onChange={(v) => update("announcement_text", v || null)}
+                                  />
+                                )}
+                                {sec.type === "featured" && (
+                                  <div>
+                                    <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Featured product</label>
+                                    <select
+                                      value={settings.featured_product_id || ""}
+                                      onChange={(e) => update("featured_product_id", e.target.value || null)}
+                                      className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300"
+                                    >
+                                      <option value="">None</option>
+                                      {myProducts.map((p) => (
+                                        <option key={p.id} value={p.id}>
+                                          {p.name}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                )}
+                                {sec.type === "text" && (
+                                  <>
+                                    <TextField
+                                      label="Heading"
+                                      value={String(sec.settings.heading || "")}
+                                      placeholder="e.g. Our story"
+                                      onChange={(v) => updateSectionSettings(sec.id, { heading: v })}
+                                    />
+                                    <div>
+                                      <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Message</label>
+                                      <textarea
+                                        value={String(sec.settings.body || "")}
+                                        onChange={(e) => updateSectionSettings(sec.id, { body: e.target.value })}
+                                        placeholder="e.g. We source quality fabrics in Lagos..."
+                                        rows={3}
+                                        className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300 placeholder-gray-400 resize-none"
+                                      />
+                                    </div>
+                                    <SelectField
+                                      label="Alignment"
+                                      value={String(sec.settings.align || "center")}
+                                      options={[
+                                        { value: "left", label: "Left" },
+                                        { value: "center", label: "Center" },
+                                        { value: "right", label: "Right" },
+                                      ]}
+                                      onChange={(v) => updateSectionSettings(sec.id, { align: v })}
+                                    />
+                                  </>
+                                )}
+                                {sec.type === "footer" && (
+                                  <TextField
+                                    label="Footer note"
+                                    value={settings.footer_text || ""}
+                                    placeholder="e.g. Thanks for shopping with us!"
+                                    onChange={(v) => update("footer_text", v || null)}
+                                  />
+                                )}
+                                {(sec.type === "banner" || sec.type === "header" || sec.type === "products" || sec.type === "socials") && (
+                                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                                    Content for this block is edited in the matching section below.
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addTextBlock}
+                      className="w-full py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 border border-dashed border-brand-300 dark:border-brand-800 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
+                    >
+                      + Add text block
+                    </button>
+                    {sectionsError && (
+                      <p className="text-xs text-red-500">{sectionsError}</p>
+                    )}
+                  </Section>
+                )}
 
                 {/* Colors */}
                 <Section icon={<PaletteIcon size={16} />} title="Colors">
