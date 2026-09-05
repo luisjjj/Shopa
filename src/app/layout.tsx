@@ -18,6 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://myshopa.com.ng"),
   title: "Shopa | Your Storefront Link",
   description:
     "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
@@ -25,6 +26,29 @@ export const metadata: Metadata = {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
     apple: "/icon.svg",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Shopa",
+    url: "https://myshopa.com.ng",
+    title: "Shopa | Your Storefront Link",
+    description:
+      "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
+    images: [
+      {
+        url: "/landing/hero-seller.jpg",
+        width: 1200,
+        height: 400,
+        alt: "Sell on Shopa",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shopa | Your Storefront Link",
+    description:
+      "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
+    images: ["/landing/hero-seller.jpg"],
   },
 };
 
