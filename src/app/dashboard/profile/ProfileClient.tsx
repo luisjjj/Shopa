@@ -305,30 +305,24 @@ export default function ProfileClient({
                 <Link href="/dashboard/upgrade" className="text-xs font-bold text-amber-700 dark:text-amber-400 underline">Renew</Link>
               </div>
             ) : null}
-            {!effectivePremium && !effectiveProPlus && (
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Free plan</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {effectiveProPlus ? "Pro+ plan" : effectivePremium ? "Premium plan" : "Free plan"}
+                </p>
+                {!effectivePremium && !effectiveProPlus && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     3 products, Shopa branding on store
                   </p>
-                </div>
-                <Link
-                  href="/dashboard/upgrade"
-                  className="text-sm font-medium text-brand-600 hover:text-brand-700"
-                >
-                  Upgrade →
-                </Link>
+                )}
               </div>
-            )}
-            {(effectivePremium || effectiveProPlus) && (
               <Link
                 href="/dashboard/upgrade"
-                className="text-sm font-medium text-brand-600 hover:text-brand-700 block"
+                className="text-sm font-medium text-brand-600 hover:text-brand-700"
               >
-                Manage plan →
+                {effectivePremium || effectiveProPlus ? "Manage plan →" : "Upgrade →"}
               </Link>
-            )}
+            </div>
           </div>
         </section>
 

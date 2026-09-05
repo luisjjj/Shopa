@@ -113,13 +113,6 @@ export default async function DashboardPage() {
               </div>
             )}
             <Link
-              href={`/${profile.username}`}
-              target="_blank"
-              className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06]"
-            >
-              View store ↗
-            </Link>
-            <Link
               href="/dashboard/profile"
               className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
               title="Profile"
