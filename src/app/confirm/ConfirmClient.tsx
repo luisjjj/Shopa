@@ -368,6 +368,7 @@ function ReviewSection({
 
   const handleSubmit = async () => {
     if (rating === 0 || !orderId) return;
+    setSubmitted(true);
     setLoading(true);
     setFormError("");
     try {
@@ -382,12 +383,13 @@ function ReviewSection({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        setSubmitted(false);
         setFormError(data.error || "Could not submit review");
         setLoading(false);
         return;
       }
-      setSubmitted(true);
     } catch {
+      setSubmitted(false);
       setFormError("Network error — try again");
     }
     setLoading(false);

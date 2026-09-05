@@ -56,9 +56,32 @@ function PlanCard({ planName, planDetail, showUpgrade }: Omit<Props, "username">
   );
 }
 
+export const DASHBOARD_MENU_EVENT = "open-dashboard-menu";
+
+export function DashboardMenuButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new CustomEvent(DASHBOARD_MENU_EVENT))}
+      aria-label="Open menu"
+      className="lg:hidden p-2.5 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
+    >
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+  );
+}
+
 export default function DashboardSidebar({ username, planName, planDetail, showUpgrade }: Props) {
   const [active, setActive] = useState("overview");
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const open = () => setDrawerOpen(true);
+    window.addEventListener(DASHBOARD_MENU_EVENT, open);
+    return () => window.removeEventListener(DASHBOARD_MENU_EVENT, open);
+  }, []);
 
   useEffect(() => {
     const sections = ANCHORS.map((a) => document.getElementById(a.id)).filter(
@@ -133,36 +156,6 @@ export default function DashboardSidebar({ username, planName, planDetail, showU
       <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-60 flex-col gap-1 bg-white dark:bg-[#141414] border-r border-gray-100 dark:border-white/[0.06] p-4 overflow-y-auto z-30">
         {nav}
       </aside>
-
-      {/* Mobile bottom tab bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-[#141414]/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/[0.06] px-2 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-4">
-          {ANCHORS.slice(0, 3).map(({ id, label, Icon, href }) => (
-            <a
-              key={id}
-              href={href}
-              className={`flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
-                active === id
-                  ? "text-brand-600 dark:text-brand-400"
-                  : "text-gray-400 dark:text-gray-500"
-              }`}
-            >
-              <Icon size={20} />
-              {label}
-            </a>
-          ))}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className="flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium text-gray-400 dark:text-gray-500"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-            Menu
-          </button>
-        </div>
-      </nav>
 
       {/* Mobile drawer */}
       {drawerOpen && (

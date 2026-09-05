@@ -1,7 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { PackageIcon, CheckIcon, PaletteIcon, UserIcon, WarningIcon } from "@/components/Icons";
+import { PackageIcon, PaletteIcon, UserIcon, WarningIcon } from "@/components/Icons";
+import { FulfilledToggle } from "@/components/FulfilledToggle";
+import { DashboardMenuButton } from "@/components/DashboardSidebar";
 import { PromoCodesSection } from "@/components/PromoCodesSection";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBanner } from "@/components/NotificationBanner";
@@ -79,9 +81,12 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
-          <Link href="/" aria-label="Shopa home">
-            <ShopaLogo markClassName="w-7 h-7" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={25} />
-          </Link>
+          <div className="flex items-center gap-1">
+            <DashboardMenuButton />
+            <Link href="/" aria-label="Shopa home">
+              <ShopaLogo markClassName="w-7 h-7" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={25} />
+            </Link>
+          </div>
           <div className="flex items-center gap-2">
             {isProPlus && stores.length > 1 && (
               <div className="relative group">
@@ -132,7 +137,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-5 py-8 pb-24 lg:pb-8">
+      <main className="max-w-5xl mx-auto px-5 py-8">
         {/* Welcome */}
         <div id="overview" className="relative mb-8 overflow-hidden rounded-2xl border border-gray-100 dark:border-white/[0.06] shadow-card dark:shadow-card-dark scroll-mt-24">
           <img src="/landing/dashboard-banner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -512,41 +517,4 @@ async function OrderList({ userId }: { userId: string }) {
   );
 }
 
-function FulfilledToggle({
-  orderId,
-  fulfilled,
-  paid,
-}: {
-  orderId: string;
-  fulfilled: boolean;
-  paid: boolean;
-}) {
-  if (!paid) {
-    return (
-      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
-        Pending
-      </span>
-    );
-  }
 
-  return (
-    <form action="/api/orders/fulfilled" method="post" className="inline">
-      <input type="hidden" name="order_id" value={orderId} />
-      <input type="hidden" name="fulfilled" value={fulfilled ? "false" : "true"} />
-      <button
-        type="submit"
-        className={`text-[10px] font-medium px-2 py-0.5 rounded-full transition-all flex items-center gap-1 active:scale-95 ${
-          fulfilled
-            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50"
-            : "bg-gray-100 dark:bg-white/[0.05] text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/[0.1]"
-        }`}
-      >
-        {fulfilled ? (
-          <><CheckIcon size={10} /> Fulfilled</>
-        ) : (
-          "Mark fulfilled"
-        )}
-      </button>
-    </form>
-  );
-}

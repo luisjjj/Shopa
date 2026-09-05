@@ -45,6 +45,19 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
     setCreating(true);
     setError("");
 
+    const optimisticPromo: Promo = {
+      id: `temp-${Date.now()}`,
+      code: code.toUpperCase(),
+      discount_percent: discountType === "percent" ? parseInt(discountValue) || null : null,
+      discount_amount: discountType === "amount" ? parseInt(discountValue) || null : null,
+      max_uses: maxUses ? parseInt(maxUses) : 0,
+      used_count: 0,
+      expires_at: expiresAt || null,
+      is_active: true,
+    };
+    setPromos((prev) => [optimisticPromo, ...prev]);
+    setShowForm(false);
+
     const body: Record<string, unknown> = {
       code,
       max_uses: maxUses ? parseInt(maxUses) : 0,
@@ -57,34 +70,47 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
       body.discount_amount = parseInt(discountValue);
     }
 
-    const res = await fetch("/api/seller/promos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch("/api/seller/promos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.error) {
-      setError(data.error);
-      setCreating(false);
-      return;
+      if (data.error) {
+        setPromos((prev) => prev.filter((p) => p.id !== optimisticPromo.id));
+        setError(data.error);
+        setShowForm(true);
+        setCreating(false);
+        return;
+      }
+
+      setPromos((prev) => prev.map((p) => (p.id === optimisticPromo.id ? data.promo : p)));
+    } catch {
+      setPromos((prev) => prev.filter((p) => p.id !== optimisticPromo.id));
+      setError("Network error — try again");
+      setShowForm(true);
     }
-
-    setPromos((prev) => [data.promo, ...prev]);
     setCode("");
     setDiscountValue("");
     setMaxUses("");
     setExpiresAt("");
-    setShowForm(false);
     setCreating(false);
   };
 
   const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/seller/promos?id=${id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (data.success) {
-      setPromos((prev) => prev.filter((p) => p.id !== id));
+    const snapshot = promos;
+    setPromos((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const res = await fetch(`/api/seller/promos?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!data.success) {
+        setPromos(snapshot);
+      }
+    } catch {
+      setPromos(snapshot);
     }
   };
 

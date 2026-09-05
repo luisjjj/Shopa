@@ -12,6 +12,8 @@ export function RemindButton({
   buyerPhone: string | null;
 }) {
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const isOlderThan1Hour =
     Date.now() - new Date(createdAt).getTime() > 60 * 60 * 1000;
@@ -20,6 +22,8 @@ export function RemindButton({
 
   const handleRemind = async () => {
     setLoading(true);
+    setError("");
+    setSent(true);
     try {
       const res = await fetch("/api/orders/remind", {
         method: "POST",
@@ -29,21 +33,28 @@ export function RemindButton({
       const data = await res.json();
       if (data.url) {
         window.open(data.url, "_blank");
+      } else {
+        setSent(false);
+        setError("Couldn't send — try again");
       }
     } catch {
-      // silent
+      setSent(false);
+      setError("Couldn't send — try again");
     }
     setLoading(false);
   };
 
   return (
-    <button
-      onClick={handleRemind}
-      disabled={loading}
-      className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors shrink-0"
-      title="Send WhatsApp reminder"
-    >
-      {loading ? "..." : "Remind"}
-    </button>
+    <span className="inline-flex flex-col items-start gap-0.5 shrink-0">
+      <button
+        onClick={handleRemind}
+        disabled={loading}
+        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors"
+        title="Send WhatsApp reminder"
+      >
+        {loading ? "..." : sent ? "Sent ✓" : "Remind"}
+      </button>
+      {error && <span className="text-[10px] text-red-500">{error}</span>}
+    </span>
   );
 }
