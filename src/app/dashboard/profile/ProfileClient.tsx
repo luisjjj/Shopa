@@ -269,7 +269,7 @@ export default function ProfileClient({
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {proPlusUntil && (
                       <>
-                        {proPlusDaysLeft > 0 ? `Renews ${new Date(proPlusUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${proPlusDaysLeft} days left)` : "Expired — please renew"}
+                        {proPlusDaysLeft > 0 ? `Renews ${new Date(proPlusUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${proPlusDaysLeft} days left)` : "Expired. Please renew"}
                       </>
                     )}
                   </p>
@@ -289,7 +289,7 @@ export default function ProfileClient({
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {premiumUntil && (
                       <>
-                        {premiumDaysLeft > 0 ? `Renews ${new Date(premiumUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${premiumDaysLeft} days left)` : "Expired — please renew"}
+                        {premiumDaysLeft > 0 ? `Renews ${new Date(premiumUntil).toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })} (${premiumDaysLeft} days left)` : "Expired. Please renew"}
                       </>
                     )}
                   </p>

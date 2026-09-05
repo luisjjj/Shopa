@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     const userId = result.data.metadata?.userId;
     const plan = result.data.metadata?.plan === "pro_plus" ? "pro_plus" : "premium";
 
-    // Bind the upgrade to the logged-in buyer — a shared/copied callback
+    // Bind the upgrade to the logged-in buyer, a shared/copied callback
     // link must not extend someone else's plan.
     if (!userId || (sessionUser && sessionUser.id !== userId)) {
       return NextResponse.redirect(

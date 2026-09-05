@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         console.error("[payouts/resolve] possible Starter Business restriction:", result.message);
       }
       return NextResponse.json(
-        { error: "Could not resolve this account — double-check the bank and number" },
+        { error: "Could not resolve this account, double-check the bank and number" },
         { status: 400 }
       );
     }
@@ -35,6 +35,6 @@ export async function POST(request: Request) {
     });
   } catch (e) {
     console.error("[payouts/resolve] failed", e);
-    return NextResponse.json({ error: "Account verification failed — try again" }, { status: 502 });
+    return NextResponse.json({ error: "Account verification failed. Try again" }, { status: 502 });
   }
 }

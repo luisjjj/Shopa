@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   // Prefer the Paystack-resolved name. If resolution is unavailable
   // (rate limits / Starter restrictions), fall back to the seller-typed name
-  // they explicitly confirmed — subaccount creation still validates the
+  // they explicitly confirmed, subaccount creation still validates the
   // account for real, so bad details fail there with Paystack's message.
   let storedName: string;
   if (manual_confirm) {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: "RESOLVE_UNAVAILABLE",
-          message: "Paystack couldn't verify this account right now. You can still continue — just confirm the details below are exactly right.",
+          message: "Paystack couldn't verify this account right now. You can still continue, just confirm the details below are exactly right.",
         },
         { status: 400 }
       );
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     });
   } catch (e) {
     console.error("[payouts/setup] failed", e);
-    return NextResponse.json({ error: "Payout setup failed — try again" }, { status: 502 });
+    return NextResponse.json({ error: "Payout setup failed. Try again" }, { status: 502 });
   }
 
   if (!created.status || !created.data?.subaccount_code) {
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
 
   if (saveError) {
     console.error("[payouts/setup] save failed", saveError);
-    return NextResponse.json({ error: "Subaccount created but could not be saved — contact support" }, { status: 500 });
+    return NextResponse.json({ error: "Subaccount created but could not be saved. Contact support" }, { status: 500 });
   }
 
   return NextResponse.json({

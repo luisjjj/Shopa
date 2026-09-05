@@ -174,7 +174,7 @@ export default async function DashboardPage() {
             <div className="space-y-1">
               {lowStockProducts.map((p) => (
                 <p key={p.id} className="text-xs text-amber-600/80 dark:text-amber-400/70">
-                  {p.name} — {p.stock} remaining
+                  {p.name}: {p.stock} remaining
                 </p>
               ))}
             </div>
@@ -183,12 +183,12 @@ export default async function DashboardPage() {
 
         <AnalyticsSection />
 
-        {/* Payout setup gate — buyers pay via Paystack, no manual fallback */}
+        {/* Payout setup gate, buyers pay via Paystack, no manual fallback */}
         {!(profile as { paystack_subaccount_code?: string | null }).paystack_subaccount_code && (
           <div className="bg-brand-50 dark:bg-brand-950/20 border border-brand-200/60 dark:border-brand-900/30 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between shadow-card dark:shadow-card-dark">
             <div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Payouts not set up — you can&apos;t accept payments yet
+                Payouts not set up, you can&apos;t accept payments yet
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 Verify your bank account once to start accepting payments.
@@ -208,7 +208,7 @@ export default async function DashboardPage() {
           <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 flex items-center justify-between shadow-card dark:shadow-card-dark">
             <div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Free plan — 3 product slots
+                Free plan, 3 product slots
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 Upgrade for unlimited products & customization

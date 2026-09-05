@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const { isPremium } = await fetchPlanStatus(supabase, user.id);
   if (!isPremium && (await countActive(supabase, user.id)) >= FREE_PRODUCT_LIMIT) {
     return NextResponse.json(
-      { error: "Product limit reached — upgrade to Premium for unlimited products" },
+      { error: "Product limit reached. Upgrade to Premium for unlimited products" },
       { status: 403 }
     );
   }
@@ -101,7 +101,7 @@ export async function PUT(request: Request) {
     const { isPremium } = await fetchPlanStatus(supabase, user.id);
     if (!isPremium && (await countActive(supabase, user.id)) >= FREE_PRODUCT_LIMIT) {
       return NextResponse.json(
-        { error: "Product limit reached — upgrade to Premium for unlimited products" },
+        { error: "Product limit reached. Upgrade to Premium for unlimited products" },
         { status: 403 }
       );
     }

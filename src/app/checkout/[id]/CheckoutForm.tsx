@@ -127,13 +127,13 @@ export default function CheckoutForm({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.authorization_url) {
-        setPayError(data.message || data.error || "Could not start payment — try again");
+        setPayError(data.message || data.error || "Could not start payment. Try again");
         setPayLoading(false);
         return;
       }
       window.location.href = data.authorization_url;
     } catch {
-      setPayError("Network error — try again");
+      setPayError("Network error. Try again");
       setPayLoading(false);
     }
   };
@@ -249,7 +249,7 @@ export default function CheckoutForm({
                     {appliedPromo?.discount_percent
                       ? `${appliedPromo.discount_percent}% off`
                       : `₦${discountAmount.toLocaleString()} off`}
-                    {" "}&mdash; {appliedPromo?.code}
+                    {" "}· {appliedPromo?.code}
                   </p>
                 )}
               </div>
@@ -570,7 +570,7 @@ export default function CheckoutForm({
                 {appliedPromo.code}
               </span>
               <span className="text-green-600 dark:text-green-400 text-xs">
-                &mdash; {appliedPromo.discount_percent
+                · {appliedPromo.discount_percent
                   ? `${appliedPromo.discount_percent}% off`
                   : `₦${appliedPromo.discount_amount?.toLocaleString()} off`}
               </span>

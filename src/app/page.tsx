@@ -97,7 +97,7 @@ export default function HomePage() {
           </div>
 
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-5">
-            Built for Nigerian sellers. Free to start — 3 product slots.
+            Built for Nigerian sellers. Free to start, 3 product slots.
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-3 gap-6 items-start">
             {[
               { title: "Instagram bio link", desc: "One link turns followers into buyers with self-serve checkout.", image: "/landing/sell-ig.jpg" },
-              { title: "WhatsApp orders", desc: "Buyers pay securely, you get notified — all tracked.", image: "/landing/sell-chat.jpg" },
+              { title: "WhatsApp orders", desc: "Buyers pay securely, you get notified, all tracked.", image: "/landing/sell-chat.jpg" },
               { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg" },
             ].map((item, i) => (
               <div key={i} className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1 group">
@@ -216,7 +216,7 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-3 gap-6 items-start">
             {[
-              { step: "01", title: "Add your first product", desc: "Photo, price, stock — done in a minute.", image: "/landing/step-add.jpg" },
+              { step: "01", title: "Add your first product", desc: "Photo, price, stock, done in a minute.", image: "/landing/step-add.jpg" },
               { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
               { step: "03", title: "Get paid", desc: "Get paid straight to your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
             ].map((item, i) => (
@@ -236,7 +236,7 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-10">
             <Link href="/signup" className="inline-block bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/20 active:scale-[0.98]">
-              Take your shot — it&apos;s free
+              Take your shot, it&apos;s free
             </Link>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
               Start free, scale as you grow
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">New — early sellers lock launch pricing.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">New: early sellers lock launch pricing.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

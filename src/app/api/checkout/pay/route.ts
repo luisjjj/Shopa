@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   }
   if (order.paid) return NextResponse.json({ error: "Order already paid" }, { status: 400 });
 
-  // buyer_email column may not exist yet (migration pending) — fetch
+  // buyer_email column may not exist yet (migration pending), fetch
   // defensively so checkout never breaks on schema lag.
   let buyerEmail: string | null = null;
   try {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     buyerEmail = null;
   }
   if (!buyerEmail) {
-    return NextResponse.json({ error: "Buyer email missing — restart checkout" }, { status: 400 });
+    return NextResponse.json({ error: "Buyer email missing. Restart checkout" }, { status: 400 });
   }
 
   // Buyer-pays-fees: charge product + Shopa 1% + Paystack estimate on top,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     });
   } catch (e) {
     console.error("[checkout/pay] initialize failed", e);
-    return NextResponse.json({ error: "Could not start payment — try again" }, { status: 502 });
+    return NextResponse.json({ error: "Could not start payment. Try again" }, { status: 502 });
   }
 
   if (!result.status || !result.data?.authorization_url) {

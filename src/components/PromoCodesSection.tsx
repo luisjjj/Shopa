@@ -90,7 +90,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
       setPromos((prev) => prev.map((p) => (p.id === optimisticPromo.id ? data.promo : p)));
     } catch {
       setPromos((prev) => prev.filter((p) => p.id !== optimisticPromo.id));
-      setError("Network error — try again");
+      setError("Network error. Try again");
       setShowForm(true);
     }
     setCode("");

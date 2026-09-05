@@ -6,7 +6,7 @@ async function requireProPlus(supabase: PlanQueryClient, userId: string) {
   const { isProPlus } = await fetchPlanStatus(supabase, userId);
   if (!isProPlus) {
     return NextResponse.json(
-      { error: "Pro+ required — upgrade to create promo codes" },
+      { error: "Pro+ required. Upgrade to create promo codes" },
       { status: 403 }
     );
   }

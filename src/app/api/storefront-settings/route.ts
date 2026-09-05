@@ -46,7 +46,7 @@ export async function PUT(request: Request) {
     .single();
 
   if (!profile || !isPremiumActive(profile as never)) {
-    return NextResponse.json({ error: "Premium required — plan expired or not active" }, { status: 403 });
+    return NextResponse.json({ error: "Premium required, plan expired or not active" }, { status: 403 });
   }
 
   const body = await request.json().catch(() => ({}));

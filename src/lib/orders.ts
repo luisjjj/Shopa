@@ -19,7 +19,7 @@ type OrderRow = {
 };
 
 // Single source of truth for marking a product purchase as paid.
-// Called by the Paystack webhook AND the client callback — whichever gets
+// Called by the Paystack webhook AND the client callback, whichever gets
 // there first wins; the loser is a no-op (guarded by paid=false).
 // NOTE on refunds: Paystack pulls refunds from OUR main balance, not from the
 // seller's settled share. A future refund feature needs manual reconciliation.
@@ -45,7 +45,7 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     return { ok: false, error: error?.message || "Order not found" };
   }
 
-  // buyer_email column may not exist yet (migration pending) — fetch
+  // buyer_email column may not exist yet (migration pending), fetch
   // defensively so settling never breaks on schema lag; receipt just skips.
   let buyerEmail: string | null = null;
   try {
@@ -105,7 +105,7 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
 
   if (seller?.email) {
     const t = {
-      subject: `New paid order — ${productName} (₦${order.amount.toLocaleString()})`,
+      subject: `New paid order: ${productName} (₦${order.amount.toLocaleString()})`,
       html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>You have a new paid order!</h2><p><b>${order.buyer_name || "A buyer"}</b> just paid <b>₦${order.amount.toLocaleString()}</b> for <b>${productName}</b> via Paystack. No action needed except fulfillment.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a></div>`,
     };
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch((e) =>

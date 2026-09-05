@@ -81,7 +81,7 @@ export default function ConfirmClient({
             >
               <p className="text-xs uppercase tracking-wider font-medium" style={{ color: hasSettings ? `${textColor}50` : undefined }}>{paid ? "Amount paid" : "Order status"}</p>
               <p className="text-3xl font-bold mt-1" style={{ color: hasSettings ? textColor : undefined }}>
-                ₦{amount ? parseInt(amount).toLocaleString() : "—"}
+                ₦{amount ? parseInt(amount).toLocaleString() : "-"}
               </p>
               <p className="text-xs mt-2 font-mono" style={{ color: hasSettings ? `${textColor}40` : undefined }}>
                 Ref: {reference}
@@ -186,7 +186,7 @@ function drawReceiptImage(details: {
       reject(new Error("Canvas unavailable"));
       return;
     }
-    const fmt = (v: string | null) => (v ? `₦${parseInt(v).toLocaleString()}` : "—");
+    const fmt = (v: string | null) => (v ? `₦${parseInt(v).toLocaleString()}` : "-");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "#ed7712";
@@ -224,7 +224,7 @@ function drawReceiptImage(details: {
     if (details.buyer) row("Buyer", details.buyer.slice(0, 28));
     ctx.font = "20px ui-monospace, monospace";
     ctx.fillStyle = "#6b7280";
-    const ref = `Ref: ${details.reference || "—"}`;
+    const ref = `Ref: ${details.reference || "-"}`;
     const rw = ctx.measureText(ref).width;
     ctx.fillText(ref, W - 60 - rw, y + 8);
     ctx.font = "20px system-ui, sans-serif";
@@ -288,7 +288,7 @@ function ReceiptActions({
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     } catch {
-      setNote("Could not generate receipt — try again");
+      setNote("Could not generate receipt. Try again");
     }
     setBusy(false);
   };
@@ -306,7 +306,7 @@ function ReceiptActions({
         await navigator.share({
           files: [file],
           title: "Shopa receipt",
-          text: `My Shopa receipt for ${details.product} — ₦${details.amount ? parseInt(details.amount).toLocaleString() : ""}`,
+          text: `My Shopa receipt for ${details.product}: ₦${details.amount ? parseInt(details.amount).toLocaleString() : ""}`,
         });
       } else if (navigator.share) {
         await navigator.share({
@@ -318,7 +318,7 @@ function ReceiptActions({
         await handleDownload();
       }
     } catch (e) {
-      if ((e as Error)?.name !== "AbortError") setNote("Sharing isn't supported here — receipt downloaded instead");
+      if ((e as Error)?.name !== "AbortError") setNote("Sharing isn't supported here, receipt downloaded instead");
     }
     setBusy(false);
   };
@@ -390,7 +390,7 @@ function ReviewSection({
       }
     } catch {
       setSubmitted(false);
-      setFormError("Network error — try again");
+      setFormError("Network error. Try again");
     }
     setLoading(false);
   };
@@ -419,7 +419,7 @@ function ReviewSection({
         Rate your experience
       </p>
       <p className="text-xs mb-3" style={{ color: hasSettings ? `${textColor}60` : "#9ca3af" }}>
-        Available once the seller confirms your payment — one review per order.
+        Available once the seller confirms your payment, one review per order.
       </p>
       {formError && (
         <p className="text-xs mb-3 text-red-500">{formError}</p>

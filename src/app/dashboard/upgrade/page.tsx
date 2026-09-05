@@ -98,13 +98,13 @@ export default function UpgradePage() {
                     );
                     return days > 0
                       ? `renews in ${days} day${days === 1 ? "" : "s"}`
-                      : "expired — renew below";
+                      : "expired. Renew below";
                   })()}
                 </span>
               </p>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 max-w-xs">
-              Plans are prepaid for 30 days. Pay again below to extend — extra time stacks on top.
+              Plans are prepaid for 30 days. Pay again below to extend, extra time stacks on top.
             </p>
           </div>
         )}

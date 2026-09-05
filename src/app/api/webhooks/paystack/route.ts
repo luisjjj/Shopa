@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { findOrderByReference, markOrderPaid } from "@/lib/orders";
 import { NextResponse } from "next/server";
 
-// Paystack webhook — SOURCE OF TRUTH for purchase paid state.
+// Paystack webhook, SOURCE OF TRUTH for purchase paid state.
 // Configure URL in Paystack dashboard: Settings → API Keys & Webhooks →
 // Webhook URL: https://myshopa.com.ng/api/webhooks/paystack
 // The client callback (/api/payments/callback) is UX only; whichever arrives
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const meta = (data.metadata || {}) as { type?: string; orderId?: string };
   const reference = data.reference as string | undefined;
 
-  // Only settle Shopa product purchases here — subscription charges are
+  // Only settle Shopa product purchases here, subscription charges are
   // handled by /api/upgrade/verify and must never touch orders.
   if (meta.type && meta.type !== "purchase") {
     return NextResponse.json({ ok: true, ignored: "non-purchase" });

@@ -330,7 +330,7 @@ export default function EditProductPage({
           {/* Category */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Category <span className="text-gray-400 font-normal">(optional — groups products on your store)</span>
+              Category <span className="text-gray-400 font-normal">(optional, groups products on your store)</span>
             </label>
             <input
               type="text"
@@ -403,7 +403,7 @@ export default function EditProductPage({
                   Product variants are a Pro+ feature
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  Offer sizes, colors and more — upgrade to unlock
+                  Offer sizes, colors and more. Upgrade to unlock
                 </p>
               </div>
               <span className="text-gray-300 dark:text-gray-600 group-hover:text-brand-500 transition-colors">→</span>

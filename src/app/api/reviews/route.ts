@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   if (typeof order_id !== "string" || order_id.length > 64) {
     return NextResponse.json({ error: "Invalid order" }, { status: 400 });
   }
-  // Strip markup — comments render in dashboards and must not carry HTML.
+  // Strip markup, comments render in dashboards and must not carry HTML.
   const cleanComment = typeof comment === "string"
     ? comment.replace(/[<>"']/g, "").trim().slice(0, 500) || null
     : null;

@@ -35,11 +35,11 @@ export function RemindButton({
         window.open(data.url, "_blank");
       } else {
         setSent(false);
-        setError("Couldn't send — try again");
+        setError("Couldn't send. Try again");
       }
     } catch {
       setSent(false);
-      setError("Couldn't send — try again");
+      setError("Couldn't send. Try again");
     }
     setLoading(false);
   };

@@ -107,12 +107,12 @@ export async function getSubaccount(idOrCode: string | number) {
 }
 
 // NOTE on refunds: a refund on a split transaction is pulled from OUR main
-// Paystack balance — it is NOT automatically clawed back from the seller's
+// Paystack balance, it is NOT automatically clawed back from the seller's
 // settled share. If a refund feature is ever built, it needs a manual
 // reconciliation step (or a hold period before seller payout settles).
 export async function initializeSplitTransaction(params: {
   email: string;
-  amountKobo: number; // integer kobo — convert BEFORE calling
+  amountKobo: number; // integer kobo, convert BEFORE calling
   subaccount: string; // ACCT_... code
   transactionChargeKobo: number; // flat kobo to the MAIN account (overrides stored %)
   bearer?: "account" | "subaccount"; // who bears Paystack fees; default "account" (platform)

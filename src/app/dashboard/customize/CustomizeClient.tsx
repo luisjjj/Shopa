@@ -438,7 +438,7 @@ export default function CustomizeClient({
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
-      setSaveError("Network error — try again");
+      setSaveError("Network error. Try again");
     }
     setSaving(false);
   };
@@ -568,10 +568,10 @@ export default function CustomizeClient({
             ) : (
               <div className="p-4 md:p-5 space-y-5 md:space-y-6">
 
-                {/* Templates — one-tap themes */}
+                {/* Templates, one-tap themes */}
                 <Section icon={<SparkleIcon size={16} />} title="Templates">
                   <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
-                    Start from a professionally designed look. Applies theme + layout — your products and text blocks stay.
+                    Start from a professionally designed look. Applies theme + layout, your products and text blocks stay.
                   </p>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {STORE_TEMPLATES.map((tpl) => (
@@ -608,7 +608,7 @@ export default function CustomizeClient({
                   </div>
                 </Section>
 
-                {/* Page Sections — drag to arrange your storefront */}
+                {/* Page Sections, drag to arrange your storefront */}
                 {sections && (
                   <Section icon={<LayoutIcon size={16} />} title="Page Sections">
                     <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
@@ -1230,7 +1230,7 @@ export default function CustomizeClient({
                   )}
                 </Section>
 
-                {/* Store Sections — builder-style blocks */}
+                {/* Store Sections, builder-style blocks */}
                 <Section icon={<LayoutIcon size={16} />} title="Store Sections">
                   <ToggleField
                     label="Announcement bar"
@@ -1252,7 +1252,7 @@ export default function CustomizeClient({
                       onChange={(e) => update("featured_product_id", e.target.value || null)}
                       className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300"
                     >
-                      <option value="">None — show all products equally</option>
+                      <option value="">None: show all products equally</option>
                       {myProducts.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name}

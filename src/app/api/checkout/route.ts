@@ -145,7 +145,7 @@ export async function POST(request: Request) {
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch(() => {});
   }
   {
-    const t = { subject: `Order placed — ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b> — ₦${finalAmount.toLocaleString()} is pending. Complete payment on the Paystack checkout page to confirm it.</p></div>` };
+    const t = { subject: `Order placed: ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b>: ₦${finalAmount.toLocaleString()} is pending. Complete payment on the Paystack checkout page to confirm it.</p></div>` };
     sendEmail({ to: normalizedEmail, subject: t.subject, html: t.html }).catch(() => {});
   }
 

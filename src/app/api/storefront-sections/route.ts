@@ -56,7 +56,7 @@ export async function GET() {
   } catch (e) {
     if (isMissingTable(e)) {
       return NextResponse.json(
-        { error: "Sections table missing — run supabase/storefront-sections.sql", missingTable: true },
+        { error: "Sections table missing. Run supabase/storefront-sections.sql", missingTable: true },
         { status: 500 }
       );
     }
@@ -155,7 +155,7 @@ export async function PUT(request: Request) {
   } catch (e) {
     if (isMissingTable(e)) {
       return NextResponse.json(
-        { error: "Sections table missing — run supabase/storefront-sections.sql", missingTable: true },
+        { error: "Sections table missing. Run supabase/storefront-sections.sql", missingTable: true },
         { status: 500 }
       );
     }

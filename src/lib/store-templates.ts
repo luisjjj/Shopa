@@ -20,7 +20,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "essentials",
     name: "Essentials",
-    blurb: "Clean, warm and friendly — great for any store.",
+    blurb: "Clean, warm and friendly, great for any store.",
     swatches: { primary: "#ed7712", bg: "#faf9f7", text: "#1a1a1a" },
     settings: {
       primary_color: "#ed7712",
@@ -65,7 +65,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "midnight",
     name: "Midnight Boutique",
-    blurb: "Dark, elegant and premium — fashion, beauty, jewelry.",
+    blurb: "Dark, elegant and premium, fashion, beauty, jewelry.",
     swatches: { primary: "#818cf8", bg: "#0f172a", text: "#f1f5f9" },
     settings: {
       primary_color: "#818cf8",
@@ -112,7 +112,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "forest",
     name: "Forest Fresh",
-    blurb: "Calm greens — food, skincare, natural products.",
+    blurb: "Calm greens, food, skincare, natural products.",
     swatches: { primary: "#16a34a", bg: "#f0fdf4", text: "#14532d" },
     settings: {
       primary_color: "#16a34a",
@@ -157,7 +157,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "sunset",
     name: "Sunset Bold",
-    blurb: "Loud and energetic — sneakers, streetwear, thrift.",
+    blurb: "Loud and energetic, sneakers, streetwear, thrift.",
     swatches: { primary: "#ea580c", bg: "#fff7ed", text: "#7c2d12" },
     settings: {
       primary_color: "#ea580c",
@@ -185,7 +185,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "landscape",
       show_announcement: true,
-      announcement_text: "New drops every Friday — don't sleep on it",
+      announcement_text: "New drops every Friday, don't sleep on it",
       show_socials: true,
       social_style: "boxed",
       whatsapp_cta: true,

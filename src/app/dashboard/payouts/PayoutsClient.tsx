@@ -38,7 +38,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
         if (data.banks) setBanks(data.banks);
         else setError(data.error || "Could not load banks");
       })
-      .catch(() => setError("Could not load banks — check your connection"))
+      .catch(() => setError("Could not load banks. Check your connection"))
       .finally(() => setBanksLoading(false));
   }, []);
 
@@ -57,7 +57,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
       });
       const data = await res.json();
       if (!res.ok) {
-        // Paystack verification unavailable (limits) — fall back to the
+        // Paystack verification unavailable (limits), fall back to the
         // seller confirming their own typed details instead of hard failing.
         if (data.error === "RESOLVE_UNAVAILABLE") {
           setManualMode(true);
@@ -70,7 +70,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
       }
       setResolvedName(data.account_name);
     } catch {
-      setError("Network error — try again");
+      setError("Network error. Try again");
     }
     setLoading(false);
   };
@@ -102,7 +102,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
       setDone(true);
       router.refresh();
     } catch {
-      setError("Network error — try again");
+      setError("Network error. Try again");
       setConfirming(false);
     }
   };
@@ -145,15 +145,15 @@ export default function PayoutsClient({ username, payout }: { username: string; 
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-gray-400">Bank</dt>
-                <dd className="font-medium text-gray-900 dark:text-white">{payout.bank_name || "—"}</dd>
+                <dd className="font-medium text-gray-900 dark:text-white">{payout.bank_name || "-"}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-gray-400">Account number</dt>
-                <dd className="font-mono font-medium text-gray-900 dark:text-white">{payout.account_number || "—"}</dd>
+                <dd className="font-mono font-medium text-gray-900 dark:text-white">{payout.account_number || "-"}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-gray-400">Account name</dt>
-                <dd className="font-medium text-gray-900 dark:text-white text-right">{payout.account_name || "—"}</dd>
+                <dd className="font-medium text-gray-900 dark:text-white text-right">{payout.account_name || "-"}</dd>
               </div>
             </dl>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-5">
@@ -216,7 +216,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
                   Automatic verification is unavailable right now
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                  Confirm these details are exactly right — {bankName}, {accountNumber}. Type the
+                  Confirm these details are exactly right: {bankName}, {accountNumber}. Type the
                   account name as your bank shows it:
                 </p>
                 <input

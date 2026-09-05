@@ -2,7 +2,7 @@
 // The fee lives in PLATFORM_FEE_PERCENT (default 1) so it can be changed
 // without touching code. It is applied per-transaction as a flat
 // transaction_charge (kobo), overriding each subaccount's stored
-// percentage_charge — so changing the fee never requires updating
+// percentage_charge, so changing the fee never requires updating
 // existing subaccounts.
 
 export function getPlatformFeePercent(): number {
@@ -27,8 +27,8 @@ export function computePlatformFeeKobo(amountKobo: number): number {
 // Buyer-pays-fees pricing: the seller nets the FULL product price, while the
 // buyer covers the Shopa fee + the Paystack processing estimate on top.
 // Paystack NG estimate (local cards/bank/USSD): 1.5% + ₦100 stub (waived
-// under ₦2,500), capped at ₦2,000. International cards cost more (3.9%) —
-// that difference is absorbed by the platform (bearer: "account"), never
+// under ₦2,500), capped at ₦2,000. International cards cost more (3.9%),
+// and that difference is absorbed by the platform (bearer: "account"), never
 // passed to the seller. Server is authoritative; any client copy is display-only.
 export const PAYSTACK_NG_RATE = 0.015;
 export const PAYSTACK_NG_STUB = 100;

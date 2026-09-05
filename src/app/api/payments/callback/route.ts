@@ -5,8 +5,8 @@ import { computeBuyerTotal } from "@/lib/platform";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { NextResponse } from "next/server";
 
-// Client-side redirect landing after Paystack checkout. This is UX only —
-// the webhook (/api/webhooks/paystack) is the source of truth for paid state,
+// Client-side redirect landing after Paystack checkout. This is UX only.
+// The webhook (/api/webhooks/paystack) is the source of truth for paid state,
 // so this handler re-verifies server-side and both paths are idempotent.
 // Redirects use the allowlisted base URL, never the request Host.
 export async function GET(request: Request) {

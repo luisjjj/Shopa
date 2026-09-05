@@ -41,7 +41,7 @@ export function FulfilledToggle({
       router.refresh();
     } catch {
       setOptimistic(null);
-      setError("Couldn't save — try again");
+      setError("Couldn't save. Try again");
     }
     setPending(false);
   };

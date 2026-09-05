@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 function getSubdomain(hostname: string): string | null {
   const base = "myshopa.com.ng";
   const stripped = hostname.replace(":3000", "").replace(":80", "").replace(":443", "");
-  // Apex and www both serve the app root — www is never a store.
+  // Apex and www both serve the app root, www is never a store.
   if (stripped === base || stripped === `www.${base}`) return null;
   if (stripped.endsWith("." + base)) {
     const sub = stripped.replace("." + base, "");
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
   const hostname = request.headers.get("host") || "";
 
-  // NOTE: www is served as the apex deliberately — never redirect it.
+  // NOTE: www is served as the apex deliberately, never redirect it.
   // An edge-level redirect (apex->www) combined with an app-level redirect
   // (www->apex) loops forever (ERR_TOO_MANY_REDIRECTS). Serving both
   // converges no matter which side redirects.

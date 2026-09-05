@@ -22,14 +22,14 @@ export function ConfirmReceiptButton({ orderId }: { orderId: string }) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setConfirmed(false);
-        setError(data.error || "Could not confirm — try again");
+        setError(data.error || "Could not confirm. Try again");
         setLoading(false);
         return;
       }
       router.refresh();
     } catch {
       setConfirmed(false);
-      setError("Network error — try again");
+      setError("Network error. Try again");
     }
     setLoading(false);
   };

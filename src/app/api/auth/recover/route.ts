@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Valid email required" }, { status: 400 });
   }
   const supabase = createClient();
-  // Redirect target comes from allowlisted config only — never from
+  // Redirect target comes from allowlisted config only, never from
   // Host/X-Forwarded-Host/Origin headers (reset-token theft).
   const redirectTo = `${getAppBaseUrl()}/auth/callback?next=/reset-password`;
   const { error } = await supabase.auth.resetPasswordForEmail(String(email).trim(), { redirectTo });

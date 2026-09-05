@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("username", params.username)
     .single();
 
-  if (!profile) return { title: "Store not found — Shopa" };
+  if (!profile) return { title: "Store not found | Shopa" };
 
   return {
-    title: `${profile.username}'s Store — Shopa`,
+    title: `${profile.username}'s Store | Shopa`,
     description: `Shop ${profile.username}'s products on Shopa`,
   };
 }

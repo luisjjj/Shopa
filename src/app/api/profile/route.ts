@@ -98,14 +98,14 @@ export async function PUT(request: Request) {
         );
         if (!match) {
           payout.message =
-            "Bank name didn't match Paystack's list — finish setup on the payouts page";
+            "Bank name didn't match Paystack's list. Finish setup on the payouts page";
         } else {
           const resolved = await resolveAccount({
             bank_code: match.code,
             account_number: String(profile.account_number),
           });
           if (!resolved.status || !resolved.data?.account_name) {
-            payout.message = "Could not verify this account — finish setup on the payouts page";
+            payout.message = "Could not verify this account. Finish setup on the payouts page";
           } else {
             const created = await createSubaccount({
               business_name: `${profile.username} (Shopa store)`,
@@ -132,7 +132,7 @@ export async function PUT(request: Request) {
                 .eq("id", user.id);
               if (saveError) {
                 console.error("[profile] payout save failed", saveError);
-                payout.message = "Subaccount created but could not be saved — contact support";
+                payout.message = "Subaccount created but could not be saved. Contact support";
               } else {
                 payout = { attempted: true, ok: true };
               }
@@ -141,7 +141,7 @@ export async function PUT(request: Request) {
         }
       } catch (e) {
         console.error("[profile] payout auto-setup failed", e);
-        payout.message = "Payout activation failed — finish setup on the payouts page";
+        payout.message = "Payout activation failed. Finish setup on the payouts page";
       }
     }
   }

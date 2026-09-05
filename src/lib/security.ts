@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 
 // Canonical public base URL. Never derive redirect/login URLs from
-// request headers (Host/X-Forwarded-Host/Origin) — those are
+// request headers (Host/X-Forwarded-Host/Origin), those are
 // attacker-controlled and enable reset-link and callback theft.
 export function getAppBaseUrl(): string {
   const env = (process.env.NEXT_PUBLIC_BASE_URL || "").replace(/\/$/, "");
@@ -22,7 +22,7 @@ export function requireSameOrigin(request: Request): boolean {
     }
   };
   // Browser form posts always send Origin (or Referer as fallback).
-  // Non-browser clients send neither — reject those too for form routes.
+  // Non-browser clients send neither, reject those too for form routes.
   if (origin) return check(origin);
   if (referer) return check(referer);
   return false;
