@@ -641,7 +641,7 @@ export default async function StorePage({
       <div className={`${containerMax} mx-auto px-4 py-3 flex items-center justify-between gap-3`}>
         <a
           href="#top"
-          className="font-bold text-sm truncate text-gray-900 dark:text-white"
+          className="font-bold text-sm truncate min-w-0 text-gray-900 dark:text-white"
           style={s ? { color: textColor } : undefined}
         >
           {profile.username}

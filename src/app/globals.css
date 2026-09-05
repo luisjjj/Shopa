@@ -143,8 +143,17 @@ body::before {
   display: inline-block;
 }
 
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.25s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-float, .hero-float-delayed, .animate-marquee, .rotate-word, .shape-drift, .shape-drift-delayed, .shape-drift-slow {
+  .hero-float, .hero-float-delayed, .animate-marquee, .rotate-word, .shape-drift, .shape-drift-delayed, .shape-drift-slow, .animate-slide-in-left {
     animation: none;
   }
 }

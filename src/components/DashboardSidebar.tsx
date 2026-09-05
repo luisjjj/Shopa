@@ -171,7 +171,7 @@ export default function DashboardSidebar({ username, planName, planDetail, showU
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setDrawerOpen(false)}
           />
-          <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white dark:bg-[#141414] p-4 overflow-y-auto flex flex-col gap-1 shadow-2xl">
+          <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white dark:bg-[#141414] p-4 overflow-y-auto flex flex-col gap-1 shadow-2xl animate-slide-in-left">
             <div className="flex items-center justify-end">
               <button
                 type="button"

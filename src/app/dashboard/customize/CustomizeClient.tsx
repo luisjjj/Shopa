@@ -640,7 +640,7 @@ export default function CustomizeClient({
                           >
                             <div className="flex items-center gap-2 px-3 py-2.5">
                               <span
-                                className={`cursor-${locked ? "default" : "grab"} text-gray-300 dark:text-gray-600 shrink-0`}
+                                className={`${locked ? "cursor-default" : "cursor-grab"} text-gray-300 dark:text-gray-600 shrink-0`}
                                 title={locked ? "Always on" : "Drag to reorder"}
                               >
                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -666,6 +666,32 @@ export default function CustomizeClient({
                                   {meta.hint}
                                 </span>
                               </button>
+                              {!locked && (
+                                <span className="flex flex-col shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => moveSection(idx, idx - 1)}
+                                    disabled={idx === 0}
+                                    aria-label="Move section up"
+                                    className="p-1 rounded-md text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => moveSection(idx, idx + 1)}
+                                    disabled={idx === sections.length - 1}
+                                    aria-label="Move section down"
+                                    className="p-1 rounded-md text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                                  >
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                  </button>
+                                </span>
+                              )}
                               {!locked && (
                                 <button
                                   type="button"
