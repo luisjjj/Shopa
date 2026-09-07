@@ -23,10 +23,19 @@ export const metadata: Metadata = {
   description:
     "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
     shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport = {
+  themeColor: "#ed7712",
+};
   openGraph: {
     type: "website",
     siteName: "Shopa",

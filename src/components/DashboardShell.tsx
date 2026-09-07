@@ -15,19 +15,16 @@ export default async function DashboardShell({ children }: { children: React.Rea
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { count }] = await Promise.all([
+    supabase.from("users").select("*").eq("id", user.id).single(),
+    supabase
+      .from("products")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_active", true),
+  ]);
 
   if (!profile) redirect("/onboarding");
-
-  const { count } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("is_active", true);
 
   const productCount = count ?? 0;
   const isPremium = isPremiumActive(profile);
@@ -120,7 +117,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
           </div>
         </header>
 
-        <main className="max-w-5xl mx-auto px-5 py-8">{children}</main>
+        <main className="max-w-5xl mx-auto px-5 py-8 animate-fade-up">{children}</main>
       </div>
     </div>
   );

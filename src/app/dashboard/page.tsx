@@ -16,11 +16,11 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { count: anyProductCount }, { data: storefront }] = await Promise.all([
+    supabase.from("users").select("*").eq("id", user.id).single(),
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+    supabase.from("storefront_settings").select("primary_color, banner_url, tagline, announcement_text, footer_text").eq("user_id", user.id).maybeSingle(),
+  ]);
 
   if (!profile) redirect("/onboarding");
 
@@ -29,10 +29,6 @@ export default async function DashboardPage() {
   const hasPayouts = !!(profile as { paystack_subaccount_code?: string | null }).paystack_subaccount_code;
   const hasWhatsapp = !!(profile as { whatsapp_number?: string | null }).whatsapp_number;
 
-  const [{ count: anyProductCount }, { data: storefront }] = await Promise.all([
-    supabase.from("products").select("id", { count: "exact", head: true }).eq("user_id", user.id),
-    supabase.from("storefront_settings").select("primary_color, banner_url, tagline, announcement_text, footer_text").eq("user_id", user.id).maybeSingle(),
-  ]);
   const hasProduct = (anyProductCount ?? 0) > 0;
   const sf = storefront as { primary_color?: string | null; banner_url?: string | null; tagline?: string | null; announcement_text?: string | null; footer_text?: string | null } | null;
   const hasCustomized = !!(

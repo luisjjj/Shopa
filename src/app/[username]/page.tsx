@@ -171,6 +171,8 @@ export default async function StorePage({
               <img
                 src={p.image_url}
                 alt={p.name}
+                loading="lazy"
+                decoding="async"
                 className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
               />
               {s?.show_stock_badge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
@@ -727,6 +729,8 @@ export default async function StorePage({
           <img
             src={s.banner_url}
             alt="Store banner"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
           {s.banner_overlay && (
@@ -863,6 +867,8 @@ export default async function StorePage({
                       <img
                         src={product.image_url}
                         alt={product.name}
+                        loading="lazy"
+                        decoding="async"
                         className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
                       />
                       {s?.show_stock_badge && product.stock != null && product.stock > 0 && product.stock <= 5 && (

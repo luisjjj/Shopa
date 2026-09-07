@@ -14,7 +14,7 @@ export default async function PromosPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("*")
+    .select("is_pro_plus, pro_plus_until")
     .eq("id", user.id)
     .single();
 

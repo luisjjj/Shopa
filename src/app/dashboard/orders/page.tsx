@@ -79,7 +79,7 @@ async function OrderList() {
             className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 shadow-card dark:shadow-card-dark flex flex-wrap items-center gap-3 sm:gap-4"
           >
             {product?.image_url ? (
-              <img src={product.image_url} alt="" className="w-11 h-11 rounded-lg object-cover shrink-0" />
+              <img src={product.image_url} alt="" loading="lazy" decoding="async" className="w-11 h-11 rounded-lg object-cover shrink-0" />
             ) : (
               <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
                 <PackageIcon className="text-gray-300 dark:text-gray-600" size={18} />

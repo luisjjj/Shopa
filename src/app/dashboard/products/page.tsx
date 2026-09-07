@@ -14,32 +14,18 @@ export default async function ProductsPage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const [{ data: profile }, { count }, { data: lowStockProducts }] = await Promise.all([
+    supabase.from("users").select("*").eq("id", user.id).single(),
+    supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("is_active", true),
+    supabase.from("products").select("id, name, stock").eq("user_id", user.id).eq("is_active", true).gt("stock", 0).lte("stock", 3),
+  ]);
 
   if (!profile) redirect("/onboarding");
 
   const isPremium = isPremiumActive(profile);
 
-  const { count } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("is_active", true);
-
   const productCount = count ?? 0;
   const canAddProduct = isPremium || productCount < 3;
-
-  const { data: lowStockProducts } = await supabase
-    .from("products")
-    .select("id, name, stock")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .gt("stock", 0)
-    .lte("stock", 3);
 
   return (
     <DashboardShell>
@@ -120,6 +106,8 @@ async function ProductList({ userId }: { userId: string }) {
               <img
                 src={product.image_url}
                 alt={product.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-contain max-h-64 group-hover:scale-[1.02] transition-transform duration-500"
               />
             </div>
