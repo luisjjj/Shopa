@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     const res = await fetch("/api/auth/recover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) setError(data.error || "Failed to send email");
-    else setMessage("Check your email for a password reset link.");
+    else setMessage(data.message || "If an account exists for that email, a reset link is on its way.");
     setLoading(false);
   };
 

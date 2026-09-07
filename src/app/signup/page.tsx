@@ -70,7 +70,13 @@ export default function SignupPage() {
     });
 
     if (signUpError) {
-      setError(signUpError.message);
+      // Don't reveal whether the email is already registered.
+      const msg = signUpError.message.toLowerCase();
+      setError(
+        msg.includes("already") || msg.includes("registered") || msg.includes("exists")
+          ? "This email may already be registered. Try signing in instead."
+          : signUpError.message
+      );
       setLoading(false);
       return;
     }

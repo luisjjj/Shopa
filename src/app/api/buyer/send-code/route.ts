@@ -3,6 +3,8 @@ import { randomInt } from "crypto";
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { hashOtp } from "@/lib/security";
+import { rateLimit } from "@/lib/rate-limit";
+import { logAuthEvent } from "@/lib/auth-log";
 
 function isMissingTable(error: unknown): boolean {
   const msg = String((error as { message?: string })?.message || error || "");
@@ -17,6 +19,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Valid email required" }, { status: 400 });
   }
   const normalized = String(email).trim().toLowerCase();
+  const ipLimited = rateLimit(request, "sendcode-ip", 20, 60 * 60 * 1000);
+  if (!ipLimited.ok) {
+    await logAuthEvent("otp_abuse", normalized);
+    return NextResponse.json({ error: "Too many codes sent. Try again in an hour" }, { status: 429 });
+  }
   const supabase = createServiceRoleClient();
 
   const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -72,5 +79,6 @@ export async function POST(request: Request) {
   // Lazily drop expired rows so the table stays small.
   await supabase.from("buyer_otps").delete().lt("expires_at", new Date().toISOString());
 
+  await logAuthEvent("otp_send", normalized);
   return NextResponse.json({ ok: true });
 }

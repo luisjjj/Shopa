@@ -13,6 +13,7 @@ import { ShopaLogo } from "@/components/ShopaLogo";
 import { isPremiumActive, isProPlusActive, daysLeft } from "@/lib/premium";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import OnboardingChecklist from "@/components/OnboardingChecklist";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -68,6 +69,21 @@ export default async function DashboardPage() {
     .eq("is_active", true)
     .gt("stock", 0)
     .lte("stock", 3);
+
+  const hasPayouts = !!(profile as { paystack_subaccount_code?: string | null }).paystack_subaccount_code;
+  const hasWhatsapp = !!(profile as { whatsapp_number?: string | null }).whatsapp_number;
+
+  const [{ count: anyProductCount }, { data: storefront }] = await Promise.all([
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+    supabase.from("storefront_settings").select("primary_color, banner_url, tagline, announcement_text, footer_text").eq("user_id", user.id).maybeSingle(),
+  ]);
+  const hasProduct = (anyProductCount ?? 0) > 0;
+  const sf = storefront as { primary_color?: string | null; banner_url?: string | null; tagline?: string | null; announcement_text?: string | null; footer_text?: string | null } | null;
+  const hasCustomized = !!(
+    sf &&
+    (sf.banner_url || sf.tagline || sf.announcement_text || sf.footer_text ||
+      (sf.primary_color && sf.primary_color.toLowerCase() !== "#ed7712"))
+  );
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
@@ -162,6 +178,32 @@ export default async function DashboardPage() {
         </div>
 
         <NotificationBanner />
+
+        <OnboardingChecklist
+          username={profile.username}
+          hasProduct={hasProduct}
+          hasPayouts={hasPayouts}
+          hasCustomized={hasCustomized}
+        />
+
+        {!hasWhatsapp && hasPayouts && (
+          <div className="bg-[#25D366]/5 border border-[#25D366]/20 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Get instant WhatsApp alerts for new paid orders
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                Add your WhatsApp number once, we ping you the second a buyer pays.
+              </p>
+            </div>
+            <Link
+              href="/dashboard/profile"
+              className="bg-[#25D366] hover:brightness-95 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap text-center"
+            >
+              Add WhatsApp number
+            </Link>
+          </div>
+        )}
 
         {lowStockProducts && lowStockProducts.length > 0 && (
           <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-2xl p-5 mb-6">

@@ -172,6 +172,9 @@ export default function ProfileClient({
                     placeholder="2348012345678"
                     className="text-sm text-gray-900 dark:text-white bg-transparent outline-none mt-0.5 w-full placeholder:text-gray-400"
                   />
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                    Instant WhatsApp pings for new paid orders go here
+                  </p>
                 </div>
               </div>
             </div>

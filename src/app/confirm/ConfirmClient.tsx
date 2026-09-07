@@ -123,6 +123,16 @@ export default function ConfirmClient({
               />
             )}
 
+            {paid && reference && (
+              <a
+                href="/track"
+                className="inline-block mb-6 text-sm font-semibold"
+                style={{ color: hasSettings ? primaryColor : "#ed7712" }}
+              >
+                Track your order →
+              </a>
+            )}
+
             {!paid && (
               <p className="text-sm" style={{ color: hasSettings ? `${textColor}80` : undefined }}>
                 This payment hasn&apos;t been confirmed. If you already paid, please contact the seller directly.

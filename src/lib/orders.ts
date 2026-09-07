@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { computeBuyerTotal } from "@/lib/platform";
+import { buildWaLink, normalizePhone, sellerPaidAlertText, sendSellerWhatsAppAlert } from "@/lib/whatsapp";
 
 export type SettleResult =
   | { ok: true; alreadySettled: boolean; orderId: string }
@@ -99,14 +100,75 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
 
   const { data: seller } = await supabase
     .from("users")
-    .select("email, username")
+    .select("email, username, whatsapp_number")
     .eq("id", order.seller_id)
     .single();
 
+  // Instant seller alert: WhatsApp Cloud API if configured, plus a loud
+  // email that carries a one-tap WhatsApp self-ping link as fallback.
+  // Best-effort only, settling the order must never depend on it.
+  const sellerNumber = (seller as { whatsapp_number?: string | null } | null)?.whatsapp_number || null;
+  if (sellerNumber && normalizePhone(sellerNumber)) {
+    const alertText = sellerPaidAlertText({
+      buyerName: order.buyer_name || "A buyer",
+      productName,
+      amount: order.amount,
+      reference: orderId.slice(0, 8),
+    });
+    sendSellerWhatsAppAlert(sellerNumber, alertText)
+      .then((sent) => {
+        if (sent) console.log(`[orders] whatsapp alert sent for ${orderId}`);
+      })
+      .catch((e) => console.error("[orders] whatsapp alert failed", e));
+    try {
+      const webPush = (await import("web-push")).default;
+      if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+        webPush.setVapidDetails(
+          "mailto:hello@myshopa.com.ng",
+          process.env.VAPID_PUBLIC_KEY,
+          process.env.VAPID_PRIVATE_KEY
+        );
+        const { data: subs } = await supabase
+          .from("push_subscriptions")
+          .select("endpoint, p256dh, auth")
+          .eq("user_id", order.seller_id);
+        const payload = JSON.stringify({
+          title: `New paid order: ${productName}`,
+          body: `${order.buyer_name || "A buyer"} paid ₦${order.amount.toLocaleString()}. Fulfill it now.`,
+          url: "/dashboard",
+        });
+        for (const sub of (subs as { endpoint: string; p256dh: string; auth: string }[] | null) || []) {
+          try {
+            await webPush.sendNotification(
+              { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+              payload
+            );
+          } catch {
+            await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[orders] seller push failed", e);
+    }
+  }
+
   if (seller?.email) {
+    const waLink =
+      sellerNumber && normalizePhone(sellerNumber)
+        ? buildWaLink(
+            sellerNumber,
+            sellerPaidAlertText({
+              buyerName: order.buyer_name || "A buyer",
+              productName,
+              amount: order.amount,
+              reference: orderId.slice(0, 8),
+            })
+          )
+        : null;
     const t = {
       subject: `New paid order: ${productName} (₦${order.amount.toLocaleString()})`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>You have a new paid order!</h2><p><b>${order.buyer_name || "A buyer"}</b> just paid <b>₦${order.amount.toLocaleString()}</b> for <b>${productName}</b> via Paystack. No action needed except fulfillment.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>You have a new paid order!</h2><p><b>${order.buyer_name || "A buyer"}</b> just paid <b>₦${order.amount.toLocaleString()}</b> for <b>${productName}</b> via Paystack. No action needed except fulfillment.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a>${waLink ? `<p style="margin-top:16px"><a href="${waLink}">Forward this alert to WhatsApp</a></p>` : `<p style="margin-top:16px;color:#888;font-size:12px">Add your WhatsApp number in Profile to get instant WhatsApp pings for paid orders.</p>`}</div>`,
     };
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch((e) =>
       console.error("[orders] seller paid email failed", e)

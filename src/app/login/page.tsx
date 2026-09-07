@@ -14,12 +14,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cooldownUntil, setCooldownUntil] = useState(0);
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
 
+  const GENERIC_ERROR = "Invalid email or password.";
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (Date.now() < cooldownUntil) {
+      setError(`Too many attempts. Try again in ${Math.ceil((cooldownUntil - Date.now()) / 1000)}s.`);
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -29,11 +36,42 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      // Generic message stops account enumeration; details go to the server log.
+      setError(GENERIC_ERROR);
+      fetch("/api/auth/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "login_failed", identifier: email.trim().toLowerCase().slice(0, 120) }),
+      }).catch(() => {});
+      try {
+        const key = "shopa-login-fails";
+        const fails = JSON.parse(localStorage.getItem(key) || "[]") as number[];
+        const recent = [...fails, Date.now()].filter((t) => Date.now() - t < 10 * 60 * 1000);
+        localStorage.setItem(key, JSON.stringify(recent));
+        // Throttle brute force: 5+ fails in 10 min locks the form for 60s.
+        if (recent.length >= 5) {
+          const until = Date.now() + 60 * 1000;
+          setCooldownUntil(until);
+          localStorage.setItem(key, JSON.stringify([]));
+          setError("Too many attempts. Try again in 60s.");
+          fetch("/api/auth/log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "login_locked", identifier: email.trim().toLowerCase().slice(0, 120) }),
+          }).catch(() => {});
+        }
+      } catch {
+        // storage unavailable, login still works
+      }
       setLoading(false);
       return;
     }
 
+    try {
+      localStorage.removeItem("shopa-login-fails");
+    } catch {
+      // ignore
+    }
     router.push("/dashboard");
   };
 
