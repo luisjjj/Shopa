@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import {
   HomeIcon,
@@ -23,11 +24,11 @@ type Props = {
   showUpgrade: boolean;
 };
 
-const ANCHORS = [
-  { id: "overview", label: "Overview", Icon: HomeIcon, href: "#overview" },
-  { id: "products", label: "Products", Icon: BagIcon, href: "#products" },
-  { id: "orders", label: "Orders", Icon: CartIcon, href: "#orders" },
-  { id: "promos", label: "Promo Codes", Icon: TagIcon, href: "#promos" },
+const MANAGE_LINKS = [
+  { label: "Overview", Icon: HomeIcon, href: "/dashboard" },
+  { label: "Products", Icon: BagIcon, href: "/dashboard/products" },
+  { label: "Orders", Icon: CartIcon, href: "/dashboard/orders" },
+  { label: "Promo Codes", Icon: TagIcon, href: "/dashboard/promos" },
 ];
 
 const PAGES = [
@@ -74,8 +75,8 @@ export function DashboardMenuButton() {
 }
 
 export default function DashboardSidebar({ username, planName, planDetail, showUpgrade }: Props) {
-  const [active, setActive] = useState("overview");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const open = () => setDrawerOpen(true);
@@ -83,22 +84,15 @@ export default function DashboardSidebar({ username, planName, planDetail, showU
     return () => window.removeEventListener(DASHBOARD_MENU_EVENT, open);
   }, []);
 
+  // Exact match for the overview, prefix match for the rest so subpages
+  // (e.g. /dashboard/products/new) keep their section highlighted.
+  // The drawer closes on navigation.
   useEffect(() => {
-    const sections = ANCHORS.map((a) => document.getElementById(a.id)).filter(
-      (el): el is HTMLElement => !!el
-    );
-    if (sections.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-30% 0px -60% 0px" }
-    );
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    setDrawerOpen(false);
+  }, [pathname]);
+
+  const isActive = (href: string) =>
+    href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
 
   const linkClass = (isActive: boolean) =>
     `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -116,11 +110,11 @@ export default function DashboardSidebar({ username, planName, planDetail, showU
         Manage
       </p>
       <nav className="space-y-1">
-        {ANCHORS.map(({ id, label, Icon, href }) => (
-          <a key={id} href={href} onClick={() => setDrawerOpen(false)} className={linkClass(active === id)}>
+        {MANAGE_LINKS.map(({ label, Icon, href }) => (
+          <Link key={href} href={href} onClick={() => setDrawerOpen(false)} className={linkClass(isActive(href))}>
             <Icon size={18} />
             {label}
-          </a>
+          </Link>
         ))}
       </nav>
       <p className="px-3 mt-5 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
@@ -128,7 +122,7 @@ export default function DashboardSidebar({ username, planName, planDetail, showU
       </p>
       <nav className="space-y-1">
         {PAGES.map(({ label, Icon, href }) => (
-          <Link key={href} href={href} onClick={() => setDrawerOpen(false)} className={linkClass(false)}>
+          <Link key={href} href={href} onClick={() => setDrawerOpen(false)} className={linkClass(isActive(href))}>
             <Icon size={18} />
             {label}
           </Link>
