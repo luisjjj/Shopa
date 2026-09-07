@@ -5,6 +5,7 @@ import { UserIcon } from "@/components/Icons";
 import DashboardSidebar, { DashboardMenuButton } from "@/components/DashboardSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShopaLogo } from "@/components/ShopaLogo";
+import TrialClaimer from "@/components/TrialClaimer";
 import { isPremiumActive, isProPlusActive, daysLeft } from "@/lib/premium";
 
 export default async function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -117,7 +118,10 @@ export default async function DashboardShell({ children }: { children: React.Rea
           </div>
         </header>
 
-        <main className="max-w-5xl mx-auto px-5 py-8 animate-fade-up">{children}</main>
+        <main className="max-w-5xl mx-auto px-5 py-8 animate-fade-up">
+          <TrialClaimer />
+          {children}
+        </main>
       </div>
     </div>
   );

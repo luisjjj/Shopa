@@ -328,11 +328,14 @@ export default function HomePage() {
                 </li>
               </ul>
               <Link
-                href="/signup"
+                href="/signup?trial=1"
                 className="block text-center bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 active:scale-[0.98]"
               >
                 Start free trial
               </Link>
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
+                7 days of Premium free, no card required
+              </p>
             </div>
 
             <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8 relative transition-all hover:shadow-lg hover:shadow-brand-500/10">

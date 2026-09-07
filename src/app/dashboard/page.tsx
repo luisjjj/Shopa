@@ -70,6 +70,26 @@ export default async function DashboardPage() {
         hasCustomized={hasCustomized}
       />
 
+      {(profile as { is_trial?: boolean | null }).is_trial && isPremium && profile.premium_until && (
+        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200/60 dark:border-green-900/30 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div>
+            <p className="text-sm font-medium text-green-700 dark:text-green-400">
+              Free trial active, Premium until{" "}
+              {new Date(profile.premium_until).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+            </p>
+            <p className="text-xs text-green-600/70 dark:text-green-400/60 mt-1">
+              Keep Premium going without interruption.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/upgrade"
+            className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap text-center"
+          >
+            Upgrade now
+          </Link>
+        </div>
+      )}
+
       {!hasWhatsapp && hasPayouts && (
         <div className="bg-[#25D366]/5 border border-[#25D366]/20 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
           <div>

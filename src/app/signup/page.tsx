@@ -2,11 +2,12 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "@/components/Icons";
 import { ShopaMark } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
+import { setTrialIntent } from "@/components/TrialClaimer";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 export default function SignupPage() {
@@ -20,6 +21,14 @@ export default function SignupPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
+  const [isTrial, setIsTrial] = useState(false);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("trial") === "1") {
+      setIsTrial(true);
+      setTrialIntent();
+    }
+  }, []);
 
   const [emailError, setEmailError] = useState("");
 
@@ -125,7 +134,9 @@ export default function SignupPage() {
         <div className="text-center mb-8">
           <ShopaMark className="w-12 h-12 mx-auto mb-4 drop-shadow-lg" title="Shopa" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create your store</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Set up your account in seconds</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">
+            {isTrial ? "7 days of Premium free, no card required" : "Set up your account in seconds"}
+          </p>
         </div>
 
         {/* Form card */}

@@ -29,7 +29,14 @@ export async function GET(request: Request) {
   if (expiredPremium && expiredPremium.length > 0) {
     const ids = expiredPremium.map((u) => u.id);
     const { error } = await supabase.from("users").update({ is_premium: false }).in("id", ids);
-    if (!error) downgradedPremium = ids.length;
+    if (!error) {
+      downgradedPremium = ids.length;
+      // Best-effort: clear the trial marker (column exists after trial.sql).
+      await supabase.from("users").update({ is_trial: false }).in("id", ids).then(
+        () => {},
+        () => {}
+      );
+    }
   }
   if (expiredPro && expiredPro.length > 0) {
     const ids = expiredPro.map((u) => u.id);

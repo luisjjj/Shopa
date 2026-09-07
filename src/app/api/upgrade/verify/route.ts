@@ -121,6 +121,13 @@ export async function GET(request: Request) {
         }
       }
 
+      // Best-effort: a paid plan ends trial status (column exists after
+      // trial.sql; a missing column must never fail a paid upgrade).
+      supabase.from("users").update({ is_trial: false }).eq("id", userId).then(
+        () => {},
+        () => {}
+      );
+
       return NextResponse.redirect(
         `${origin}/dashboard?upgrade=success`
       );

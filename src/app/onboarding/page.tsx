@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
 import BankPicker from "@/components/BankPicker";
+import TrialClaimer from "@/components/TrialClaimer";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
 import { isProPlusActive } from "@/lib/premium";
@@ -184,6 +185,7 @@ export default function OnboardingPage() {
           <AuthSidePanel />
         </div>
         <div className="w-full max-w-md min-w-0 mx-auto lg:mx-0">
+        <TrialClaimer />
         <div className="flex justify-end mb-4">
           <button
             onClick={toggle}

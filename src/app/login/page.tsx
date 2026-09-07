@@ -2,11 +2,12 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "@/components/Icons";
 import { ShopaMark } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
+import { setTrialIntent } from "@/components/TrialClaimer";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 export default function LoginPage() {
@@ -18,6 +19,12 @@ export default function LoginPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("trial") === "1") {
+      setTrialIntent();
+    }
+  }, []);
 
   const GENERIC_ERROR = "Invalid email or password.";
 
