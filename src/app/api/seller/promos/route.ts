@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { serverError } from "@/lib/api-error";
 import { fetchPlanStatus, type PlanQueryClient } from "@/lib/premium";
 
 async function requireProPlus(supabase: PlanQueryClient, userId: string) {
@@ -30,7 +31,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("promos:list", error, "Could not load promo codes. Try again.");
   }
 
   return NextResponse.json({ promos: data });
@@ -98,7 +99,7 @@ export async function POST(request: Request) {
         { status: 409 }
       );
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("promos:create", error, "Could not create promo code. Try again.");
   }
 
   return NextResponse.json({ promo: data });
@@ -131,8 +132,6 @@ export async function DELETE(request: Request) {
     .eq("seller_id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("promos:delete", error, "Could not delete promo code. Try again.");
   }
-
-  return NextResponse.json({ success: true });
 }

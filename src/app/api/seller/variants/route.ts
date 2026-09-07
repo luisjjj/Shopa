@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { serverError } from "@/lib/api-error";
 import { fetchPlanStatus, type PlanQueryClient } from "@/lib/premium";
 
 async function requireProPlus(supabase: PlanQueryClient, userId: string) {
@@ -48,7 +49,7 @@ export async function GET(request: Request) {
     .order("created_at", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("variants:list", error, "Could not load variants. Try again.");
   }
 
   return NextResponse.json({ variants: data });
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("variants:create", error, "Could not create variant. Try again.");
   }
 
   return NextResponse.json({ variant: data });
@@ -165,7 +166,7 @@ export async function DELETE(request: Request) {
     .eq("id", id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("variants:delete", error, "Could not delete variant. Try again.");
   }
 
   return NextResponse.json({ success: true });

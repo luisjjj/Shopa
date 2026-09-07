@@ -176,6 +176,39 @@ export default function ConfirmClient({
   );
 }
 
+const RECEIPT_FONT = "system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+const RECEIPT_MONO = "ui-monospace, 'Cascadia Mono', 'Courier New', monospace";
+
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, w, h, r);
+    return;
+  }
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let t = text;
+  while (t.length > 1 && ctx.measureText(t + "…").width > maxWidth) {
+    t = t.slice(0, -1);
+  }
+  return t + "…";
+}
+
 function drawReceiptImage(details: {
   product: string;
   amount: string;
@@ -187,7 +220,7 @@ function drawReceiptImage(details: {
 }): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const W = 640;
-    const H = 860;
+    const H = 960;
     const canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
@@ -196,54 +229,186 @@ function drawReceiptImage(details: {
       reject(new Error("Canvas unavailable"));
       return;
     }
-    const fmt = (v: string | null) => (v ? `₦${parseInt(v).toLocaleString()}` : "-");
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#ed7712";
-    ctx.fillRect(0, 0, W, 150);
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 44px system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Shopa", W / 2, 70);
-    ctx.font = "24px system-ui, sans-serif";
-    ctx.fillText("Payment Receipt", W / 2, 110);
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#111827";
-    let y = 230;
-    const row = (label: string, value: string, bold = false) => {
-      ctx.font = "22px system-ui, sans-serif";
-      ctx.fillStyle = "#6b7280";
-      ctx.fillText(label, 60, y);
-      ctx.fillStyle = "#111827";
-      ctx.font = `${bold ? "bold" : "normal"} 24px system-ui, sans-serif`;
-      const w = ctx.measureText(value).width;
-      ctx.fillText(value, W - 60 - w, y);
-      y += 56;
+    const naira = (v: string | null) => {
+      if (!v) return "";
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? "" : `\u20A6${n.toLocaleString("en-NG")}`;
     };
-    row("Product", (details.product || "Order").slice(0, 28));
-    if (details.productPrice) row("Price", fmt(details.productPrice));
-    if (details.shopaFee) row("Shopa fee (1%)", fmt(details.shopaFee));
-    if (details.paystackFee) row("Paystack fee", fmt(details.paystackFee));
-    ctx.strokeStyle = "#e5e7eb";
+
+    // Page background
+    ctx.fillStyle = "#FAF7F2";
+    ctx.fillRect(0, 0, W, H);
+
+    // Brand header
+    const headerH = 240;
+    const grad = ctx.createLinearGradient(0, 0, W, headerH);
+    grad.addColorStop(0, "#F49A35");
+    grad.addColorStop(1, "#D95012");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, headerH);
+
+    // Shopa mark badge (same S as the app logo, drawn from its SVG path)
+    const badgeX = 56;
+    const badgeY = 52;
+    const badgeS = 84;
+    ctx.fillStyle = "#ffffff";
+    roundRectPath(ctx, badgeX, badgeY, badgeS, badgeS, 24);
+    ctx.fill();
+    try {
+      const sPath = new Path2D(
+        "M34.5 14.5C31.6 12.5 28.2 11.5 24.2 11.5C17.7 11.5 13.5 14.1 13.5 18.1C13.5 25 34.5 21.1 34.5 29.2C34.5 33.6 30.3 36.5 23.7 36.5C19.4 36.5 15.7 35.2 13 32.8"
+      );
+      const k = badgeS / 48;
+      ctx.save();
+      ctx.translate(badgeX, badgeY);
+      ctx.scale(k, k);
+      const sGrad = ctx.createLinearGradient(8, 6, 40, 43);
+      sGrad.addColorStop(0, "#F49A35");
+      sGrad.addColorStop(1, "#D95012");
+      ctx.strokeStyle = sGrad;
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.stroke(sPath);
+      ctx.restore();
+    } catch {
+      ctx.fillStyle = "#D95012";
+      ctx.font = `bold 52px ${RECEIPT_FONT}`;
+      ctx.textAlign = "center";
+      ctx.fillText("S", badgeX + badgeS / 2, badgeY + 60);
+    }
+
+    // Wordmark + subtitle
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold 46px ${RECEIPT_FONT}`;
+    ctx.fillText("Shopa", badgeX + badgeS + 20, badgeY + 52);
+    ctx.font = `24px ${RECEIPT_FONT}`;
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.fillText("Payment Receipt", badgeX + badgeS + 20, badgeY + 84);
+
+    // PAID pill
+    ctx.font = `bold 22px ${RECEIPT_FONT}`;
+    const pillText = "\u2713 PAID";
+    const pillW = ctx.measureText(pillText).width + 36;
+    const pillX = W - 56 - pillW;
+    const pillY = 176;
+    ctx.fillStyle = "#ffffff";
+    roundRectPath(ctx, pillX, pillY, pillW, 40, 20);
+    ctx.fill();
+    ctx.fillStyle = "#16A34A";
+    ctx.textAlign = "center";
+    ctx.fillText(pillText, pillX + pillW / 2, pillY + 28);
+
+    // White card overlapping the header
+    const cardX = 40;
+    const cardY = 196;
+    const cardW = W - 80;
+    const cardH = H - cardY - 40;
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(0,0,0,0.12)";
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 8;
+    roundRectPath(ctx, cardX, cardY, cardW, cardH, 28);
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    const pad = 48;
+    const leftX = cardX + pad;
+    const rightX = cardX + cardW - pad;
+    let y = cardY + 72;
+
+    const row = (label: string, value: string, opts?: { bold?: boolean; size?: number }) => {
+      const size = opts?.size || 24;
+      ctx.font = `22px ${RECEIPT_FONT}`;
+      ctx.fillStyle = "#8A8A8A";
+      ctx.textAlign = "left";
+      ctx.fillText(label, leftX, y);
+      ctx.font = `${opts?.bold ? "bold" : "normal"} ${size}px ${RECEIPT_FONT}`;
+      ctx.fillStyle = "#1A1A1A";
+      ctx.textAlign = "right";
+      ctx.fillText(fitText(ctx, value, rightX - leftX - 170), rightX, y);
+      y += 58;
+    };
+
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#1A1A1A";
+    ctx.font = `bold 30px ${RECEIPT_FONT}`;
+    ctx.fillText(fitText(ctx, details.product || "Order", cardW - pad * 2), leftX, y);
+    y += 22;
+    ctx.font = `20px ${RECEIPT_FONT}`;
+    ctx.fillStyle = "#B0B0B0";
+    const date = new Date().toLocaleString("en-NG", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    ctx.fillText(date, leftX, y);
+    y += 52;
+
+    // Divider
+    ctx.strokeStyle = "#EDEDED";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(60, y - 18);
-    ctx.lineTo(W - 60, y - 18);
+    ctx.moveTo(leftX, y);
+    ctx.lineTo(rightX, y);
     ctx.stroke();
-    row("Total paid", fmt(details.amount), true);
-    if (details.buyer) row("Buyer", details.buyer.slice(0, 28));
-    ctx.font = "20px ui-monospace, monospace";
-    ctx.fillStyle = "#6b7280";
-    const ref = `Ref: ${details.reference || "-"}`;
-    const rw = ctx.measureText(ref).width;
-    ctx.fillText(ref, W - 60 - rw, y + 8);
-    ctx.font = "20px system-ui, sans-serif";
-    const date = new Date().toLocaleString("en-NG");
-    ctx.fillText(date, 60, y + 8);
+    y += 50;
+
+    if (details.productPrice) row("Price", naira(details.productPrice));
+    if (details.shopaFee) row("Shopa fee (1%)", naira(details.shopaFee));
+    if (details.paystackFee) row("Paystack fee", naira(details.paystackFee));
+
+    // Dashed total separator
+    ctx.strokeStyle = "#D95012";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(leftX, y);
+    ctx.lineTo(rightX, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    y += 52;
+
+    ctx.font = `22px ${RECEIPT_FONT}`;
+    ctx.fillStyle = "#8A8A8A";
+    ctx.textAlign = "left";
+    ctx.fillText("Total paid", leftX, y);
+    ctx.font = `bold 40px ${RECEIPT_FONT}`;
+    ctx.fillStyle = "#D95012";
+    ctx.textAlign = "right";
+    ctx.fillText(naira(details.amount) || "\u20A60", rightX, y);
+    y += 62;
+
+    if (details.buyer) {
+      row("Buyer", details.buyer.slice(0, 40));
+    }
+
+    ctx.font = `20px ${RECEIPT_MONO}`;
+    ctx.fillStyle = "#8A8A8A";
+    ctx.textAlign = "left";
+    ctx.fillText(fitText(ctx, `Ref: ${details.reference || "-"}`, cardW - pad * 2), leftX, y);
+    y += 60;
+
+    // Footer
+    ctx.strokeStyle = "#EDEDED";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(leftX, y);
+    ctx.lineTo(rightX, y);
+    ctx.stroke();
+    y += 40;
     ctx.textAlign = "center";
-    ctx.font = "20px system-ui, sans-serif";
-    ctx.fillStyle = "#9ca3af";
-    ctx.fillText("Thank you for shopping with Shopa", W / 2, H - 50);
+    ctx.font = `20px ${RECEIPT_FONT}`;
+    ctx.fillStyle = "#B0B0B0";
+    ctx.fillText("Track your order at myshopa.com.ng/track", W / 2, y);
+    y += 32;
+    ctx.fillStyle = "#D95012";
+    ctx.fillText("Thank you for shopping with Shopa", W / 2, y);
+
     canvas.toBlob((blob) => {
       if (blob) resolve(blob);
       else reject(new Error("Could not render receipt"));

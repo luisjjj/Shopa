@@ -117,7 +117,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    return NextResponse.json({ error: message }, { status: 400 });
+    console.error("[checkout/pay] initialize rejected:", message);
+    return NextResponse.json({ error: "Could not start payment. Try again" }, { status: 400 });
   }
 
   return NextResponse.json({

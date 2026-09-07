@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { isPremiumActive } from "@/lib/premium";
 import { isHexColor, isHttpsUrl, sanitizeText } from "@/lib/security";
+import { serverError } from "@/lib/api-error";
 
 export async function GET(request: Request) {
   const supabase = createClient();
@@ -123,11 +124,11 @@ export async function PUT(request: Request) {
         .select()
         .single();
       if (retry.error) {
-        return NextResponse.json({ error: retry.error.message }, { status: 500 });
+        return serverError("storefront-settings:save", retry.error, "Could not save store settings. Try again.");
       }
       return NextResponse.json({ ...retry.data, _sectionsPendingMigration: true });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("storefront-settings:save", error, "Could not save store settings. Try again.");
   }
 
   return NextResponse.json(data);

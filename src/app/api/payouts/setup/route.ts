@@ -78,8 +78,13 @@ export async function POST(request: Request) {
     if (isStarterSafeError(message)) {
       // Flag immediately per migration spec: Starter Business must allow this.
       console.error("[payouts/setup] POSSIBLE STARTER-BUSINESS RESTRICTION:", message);
+    } else {
+      console.error("[payouts/setup] subaccount create failed:", message);
     }
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json(
+      { error: "Payout setup failed. Check your bank details and try again" },
+      { status: 400 }
+    );
   }
 
   const service = createServiceRoleClient();

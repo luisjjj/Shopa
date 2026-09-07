@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { serverError } from "@/lib/api-error";
 import { fetchPlanStatus, FREE_PRODUCT_LIMIT, type PlanQueryClient } from "@/lib/premium";
 
 async function countActive(supabase: PlanQueryClient, userId: string) {
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("products:create", error, "Could not create product. Try again.");
   }
 
   return NextResponse.json({ id: data.id });
@@ -136,7 +137,7 @@ export async function PUT(request: Request) {
   const { error } = await supabase.from("products").update(updates).eq("id", id).eq("user_id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("products:update", error, "Could not save product. Try again.");
   }
 
   return NextResponse.json({ success: true });

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { serverError } from "@/lib/api-error";
 import { createSubaccount, listBanks, resolveAccount } from "@/lib/paystack";
 import { getPlatformFeePercent, isStarterSafeError } from "@/lib/platform";
 import { NextResponse } from "next/server";
@@ -60,7 +61,7 @@ export async function PUT(request: Request) {
     .eq("id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("profile:save", error, "Could not save profile. Try again.");
   }
 
   // If bank details were saved and this store has no payout subaccount yet,

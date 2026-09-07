@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { serverError } from "@/lib/api-error";
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("push:subscribe", error, "Could not turn on notifications. Try again.");
   }
 
   return NextResponse.json({ success: true });
@@ -53,7 +54,7 @@ export async function DELETE() {
     .eq("user_id", user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("push:unsubscribe", error, "Could not turn off notifications. Try again.");
   }
 
   return NextResponse.json({ success: true });

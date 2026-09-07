@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from "@/lib/supabase/service";
 import { verifyTransaction } from "@/lib/paystack";
 import { requireCronSecret } from "@/lib/security";
+import { serverError } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     .not("paystack_reference", "is", null);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("orders:backfill", error, "Could not check unpaid orders. Try again.");
   }
 
   if (!unpaidOrders || unpaidOrders.length === 0) {

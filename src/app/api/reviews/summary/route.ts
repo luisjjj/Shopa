@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service";
+import { serverError } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -9,7 +10,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "product_id required" }, { status: 400 });
   }
 
-  const supabase = createClient();
+  // Service role: storefront visitors are anonymous, so the server reads on
+  // their behalf. Writes stay locked down (see product-reviews-rls.sql).
+  const supabase = createServiceRoleClient();
 
   const { data, error } = await supabase
     .from("product_reviews")
@@ -17,7 +20,7 @@ export async function GET(request: Request) {
     .eq("product_id", productId);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError("reviews:summary", error, "Could not load ratings. Try again.");
   }
 
   const reviews = data || [];
