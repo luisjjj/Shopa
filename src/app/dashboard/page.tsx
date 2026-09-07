@@ -153,7 +153,7 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch gap-4">
         <Link
           href="/dashboard/products"
           className="flex-1 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark transition-all hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-0.5 group text-center"

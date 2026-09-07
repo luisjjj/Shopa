@@ -117,7 +117,7 @@ export default function DateTimePicker({ value, onChange, placeholder }: Props) 
       </div>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-[280px] bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden">
+        <div className="absolute z-50 mt-2 w-[280px] max-w-[calc(100vw-3rem)] bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden">
           <div className="flex border-b border-gray-100 dark:border-white/10">
             {(["date", "time"] as const).map((t) => (
               <button

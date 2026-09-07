@@ -108,7 +108,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
                 <UserIcon size={16} />
               </Link>
               <ThemeToggle />
-              <form action="/api/auth/signout" method="post">
+              <form action="/api/auth/signout" method="post" className="hidden sm:block">
                 <button
                   type="submit"
                   className="text-sm text-gray-400 hover:text-red-500 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
