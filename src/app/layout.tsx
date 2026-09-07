@@ -31,11 +31,6 @@ export const metadata: Metadata = {
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
-};
-
-export const viewport = {
-  themeColor: "#ed7712",
-};
   openGraph: {
     type: "website",
     siteName: "Shopa",
@@ -59,6 +54,10 @@ export const viewport = {
       "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
     images: ["/landing/hero-seller.jpg"],
   },
+};
+
+export const viewport = {
+  themeColor: "#ed7712",
 };
 
 export default function RootLayout({
