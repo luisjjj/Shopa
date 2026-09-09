@@ -40,16 +40,25 @@ async function sendViaMailjet(opts: { to: string; subject: string; html: string;
       }),
     });
     const data = await res.json().catch(() => ({}));
-    const sent = (data as { Sent?: unknown[] }).Sent?.[0] as
-      | { MessageID?: number; Errors?: { ErrorMessage?: string }[] }
-      | undefined;
-    const firstError = sent?.Errors?.[0]?.ErrorMessage;
-    if (!res.ok || firstError) {
-      console.error("[email] mailjet send failed", firstError || res.status);
-      return { error: firstError || `Mailjet error ${res.status}` };
+    // v3.1 shape: { Messages: [{ Status: "success"|"error", To: [{ MessageUUID, MessageID }], Errors: [...] }] }
+    const msg = (data as {
+      Messages?: {
+        Status?: string;
+        To?: { Email?: string; MessageUUID?: string; MessageID?: number }[];
+        Errors?: { ErrorMessage?: string; ErrorCode?: string }[];
+      }[];
+    }).Messages?.[0];
+    const firstError = msg?.Errors?.[0];
+    const to0 = msg?.To?.[0];
+    if (!res.ok || !msg || msg.Status !== "success" || firstError) {
+      const detail =
+        (firstError && `${firstError.ErrorCode || ""} ${firstError.ErrorMessage || ""}`.trim()) ||
+        `Mailjet error ${res.status}`;
+      console.error("[email] mailjet send failed", detail);
+      return { error: detail };
     }
-    console.log(`[email] sent via mailjet to ${opts.to} id=${sent?.MessageID}`);
-    return { queued: true, id: String(sent?.MessageID || "") };
+    console.log(`[email] sent via mailjet to ${opts.to} uuid=${to0?.MessageUUID} id=${to0?.MessageID}`);
+    return { queued: true, id: String(to0?.MessageID || "") };
   } catch (e) {
     console.error("[email] mailjet send error", e);
     return { error: String(e) };
