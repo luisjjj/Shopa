@@ -620,11 +620,11 @@ export default function CustomizeClient({
                   <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
                     Start from a professionally designed look. Applies theme + layout, your products and text blocks stay.
                   </p>
-                  <div className="grid sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {STORE_TEMPLATES.map((tpl) => (
                       <div
                         key={tpl.id}
-                        className="border border-gray-200 dark:border-white/10 rounded-xl p-3 flex items-center gap-3"
+                        className="border border-gray-200 dark:border-white/10 rounded-xl p-3 flex items-center gap-3 min-w-0"
                       >
                         <div className="flex -space-x-1.5 shrink-0">
                           {[tpl.swatches.primary, tpl.swatches.bg, tpl.swatches.text].map((c) => (
