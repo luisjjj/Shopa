@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   const res = await sendEmail({ to: normalized, subject: t.subject, html: t.html });
   const sendError = (res as { error?: string }).error;
   if (sendError) {
-    console.error("[send-code] brevo send failed", sendError);
+    console.error("[send-code] email send failed", sendError);
     await supabase.from("buyer_otps").delete().eq("email", normalized).gt("created_at", hourAgo);
     const hint = sendError.includes("sender") || sendError.includes("5.7.8") || sendError.includes("535")
       ? "Email service rejected the send, seller: verify the sender address in your email provider"
