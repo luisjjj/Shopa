@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 function getTransporter() {
-  const host = process.env.SMTP_HOST || "smtp-relay.brevo.com";
+  const host = process.env.SMTP_HOST || "in-v3.mailjet.com";
   const port = parseInt(process.env.SMTP_PORT || "587");
   const user = process.env.SMTP_USER || "";
   const pass = process.env.SMTP_PASS || "";
@@ -9,16 +9,65 @@ function getTransporter() {
   return nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
 }
 
-export async function sendEmail(opts: { to: string; subject: string; html: string; text?: string }) {
-  const transporter = getTransporter();
+function getFrom() {
   const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@shopa.store";
   const fromName = process.env.SMTP_FROM_NAME || "Shopa";
-  const from = `${fromName} <${fromEmail.replace(/^.*<|>.*$/g, "")}>`;
+  return { fromEmail: fromEmail.replace(/^.*<|>.*$/g, ""), fromName };
+}
+
+async function sendViaMailjet(opts: { to: string; subject: string; html: string; text?: string }) {
+  const apiKey = process.env.MAILJET_API_KEY || "";
+  const apiSecret = process.env.MAILJET_API_SECRET_KEY || "";
+  if (!apiKey || !apiSecret) return null;
+  const { fromEmail, fromName } = getFrom();
+  try {
+    const res = await fetch("https://api.mailjet.com/v3.1/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString("base64")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Messages: [
+          {
+            From: { Email: fromEmail, Name: fromName },
+            To: [{ Email: opts.to }],
+            Subject: opts.subject,
+            HTMLPart: opts.html,
+            TextPart: opts.text || opts.html.replace(/<[^>]+>/g, ""),
+          },
+        ],
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    const sent = (data as { Sent?: unknown[] }).Sent?.[0] as
+      | { MessageID?: number; Errors?: { ErrorMessage?: string }[] }
+      | undefined;
+    const firstError = sent?.Errors?.[0]?.ErrorMessage;
+    if (!res.ok || firstError) {
+      console.error("[email] mailjet send failed", firstError || res.status);
+      return { error: firstError || `Mailjet error ${res.status}` };
+    }
+    console.log(`[email] sent via mailjet to ${opts.to} id=${sent?.MessageID}`);
+    return { queued: true, id: String(sent?.MessageID || "") };
+  } catch (e) {
+    console.error("[email] mailjet send error", e);
+    return { error: String(e) };
+  }
+}
+
+export async function sendEmail(opts: { to: string; subject: string; html: string; text?: string }) {
+  if (!opts.to || !opts.to.includes("@")) return { error: "Invalid recipient" };
+  // Primary: Mailjet Send API. Fallback: SMTP (also Mailjet after migration).
+  const viaApi = await sendViaMailjet(opts);
+  if (viaApi) return viaApi;
+  const transporter = getTransporter();
+  const { fromEmail, fromName } = getFrom();
+  const from = `${fromName} <${fromEmail}>`;
   if (!transporter) {
-    console.log(`[email] SMTP not configured, would send to ${opts.to}: ${opts.subject}`);
+    console.log(`[email] no provider configured, would send to ${opts.to}: ${opts.subject}`);
     return { queued: false };
   }
-  if (!opts.to || !opts.to.includes("@")) return { error: "Invalid recipient" };
   try {
     const info = await transporter.sendMail({ from, to: opts.to, subject: opts.subject, html: opts.html, text: opts.text || opts.html.replace(/<[^>]+>/g, "") });
     console.log(`[email] sent to ${opts.to} id=${info.messageId}`);
@@ -59,6 +108,14 @@ export function emailTemplates() {
     buyerOtp: (code: string) => ({
       subject: `Your Shopa verification code: ${code}`,
       html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Verify your email</h2><p>Your Shopa verification code is:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#ed7712">${code}</p><p>It expires in 10 minutes. If you didn't request this, ignore this email.</p></div>`,
+    }),
+    trialActivated: (name: string, endsDate: string) => ({
+      subject: `Your 7-day Premium trial is active`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to Premium, ${name}!</h2><p>Your free 7-day Premium trial is now active until <b>${endsDate}</b>. Enjoy unlimited products, store customization, and no Shopa branding.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Set up your store</a><p style="color:#888;font-size:12px;margin-top:24px">No card was charged. Upgrade anytime to keep Premium after the trial.</p></div>`,
+    }),
+    premiumActivated: (name: string, plan: string) => ({
+      subject: `You're on Shopa ${plan}, enjoy!`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to ${plan}, ${name}!</h2><p>Your payment went through and <b>${plan}</b> is now active on your store. Thanks for supporting Shopa.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Go to dashboard</a><p style="color:#888;font-size:12px;margin-top:24px">- The Shopa Team</p></div>`,
     }),
   };
 }

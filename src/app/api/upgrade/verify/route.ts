@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     }
 
     if (userId) {
-      const { data: existing } = await supabase.from("users").select("premium_until, pro_plus_until").eq("id", userId).single();
+      const { data: existing } = await supabase.from("users").select("email, username, premium_until, pro_plus_until").eq("id", userId).single();
       const basePremium = existing?.premium_until && new Date(existing.premium_until).getTime() > Date.now() ? new Date(existing.premium_until) : new Date();
       const basePro = existing?.pro_plus_until && new Date(existing.pro_plus_until).getTime() > Date.now() ? new Date(existing.pro_plus_until) : new Date();
       const untilPremium = new Date(basePremium);
@@ -127,6 +127,19 @@ export async function GET(request: Request) {
         () => {},
         () => {}
       );
+
+      const buyerEmail = existing?.email;
+      if (buyerEmail) {
+        const { emailTemplates, sendEmail } = await import("@/lib/email");
+        const buyerName = existing?.username || "seller";
+        const t = emailTemplates().premiumActivated(
+          buyerName,
+          plan === "pro_plus" ? "Pro+" : "Premium"
+        );
+        sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch((e) =>
+          console.error("[upgrade/verify] activation email failed", e)
+        );
+      }
 
       return NextResponse.redirect(
         `${origin}/dashboard?upgrade=success`

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service";
+import { sendEmail, emailTemplates } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { serverError } from "@/lib/api-error";
 
@@ -69,5 +70,19 @@ export async function POST(request: Request) {
   }
 
   console.log(`[trial] granted 7d premium to ${user.id}`);
+
+  const { data: authUser } = await service.auth.admin.getUserById(user.id);
+  const email = authUser?.user?.email;
+  const endsDate = new Date(endsAt).toLocaleDateString("en-NG", { month: "long", day: "numeric" });
+  if (email) {
+    const t = emailTemplates().trialActivated(
+      (authUser.user?.user_metadata?.username as string | undefined) || "seller",
+      endsDate
+    );
+    sendEmail({ to: email, subject: t.subject, html: t.html }).catch((e) =>
+      console.error("[trial] activation email failed", e)
+    );
+  }
+
   return NextResponse.json({ trial: true, endsAt });
 }
