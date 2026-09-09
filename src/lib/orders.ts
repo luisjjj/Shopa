@@ -46,16 +46,32 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     return { ok: false, error: error?.message || "Order not found" };
   }
 
-  // buyer_email column may not exist yet (migration pending), fetch
-  // defensively so settling never breaks on schema lag; receipt just skips.
+  // buyer contact + reference fields may lag behind schema, fetch
+  // defensively so settling never breaks; receipts just skip gaps.
   let buyerEmail: string | null = null;
+  let buyerPhone: string | null = null;
+  let reference: string | null = null;
+  let placedAt: string | null = null;
+  let deliveryAddress: string | null = null;
   try {
-    const { data: emailRow } = (await supabase
+    const { data: detailRow } = (await supabase
       .from("orders")
-      .select("buyer_email")
+      .select("buyer_email, buyer_phone, paystack_reference, created_at, delivery_address")
       .eq("id", orderId)
-      .single()) as unknown as { data: { buyer_email: string | null } | null };
-    buyerEmail = emailRow?.buyer_email || null;
+      .single()) as unknown as {
+      data: {
+        buyer_email: string | null;
+        buyer_phone: string | null;
+        paystack_reference: string | null;
+        created_at: string | null;
+        delivery_address: string | null;
+      } | null;
+    };
+    buyerEmail = detailRow?.buyer_email || null;
+    buyerPhone = detailRow?.buyer_phone || null;
+    reference = detailRow?.paystack_reference || null;
+    placedAt = detailRow?.created_at || null;
+    deliveryAddress = detailRow?.delivery_address || null;
   } catch {
     buyerEmail = null;
   }
@@ -66,12 +82,14 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     .eq("id", order.product_id)
     .single();
 
+  let variantName: string | null = null;
   if (order.variant_id) {
     const { data: variant } = await supabase
       .from("product_variants")
-      .select("stock")
+      .select("name, stock")
       .eq("id", order.variant_id)
       .single();
+    variantName = variant?.name || null;
     if (variant && variant.stock != null && variant.stock > 0) {
       await supabase
         .from("product_variants")
@@ -153,23 +171,38 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     }
   }
 
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const sellerUsername = (seller as { username?: string | null } | null)?.username || null;
+  const buyerName = order.buyer_name || "A buyer";
+  const ref = reference || orderId.slice(0, 8);
+  const dateStr = placedAt
+    ? new Date(placedAt).toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })
+    : new Date().toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+
   if (seller?.email) {
     const waLink =
       sellerNumber && normalizePhone(sellerNumber)
         ? buildWaLink(
             sellerNumber,
-            sellerPaidAlertText({
-              buyerName: order.buyer_name || "A buyer",
-              productName,
-              amount: order.amount,
-              reference: orderId.slice(0, 8),
-            })
+            sellerPaidAlertText({ buyerName, productName, amount: order.amount, reference: ref })
           )
         : null;
-    const t = {
-      subject: `New paid order: ${productName} (₦${order.amount.toLocaleString()})`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>You have a new paid order!</h2><p><b>${order.buyer_name || "A buyer"}</b> just paid <b>₦${order.amount.toLocaleString()}</b> for <b>${productName}</b> via Paystack. No action needed except fulfillment.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">View order</a>${waLink ? `<p style="margin-top:16px"><a href="${waLink}">Forward this alert to WhatsApp</a></p>` : `<p style="margin-top:16px;color:#888;font-size:12px">Add your WhatsApp number in Profile to get instant WhatsApp pings for paid orders.</p>`}</div>`,
-    };
+    const t = emailTemplates().orderPaidSeller({
+      buyerName,
+      buyerPhone,
+      productName,
+      variantName,
+      storeName: sellerUsername || "your store",
+      storeUrl: sellerUsername ? `${base}/${sellerUsername}` : `${base}/dashboard`,
+      trackUrl: `${base}/track`,
+      dashboardUrl: `${base}/dashboard`,
+      waForwardUrl: waLink,
+      deliveryAddress,
+      reference: ref,
+      date: dateStr,
+      price: order.amount,
+      total: order.amount,
+    });
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch((e) =>
       console.error("[orders] seller paid email failed", e)
     );
@@ -177,7 +210,21 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
 
   if (buyerEmail) {
     const b = computeBuyerTotal(order.amount);
-    const t = emailTemplates().orderConfirmed(productName, b.total);
+    const t = emailTemplates().orderReceiptBuyer({
+      buyerName,
+      productName,
+      variantName,
+      storeName: sellerUsername || "your store",
+      storeUrl: sellerUsername ? `${base}/${sellerUsername}` : base,
+      trackUrl: `${base}/track`,
+      dashboardUrl: `${base}/dashboard`,
+      reference: ref,
+      date: dateStr,
+      price: b.product,
+      shopaFee: b.shopaFee,
+      paystackFee: b.paystackFee,
+      total: b.total,
+    });
     sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch((e) =>
       console.error("[orders] buyer receipt email failed", e)
     );

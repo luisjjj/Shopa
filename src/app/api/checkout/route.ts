@@ -140,12 +140,27 @@ export async function POST(request: Request) {
   if (!order) return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
 
   const productName = productRow?.name || "your order";
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const storeName = seller?.username || "your store";
+  const storeUrl = seller?.username ? `${base}/${seller.username}` : base;
+  const mailBase = {
+    buyerName: String(buyerName),
+    productName,
+    storeName,
+    storeUrl,
+    trackUrl: `${base}/track`,
+    dashboardUrl: `${base}/dashboard`,
+    reference,
+    date: new Date().toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric" }),
+    price: finalAmount,
+    total: finalAmount,
+  };
   if (seller?.email) {
-    const t = emailTemplates().orderPlaced(seller.username || "seller", productName, finalAmount);
+    const t = emailTemplates().orderPendingSeller(mailBase);
     sendEmail({ to: seller.email, subject: t.subject, html: t.html }).catch(() => {});
   }
   {
-    const t = { subject: `Order placed: ${productName}`, html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Order placed</h2><p>Hi ${buyerName}, your order for <b>${productName}</b>: ₦${finalAmount.toLocaleString()} is pending. Complete payment on the Paystack checkout page to confirm it.</p></div>` };
+    const t = emailTemplates().orderPendingBuyer(mailBase);
     sendEmail({ to: normalizedEmail, subject: t.subject, html: t.html }).catch(() => {});
   }
 
