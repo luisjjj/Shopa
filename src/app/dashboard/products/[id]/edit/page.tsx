@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { compressImage } from "@/lib/image";
 
 type Variant = {
   id: string;
@@ -89,36 +90,39 @@ export default function EditProductPage({
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
 
     setUploading(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
+    setError("");
+    try {
+      const { blob, ext } = await compressImage(file);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const path = `${user.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("products")
+        .upload(path, blob, { contentType: blob.type || "image/jpeg" });
+
+      if (uploadError) {
+        setError("Image upload failed. Try again.");
+        return;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("products").getPublicUrl(path);
+
+      setImageUrl(publicUrl);
+    } catch {
+      setError("Could not process that image. Try another.");
+    } finally {
       setUploading(false);
-      return;
     }
-
-    const ext = file.name.split(".").pop();
-    const path = `${user.id}/${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("products")
-      .upload(path, file);
-
-    if (uploadError) {
-      setError(uploadError.message);
-      setUploading(false);
-      return;
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("products").getPublicUrl(path);
-
-    setImageUrl(publicUrl);
-    setUploading(false);
   };
 
   const addVariant = () => {
@@ -257,7 +261,8 @@ export default function EditProductPage({
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="hidden"
+              className="sr-only"
+              id="product-image-picker"
             />
             {imageUrl ? (
               <div className="relative">
@@ -278,11 +283,12 @@ export default function EditProductPage({
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 transition-colors"
+              <label
+                htmlFor="product-image-picker"
+                onClick={(e) => {
+                  if (uploading) e.preventDefault();
+                }}
+                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
               >
                 {uploading ? (
                   <span>Uploading...</span>
@@ -294,7 +300,7 @@ export default function EditProductPage({
                     <span className="text-sm">Tap to upload image</span>
                   </>
                 )}
-              </button>
+              </label>
             )}
           </div>
 

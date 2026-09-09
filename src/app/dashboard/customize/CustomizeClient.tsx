@@ -34,6 +34,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { compressImage } from "@/lib/image";
 
 interface StorefrontSettings {
   primary_color: string;
@@ -332,13 +333,21 @@ export default function CustomizeClient({
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (fileInputRef.current) fileInputRef.current.value = "";
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError("Image must be under 5MB");
-      return;
-    }
     setUploading(true);
     setUploadError(null);
+    let blob: Blob = file;
+    let ext = file.name.split(".").pop() || "jpg";
+    try {
+      const compressed = await compressImage(file, 1920);
+      blob = compressed.blob;
+      ext = compressed.ext;
+    } catch {
+      setUploading(false);
+      setUploadError("Could not process that image. Try another.");
+      return;
+    }
     const supabase = createClient();
     const {
       data: { user },
@@ -348,7 +357,6 @@ export default function CustomizeClient({
       setUploadError("Not logged in");
       return;
     }
-    const ext = file.name.split(".").pop() || "jpg";
     const path = `${user.id}_${Date.now()}.${ext}`;
 
     let uploadError2 = null;
@@ -356,7 +364,7 @@ export default function CustomizeClient({
 
     const { error: e1 } = await supabase.storage
       .from("banners")
-      .upload(path, file, { upsert: true });
+      .upload(path, blob, { upsert: true, contentType: blob.type || "image/jpeg" });
     if (e1) {
       uploadError2 = e1;
     } else {
@@ -367,10 +375,10 @@ export default function CustomizeClient({
     if (uploadError2 || !publicUrl) {
       const { error: e2 } = await supabase.storage
         .from("products")
-        .upload(`banners/${path}`, file, { upsert: true });
+        .upload(`banners/${path}`, blob, { upsert: true, contentType: blob.type || "image/jpeg" });
       if (e2) {
         setUploading(false);
-        setUploadError("Upload failed: " + (e2.message || "Unknown error"));
+        setUploadError("Upload failed. Try again.");
         return;
       }
       const { data } = supabase.storage
@@ -777,25 +785,26 @@ export default function CustomizeClient({
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                      className="w-full border-2 border-dashed border-gray-200 dark:border-white/10 rounded-lg p-6 text-center hover:border-brand-300 dark:hover:border-brand-700 transition-colors"
+                    <label
+                      onClick={(e) => {
+                        if (uploading) e.preventDefault();
+                      }}
+                      className="block w-full border-2 border-dashed border-gray-200 dark:border-white/10 rounded-lg p-6 text-center hover:border-brand-300 dark:hover:border-brand-700 transition-colors cursor-pointer"
                     >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBannerUpload}
+                        className="sr-only"
+                      />
                       <UploadIcon className="mx-auto text-gray-400 mb-2" size={24} />
                       <p className="text-sm text-gray-500">
                         {uploading ? "Uploading..." : "Click to upload banner"}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">1200x400 recommended</p>
-                    </button>
+                    </label>
                   )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleBannerUpload}
-                    className="hidden"
-                  />
                   {uploadError && (
                     <p className="text-xs text-red-500 mt-2">{uploadError}</p>
                   )}
