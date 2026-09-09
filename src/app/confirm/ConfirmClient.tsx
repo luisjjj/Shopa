@@ -83,15 +83,15 @@ export default function ConfirmClient({
               <p className="text-3xl font-bold mt-1" style={{ color: hasSettings ? textColor : undefined }}>
                 ₦{amount ? parseInt(amount).toLocaleString() : "-"}
               </p>
-              <p className="text-xs mt-2 font-mono" style={{ color: hasSettings ? `${textColor}40` : undefined }}>
+              <p className="text-xs mt-2 font-mono break-all" style={{ color: hasSettings ? `${textColor}40` : undefined }}>
                 Ref: {reference}
               </p>
               {paid && (productPrice || shopaFee || paystackFee) && (
                 <div className="mt-3 pt-3 space-y-1 text-sm text-left" style={{ borderTop: `1px dashed ${hasSettings ? `${textColor}20` : "#e5e7eb"}` }}>
                   {productPrice && (
-                    <div className="flex justify-between" style={{ color: hasSettings ? `${textColor}90` : "#374151" }}>
-                      <span>{product || "Product"}</span>
-                      <span>₦{parseInt(productPrice).toLocaleString()}</span>
+                    <div className="flex justify-between gap-3" style={{ color: hasSettings ? `${textColor}90` : "#374151" }}>
+                      <span className="truncate min-w-0">{product || "Product"}</span>
+                      <span className="shrink-0">₦{parseInt(productPrice).toLocaleString()}</span>
                     </div>
                   )}
                   {shopaFee && (

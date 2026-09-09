@@ -67,8 +67,8 @@ export function NotificationBanner() {
   if (!visible || dismissed) return null;
 
   return (
-    <div className="bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-800/50 rounded-xl p-4 mb-6 flex items-center justify-between gap-3">
-      <div>
+    <div className="bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-800/50 rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="min-w-0">
         <p className="text-sm font-medium text-brand-700 dark:text-brand-300">
           Enable notifications
         </p>
@@ -80,13 +80,14 @@ export function NotificationBanner() {
         <button
           onClick={handleEnable}
           disabled={loading}
-          className="text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+          className="text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
         >
           {loading ? "Enabling..." : "Enable"}
         </button>
         <button
           onClick={handleDismiss}
-          className="p-1.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 text-brand-400 transition-colors"
+          aria-label="Dismiss"
+          className="p-2.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 text-brand-400 transition-colors"
         >
           <XIcon size={14} />
         </button>

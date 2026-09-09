@@ -140,20 +140,20 @@ export default function PayoutsClient({ username, payout }: { username: string; 
             </div>
             <dl className="space-y-3 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-gray-400">Store</dt>
-                <dd className="font-medium text-gray-900 dark:text-white">myshopa.com.ng/{username}</dd>
+                <dt className="text-gray-400 shrink-0">Store</dt>
+                <dd className="font-medium text-gray-900 dark:text-white text-right break-all min-w-0">myshopa.com.ng/{username}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-gray-400">Bank</dt>
-                <dd className="font-medium text-gray-900 dark:text-white">{payout.bank_name || "-"}</dd>
+                <dt className="text-gray-400 shrink-0">Bank</dt>
+                <dd className="font-medium text-gray-900 dark:text-white text-right truncate min-w-0">{payout.bank_name || "-"}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-gray-400">Account number</dt>
-                <dd className="font-mono font-medium text-gray-900 dark:text-white">{payout.account_number || "-"}</dd>
+                <dt className="text-gray-400 shrink-0">Account number</dt>
+                <dd className="font-mono font-medium text-gray-900 dark:text-white text-right truncate min-w-0">{payout.account_number || "-"}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-gray-400">Account name</dt>
-                <dd className="font-medium text-gray-900 dark:text-white text-right">{payout.account_name || "-"}</dd>
+                <dt className="text-gray-400 shrink-0">Account name</dt>
+                <dd className="font-medium text-gray-900 dark:text-white text-right break-words min-w-0">{payout.account_name || "-"}</dd>
               </div>
             </dl>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-5">

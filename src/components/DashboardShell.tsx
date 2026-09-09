@@ -5,6 +5,7 @@ import { UserIcon } from "@/components/Icons";
 import DashboardSidebar, { DashboardMenuButton } from "@/components/DashboardSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShopaLogo } from "@/components/ShopaLogo";
+import StoreSwitcher from "@/components/StoreSwitcher";
 import TrialClaimer from "@/components/TrialClaimer";
 import { isPremiumActive, isProPlusActive, daysLeft } from "@/lib/premium";
 
@@ -69,38 +70,12 @@ export default async function DashboardShell({ children }: { children: React.Rea
               </Link>
             </div>
             <div className="flex items-center gap-2">
-              {isProPlus && stores.length > 1 && (
-                <div className="relative group">
-                  <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] flex items-center gap-1.5">
-                    <span className="max-w-[100px] truncate">{profile.username}</span>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" /></svg>
-                  </button>
-                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-xl shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-30 min-w-[180px]">
-                    {stores.map((store) => (
-                      <Link
-                        key={store.id}
-                        href="/dashboard"
-                        className={`block px-4 py-2 text-sm transition-colors ${
-                          store.id === user.id
-                            ? "text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-brand-950/30"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
-                        }`}
-                      >
-                        {store.username}
-                      </Link>
-                    ))}
-                    <Link
-                      href="/onboarding"
-                      className="block px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border-t border-gray-100 dark:border-white/10 mt-1"
-                    >
-                      + New store
-                    </Link>
-                  </div>
-                </div>
+              {isProPlus && (
+                <StoreSwitcher username={profile.username} userId={user.id} stores={stores} />
               )}
               <Link
                 href="/dashboard/profile"
-                className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
+                className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
                 title="Profile"
               >
                 <UserIcon size={16} />

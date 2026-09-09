@@ -196,7 +196,7 @@ export default function NewProductPage() {
                     setImageUrl("");
                     if (fileRef.current) fileRef.current.value = "";
                   }}
-                  className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-white dark:hover:bg-black"
+                  className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 text-red-500 text-xs px-2.5 py-1.5 rounded-lg hover:bg-white dark:hover:bg-black"
                 >
                   Remove
                 </button>
@@ -348,12 +348,12 @@ export default function NewProductPage() {
           {hasVariants && (
             <div className="mb-6 space-y-3">
               {variants.map((v) => (
-                <div key={v.id} className="flex items-start gap-2">
+                <div key={v.id} className="flex flex-wrap items-start gap-2">
                   <input
                     type="text"
                     value={v.name}
                     onChange={(e) => updateVariant(v.id, "name", e.target.value)}
-                    className="input-base flex-1"
+                    className="input-base min-w-0 flex-1"
                     placeholder="e.g. Red / XL"
                     required
                   />
@@ -361,7 +361,7 @@ export default function NewProductPage() {
                     type="number"
                     value={v.stock}
                     onChange={(e) => updateVariant(v.id, "stock", e.target.value)}
-                    className="input-base w-24"
+                    className="input-base w-24 shrink-0"
                     placeholder="Stock"
                     min="0"
                   />
@@ -369,14 +369,15 @@ export default function NewProductPage() {
                     type="number"
                     value={v.price_override}
                     onChange={(e) => updateVariant(v.id, "price_override", e.target.value)}
-                    className="input-base w-32"
+                    className="input-base w-28 shrink-0"
                     placeholder="₦ Override"
                     min="0"
                   />
                   <button
                     type="button"
                     onClick={() => removeVariant(v.id)}
-                    className="mt-2 text-red-400 hover:text-red-600 transition-colors p-1"
+                    aria-label="Remove variant"
+                    className="mt-1.5 text-red-400 hover:text-red-600 transition-colors p-2 shrink-0"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

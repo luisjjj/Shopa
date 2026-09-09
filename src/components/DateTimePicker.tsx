@@ -180,7 +180,7 @@ export default function DateTimePicker({ value, onChange, placeholder }: Props) 
                       type="button"
                       disabled={isPast}
                       onClick={() => pickDay(d)}
-                      className={`text-xs py-1.5 rounded-lg transition-colors ${
+                      className={`text-xs py-2 rounded-lg transition-colors ${
                         isSel
                           ? "bg-brand-500 text-white font-bold"
                           : isPast

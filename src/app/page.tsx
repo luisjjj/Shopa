@@ -113,7 +113,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="hero-float-delayed absolute -right-2 sm:-right-4 top-6 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-full shadow-lg px-4 py-2">
-            <p className="text-xs font-mono text-gray-500 dark:text-gray-400">myshopa.com.ng/amakabags</p>
+            <p className="text-xs font-mono text-gray-500 dark:text-gray-400 truncate">myshopa.com.ng/amakabags</p>
           </div>
         </div>
       </section>

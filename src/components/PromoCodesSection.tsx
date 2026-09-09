@@ -151,7 +151,8 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">New Promo Code</h3>
             <button
               onClick={() => { setShowForm(false); setError(""); }}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-400 transition-colors"
+              aria-label="Close promo form"
+              className="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-400 transition-colors"
             >
               <XIcon size={16} />
             </button>
@@ -289,7 +290,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-0.5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 min-w-0">
                   <span className="text-xs text-brand-600 dark:text-brand-400 font-medium">
                     {promo.discount_percent
                       ? `${promo.discount_percent}% off`
@@ -305,7 +306,8 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
 
               <button
                 onClick={() => handleDelete(promo.id)}
-                className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 text-gray-400 hover:text-red-500 transition-colors shrink-0"
+                aria-label="Delete promo code"
+                className="p-2.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 text-gray-400 hover:text-red-500 transition-colors shrink-0"
                 title="Delete promo code"
               >
                 <XIcon size={16} />

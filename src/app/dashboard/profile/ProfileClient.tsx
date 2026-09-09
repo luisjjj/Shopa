@@ -158,12 +158,12 @@ export default function ProfileClient({
               label="Email"
               value={email}
             />
-            <div className="px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-gray-400">
+            <div className="px-5 py-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="text-gray-400 shrink-0">
                   <SmartphoneIcon size={16} />
                 </span>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-gray-500 dark:text-gray-400">WhatsApp number</p>
                   <input
                     type="tel"
@@ -234,7 +234,7 @@ export default function ProfileClient({
         </section>
 
         {/* Save Button */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleSave}
             disabled={saving}
@@ -252,8 +252,8 @@ export default function ProfileClient({
               "Save changes"
             )}
           </button>
-          {error && <p className="text-sm text-red-500">{error}</p>}
-          {payoutNote && <p className="text-sm text-amber-600 dark:text-amber-400">{payoutNote}</p>}
+          {error && <p className="text-sm text-red-500 basis-full sm:basis-auto">{error}</p>}
+          {payoutNote && <p className="text-sm text-amber-600 dark:text-amber-400 basis-full sm:basis-auto">{payoutNote}</p>}
         </div>
 
         {/* Plan */}
@@ -263,8 +263,8 @@ export default function ProfileClient({
           </div>
           <div className="p-5 space-y-4">
             {effectiveProPlus && (
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <SparkleIcon className="text-brand-600" size={16} />
                     <span className="text-sm font-semibold text-brand-600">Pro+</span>
@@ -277,14 +277,14 @@ export default function ProfileClient({
                     )}
                   </p>
                 </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 font-medium">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-600 font-medium shrink-0">
                   Active
                 </span>
               </div>
             )}
             {effectivePremium && !effectiveProPlus && (
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <SparkleIcon className="text-brand-600" size={16} />
                     <span className="text-sm font-semibold text-brand-600">Premium</span>

@@ -102,7 +102,7 @@ export default function TrackPage() {
                 ₦{result.amount.toLocaleString()}
               </p>
             </div>
-            <p className="text-xs text-gray-400 font-mono mt-1">Ref: {result.reference}</p>
+            <p className="text-xs text-gray-400 font-mono mt-1 break-all">Ref: {result.reference}</p>
             <div className="mt-5 space-y-0">
               <Step n={1} active={step >= 1} done={step > 1} label="Order placed" hint="We received your order" />
               <Step n={2} active={step >= 2} done={step > 2} label="Paid" hint={result.paid ? "Payment confirmed" : "Waiting for payment"} />

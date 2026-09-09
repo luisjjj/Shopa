@@ -190,14 +190,14 @@ export default async function StorePage({
             </div>
           )}
         </div>
-        <div className={isList ? "flex items-center justify-between" : ""}>
+        <div className={isList ? "flex items-center justify-between gap-2" : ""}>
           <h3
-            className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"} ${s ? "" : "text-gray-900 dark:text-white"}`}
+            className={`${nameWeight} ${nameSize} truncate min-w-0 ${isList ? "flex-1" : ""} ${s ? "" : "text-gray-900 dark:text-white"}`}
             style={s ? { color: cardText } : undefined}
           >
             {p.name}
           </h3>
-          <p className={priceClasses} style={priceStyle}>
+          <p className={`${priceClasses} shrink-0`} style={priceStyle}>
             ₦{p.price.toLocaleString()}
           </p>
           <ProductRating productId={p.id} />
@@ -390,7 +390,7 @@ export default async function StorePage({
   const gridCols = (() => {
     switch (s?.layout) {
       case "grid3":
-        return "grid-cols-3";
+        return "grid-cols-2 sm:grid-cols-3";
       case "grid4":
         return "grid-cols-2 sm:grid-cols-4";
       case "list":
@@ -669,7 +669,7 @@ export default async function StorePage({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
-              className="ml-1 w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+              className="ml-1 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shrink-0"
               style={{ background: "#25D366" }}
             >
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">

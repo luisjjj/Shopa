@@ -139,13 +139,13 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-3">
-      <div className="flex items-center gap-2 mb-1">
+    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-xl p-3 min-w-0">
+      <div className="flex items-center gap-2 mb-1 min-w-0">
         {icon}
-        <span className="text-xs text-gray-400">{label}</span>
+        <span className="text-xs text-gray-400 truncate">{label}</span>
       </div>
-      <p className="text-lg font-bold text-gray-900 dark:text-white">{value}</p>
-      {sub && <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>}
+      <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{value}</p>
+      {sub && <p className="text-[10px] text-gray-400 mt-0.5 truncate">{sub}</p>}
     </div>
   );
 }

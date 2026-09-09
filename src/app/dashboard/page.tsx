@@ -131,7 +131,7 @@ export default async function DashboardPage() {
       )}
 
       {!isPremium && (
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 flex items-center justify-between shadow-card dark:shadow-card-dark">
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center gap-3 justify-between shadow-card dark:shadow-card-dark">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Free plan, 3 product slots

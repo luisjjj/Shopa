@@ -72,7 +72,7 @@ export default function OnboardingChecklist({ username, hasProduct, hasPayouts, 
             }
           }}
           aria-label="Dismiss checklist"
-          className="text-gray-300 dark:text-gray-600 hover:text-gray-500 transition-colors text-lg leading-none"
+          className="text-gray-300 dark:text-gray-600 hover:text-gray-500 transition-colors text-lg leading-none p-2 -m-1 shrink-0"
         >
           ×
         </button>
@@ -102,7 +102,7 @@ export default function OnboardingChecklist({ username, hasProduct, hasPayouts, 
                 {s.label} →
               </Link>
             ) : (
-              <button type="button" onClick={copyLink} className="font-medium text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400">
+              <button type="button" onClick={copyLink} className="font-medium text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 text-left break-all">
                 {copied ? "Link copied!" : `${s.label} (copy ${storeUrl})`}
               </button>
             )}

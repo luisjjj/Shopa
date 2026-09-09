@@ -219,15 +219,15 @@ export default function OnboardingPage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Pick your store link
             </label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">myshopa.com.ng/</span>
+            <div className="flex items-center min-w-0">
+              <span className="text-gray-400 text-sm mr-1 shrink-0">myshopa.com.ng/</span>
               <input
                 type="text"
                 value={username}
                 onChange={(e) =>
                   checkUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
                 }
-                className="flex-1 border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 text-lg font-medium transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+                className="flex-1 min-w-0 border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 text-lg font-medium transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
                 placeholder="yourstore"
                 required
                 minLength={3}

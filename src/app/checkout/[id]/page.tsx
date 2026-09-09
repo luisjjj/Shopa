@@ -141,7 +141,7 @@ export default async function CheckoutPage({ params }: Props) {
             </div>
           )}
           <div className="p-4">
-            <h1 className="text-lg font-bold" style={{ color: s ? readableTextOn(cardBg, textColor) : undefined }}>
+            <h1 className="text-lg font-bold break-words" style={{ color: s ? readableTextOn(cardBg, textColor) : undefined }}>
               {product.name}
             </h1>
             <p className="text-xl font-bold mt-1" style={{ color: primaryColor }}>

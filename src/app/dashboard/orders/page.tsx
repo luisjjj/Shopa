@@ -146,7 +146,7 @@ async function OrderList() {
                   <button
                     type="submit"
                     title="Cancel this order"
-                    className="text-[10px] font-medium px-2 py-0.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
                   >
                     Cancel
                   </button>
@@ -159,7 +159,7 @@ async function OrderList() {
                 href={`https://wa.me/${order.buyer_phone.replace("+", "").replace(/\s/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0 hover:bg-[#25D366]/20 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#25D366]/10 flex items-center justify-center shrink-0 hover:bg-[#25D366]/20 transition-colors"
                 title="Contact buyer on WhatsApp"
               >
                 <svg className="w-4 h-4 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor">

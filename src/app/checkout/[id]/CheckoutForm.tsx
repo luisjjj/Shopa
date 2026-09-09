@@ -261,9 +261,9 @@ export default function CheckoutForm({
                   border: `1px solid ${s ? `${textColor}10` : "#e5e7eb"}`,
                 }}
               >
-                <div className="flex justify-between" style={{ color: s ? `${textColor}90` : "#374151" }}>
-                  <span>{productName}</span>
-                  <span className="font-medium">₦{feePreview.product.toLocaleString()}</span>
+                <div className="flex justify-between gap-3" style={{ color: s ? `${textColor}90` : "#374151" }}>
+                  <span className="truncate min-w-0">{productName}</span>
+                  <span className="font-medium shrink-0">₦{feePreview.product.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between" style={{ color: s ? `${textColor}90` : "#374151" }}>
                   <span>Shopa fee (1%)</span>
