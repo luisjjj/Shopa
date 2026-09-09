@@ -36,6 +36,11 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { compressImage } from "@/lib/image";
 
+const TEMPLATE_INDUSTRIES = [
+  "All",
+  ...Array.from(new Set(STORE_TEMPLATES.map((t) => t.industry))),
+];
+
 interface StorefrontSettings {
   primary_color: string;
   background_color: string;
@@ -148,6 +153,11 @@ export default function CustomizeClient({
   const [sections, setSections] = useState<StoreSection[] | null>(null);
   const [sectionsError, setSectionsError] = useState("");
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [industryFilter, setIndustryFilter] = useState("All");
+  const visibleTemplates =
+    industryFilter === "All"
+      ? STORE_TEMPLATES
+      : STORE_TEMPLATES.filter((t) => t.industry === industryFilter);
 
   const sectionSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -620,38 +630,94 @@ export default function CustomizeClient({
                   <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
                     Start from a professionally designed look. Applies theme + layout, your products and text blocks stay.
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {STORE_TEMPLATES.map((tpl) => (
-                      <div
-                        key={tpl.id}
-                        className="border border-gray-200 dark:border-white/10 rounded-xl p-3 flex items-center gap-3 min-w-0"
+                  <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+                    {TEMPLATE_INDUSTRIES.map((ind) => (
+                      <button
+                        key={ind}
+                        type="button"
+                        onClick={() => setIndustryFilter(ind)}
+                        className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all active:scale-95 ${
+                          industryFilter === ind
+                            ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-transparent"
+                            : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20"
+                        }`}
                       >
-                        <div className="flex -space-x-1.5 shrink-0">
-                          {[tpl.swatches.primary, tpl.swatches.bg, tpl.swatches.text].map((c) => (
-                            <span
-                              key={c}
-                              className="w-5 h-5 rounded-full border-2 border-white dark:border-[#1a1a1a]"
-                              style={{ background: c }}
-                            />
-                          ))}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
-                            {tpl.name}
-                          </p>
-                          <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 truncate">
-                            {tpl.blurb}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => applyTemplate(tpl)}
-                          className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-85 transition-all active:scale-95"
-                        >
-                          Apply
-                        </button>
-                      </div>
+                        {ind}
+                      </button>
                     ))}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {visibleTemplates.map((tpl) => {
+                      const tBg = String(tpl.settings.background_color || "#ffffff");
+                      const tCard = String(tpl.settings.card_background || "#ffffff");
+                      const tPrimary = String(tpl.settings.primary_color || "#ed7712");
+                      const tBanner = (tpl.settings.banner_url as string | null) || null;
+                      const tTagline = (tpl.settings.tagline as string | null) || null;
+                      return (
+                        <div
+                          key={tpl.id}
+                          className="border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden min-w-0 bg-white dark:bg-white/[0.02]"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => applyTemplate(tpl)}
+                            className="block w-full text-left"
+                            aria-label={`Apply ${tpl.name} theme`}
+                          >
+                            <div className="relative h-28 overflow-hidden" style={{ background: tBg }}>
+                              {tBanner ? (
+                                <img src={tBanner} alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                              ) : (
+                                <div
+                                  className="absolute inset-0 flex items-center justify-center px-6"
+                                  style={{ background: `linear-gradient(135deg, ${tPrimary}, ${tPrimary}88)` }}
+                                >
+                                  <p className="text-white text-sm font-bold text-center leading-tight line-clamp-2">
+                                    {tTagline || tpl.name}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="absolute top-1.5 left-2 flex gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                              </div>
+                              <div className="absolute bottom-1.5 left-1.5 right-1.5 flex gap-1">
+                                {[0, 1, 2].map((i) => (
+                                  <div
+                                    key={i}
+                                    className="flex-1 h-7 rounded-md border border-black/10"
+                                    style={{ background: tCard }}
+                                  >
+                                    <div className="w-2.5 h-2.5 rounded-full m-1" style={{ background: tPrimary }} />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </button>
+                          <div className="p-3 flex items-center gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight truncate">
+                                {tpl.name}
+                              </p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: tPrimary }}>
+                                {tpl.industry}
+                              </p>
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 truncate">
+                                {tpl.blurb}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => applyTemplate(tpl)}
+                              className="shrink-0 text-xs font-semibold px-3 py-2 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-85 transition-all active:scale-95"
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </Section>
 

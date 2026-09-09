@@ -222,8 +222,18 @@ export default async function StorePage({
       case "banner":
         return s?.banner_url ? (
           <div key={sec.id} className={`w-full ${bannerHeight} overflow-hidden relative`}>
-            <img src={s.banner_url} alt="Store banner" className="w-full h-full object-cover" />
+            <img src={s.banner_url} alt="Store banner" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
             {s.banner_overlay && <div className="absolute inset-0 bg-black/40" />}
+            {s.banner_overlay && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                <h2 className="text-white text-2xl sm:text-4xl font-bold break-words max-w-xl" style={{ fontFamily }}>
+                  {s.tagline || profile.username}
+                </h2>
+                <a href="#shop" className="mt-4 text-sm font-semibold px-7 py-3 rounded-xl text-white transition-transform hover:scale-105 active:scale-95" style={{ background: accentColor }}>
+                  Shop now →
+                </a>
+              </div>
+            )}
           </div>
         ) : null;
       case "header":
@@ -341,8 +351,18 @@ export default async function StorePage({
         ) : null;
       case "footer":
         return (
-          <footer key={sec.id} id="contact" className="border-t py-6 scroll-mt-20" style={{ borderColor: `${textColor}10` }}>
+          <footer key={sec.id} id="contact" className="border-t py-8 scroll-mt-20" style={{ borderColor: `${textColor}10` }}>
             <div className="text-center px-4">
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4 text-xs font-medium" style={{ color: `${textColor}60` }}>
+                <span>🔒 Secure Paystack checkout</span>
+                <span>💬 WhatsApp support</span>
+                <span>🚚 Nationwide delivery</span>
+              </div>
+              <div className="flex items-center justify-center gap-6 mb-4 text-sm font-semibold" style={{ color: textColor }}>
+                <a href="#shop" className="hover:opacity-70 transition-opacity">Shop</a>
+                <a href="/track" className="hover:opacity-70 transition-opacity">Track order</a>
+                <a href="#contact" className="hover:opacity-70 transition-opacity">Contact</a>
+              </div>
               {s?.footer_text && (
                 <p className="text-sm mb-2" style={{ color: `${textColor}70` }}>{s.footer_text}</p>
               )}
@@ -971,8 +991,18 @@ export default async function StorePage({
         </a>
       )}
 
-      <footer id="contact" className="border-t py-6 border-gray-100 dark:border-white/10 scroll-mt-20" style={s ? { borderColor: `${textColor}10` } : undefined}>
+      <footer id="contact" className="border-t py-8 border-gray-100 dark:border-white/10 scroll-mt-20" style={s ? { borderColor: `${textColor}10` } : undefined}>
         <div className="text-center px-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4 text-xs font-medium text-gray-400 dark:text-gray-500" style={s ? { color: `${textColor}60` } : undefined}>
+            <span>🔒 Secure Paystack checkout</span>
+            <span>💬 WhatsApp support</span>
+            <span>🚚 Nationwide delivery</span>
+          </div>
+          <div className="flex items-center justify-center gap-6 mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300" style={s ? { color: textColor } : undefined}>
+            <a href="#shop" className="hover:opacity-70 transition-opacity">Shop</a>
+            <a href="/track" className="hover:opacity-70 transition-opacity">Track order</a>
+            <a href="#contact" className="hover:opacity-70 transition-opacity">Contact</a>
+          </div>
           {s?.footer_text ? (
             <p className="text-sm mb-2" style={{ color: `${textColor}70` }}>
               {s.footer_text}
