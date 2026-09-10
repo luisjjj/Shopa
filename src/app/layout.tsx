@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingIcons from "@/components/FloatingIcons";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
@@ -81,6 +82,7 @@ export default function RootLayout({
           <FloatingIcons />
           <ServiceWorkerRegistration />
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
