@@ -141,7 +141,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
             <dl className="space-y-3 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-gray-400 shrink-0">Store</dt>
-                <dd className="font-medium text-gray-900 dark:text-white text-right break-all min-w-0">myshopa.com.ng/{username}</dd>
+                <dd className="font-medium text-gray-900 dark:text-white text-right break-all min-w-0">myshopa.shop/{username}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-gray-400 shrink-0">Bank</dt>

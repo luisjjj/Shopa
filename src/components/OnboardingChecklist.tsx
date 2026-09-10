@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function OnboardingChecklist({ username, hasProduct, hasPayouts, hasCustomized }: Props) {
-  const storeUrl = `myshopa.com.ng/${username}`;
+  const storeUrl = `myshopa.shop/${username}`;
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
   const [dismissed, setDismissed] = useState(false);

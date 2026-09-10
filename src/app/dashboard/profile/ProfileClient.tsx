@@ -200,7 +200,7 @@ export default function ProfileClient({
             <InfoRow
               icon={<GlobeIcon size={16} />}
               label="Store URL"
-              value={`myshopa.com.ng/${storeName}`}
+              value={`myshopa.shop/${storeName}`}
               mono
             />
           </div>

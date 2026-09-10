@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://myshopa.com.ng"),
+  metadataBase: new URL("https://myshopa.shop"),
   title: "Shopa | Your Storefront Link",
   description:
     "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Shopa",
-    url: "https://myshopa.com.ng",
+    url: "https://myshopa.shop",
     title: "Shopa | Your Storefront Link",
     description:
       "Create a simple store page for your Instagram & WhatsApp business. Share one link, get paid.",

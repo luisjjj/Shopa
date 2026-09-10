@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 // Paystack webhook, SOURCE OF TRUTH for purchase paid state.
 // Configure URL in Paystack dashboard: Settings → API Keys & Webhooks →
-// Webhook URL: https://myshopa.com.ng/api/webhooks/paystack
+// Webhook URL: https://myshopa.shop/api/webhooks/paystack
 // The client callback (/api/payments/callback) is UX only; whichever arrives
 // first settles the order, the other is a no-op (see markOrderPaid).
 export async function POST(request: Request) {

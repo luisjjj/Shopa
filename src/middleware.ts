@@ -1,14 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const BASES = ["myshopa.shop", "myshopa.com.ng"];
+
 function getSubdomain(hostname: string): string | null {
-  const base = "myshopa.com.ng";
   const stripped = hostname.replace(":3000", "").replace(":80", "").replace(":443", "");
-  // Apex and www both serve the app root, www is never a store.
-  if (stripped === base || stripped === `www.${base}`) return null;
-  if (stripped.endsWith("." + base)) {
-    const sub = stripped.replace("." + base, "");
-    if (sub && !sub.includes(".")) return sub;
+  for (const base of BASES) {
+    // Apex and www both serve the app root, www is never a store.
+    if (stripped === base || stripped === `www.${base}`) return null;
+    if (stripped.endsWith("." + base)) {
+      const sub = stripped.replace("." + base, "");
+      if (sub && !sub.includes(".")) return sub;
+    }
   }
   return null;
 }

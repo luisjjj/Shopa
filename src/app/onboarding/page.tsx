@@ -220,7 +220,7 @@ export default function OnboardingPage() {
               Pick your store link
             </label>
             <div className="flex items-center min-w-0">
-              <span className="text-gray-400 text-sm mr-1 shrink-0">myshopa.com.ng/</span>
+              <span className="text-gray-400 text-sm mr-1 shrink-0">myshopa.shop/</span>
               <input
                 type="text"
                 value={username}

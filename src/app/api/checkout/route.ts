@@ -140,7 +140,7 @@ export async function POST(request: Request) {
   if (!order) return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
 
   const productName = productRow?.name || "your order";
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop").replace(/\/$/, "");
   const storeName = seller?.username || "your store";
   const storeUrl = seller?.username ? `${base}/${seller.username}` : base;
   const mailBase = {

@@ -49,7 +49,7 @@ export default async function DashboardPage() {
               Welcome back, {profile.username}
             </h1>
             <p className="text-white/80 mt-1 text-sm break-all">
-              myshopa.com.ng/<span className="font-medium text-white">{profile.username}</span>
+              myshopa.shop/<span className="font-medium text-white">{profile.username}</span>
             </p>
           </div>
           <Link
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
       </div>
       <ShareStoreCard
         username={profile.username}
-        storeUrl={`https://myshopa.com.ng/${profile.username}`}
+        storeUrl={`https://myshopa.shop/${profile.username}`}
         isPremium={isPremium}
       />
     </DashboardShell>

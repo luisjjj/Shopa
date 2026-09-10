@@ -89,7 +89,7 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
 
 export function emailTemplates() {
   const brand = "Shopa";
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop").replace(/\/$/, "");
   return {
     welcome: (name: string) => ({
       subject: `Welcome to ${brand}, your store is ready`,
@@ -122,11 +122,11 @@ export function emailTemplates() {
     }),
     trialActivated: (name: string, endsDate: string) => ({
       subject: `Your 7-day Premium trial is active`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to Premium, ${name}!</h2><p>Your free 7-day Premium trial is now active until <b>${endsDate}</b>. Enjoy unlimited products, store customization, and no Shopa branding.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Set up your store</a><p style="color:#888;font-size:12px;margin-top:24px">No card was charged. Upgrade anytime to keep Premium after the trial.</p></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to Premium, ${name}!</h2><p>Your free 7-day Premium trial is now active until <b>${endsDate}</b>. Enjoy unlimited products, store customization, and no Shopa branding.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Set up your store</a><p style="color:#888;font-size:12px;margin-top:24px">No card was charged. Upgrade anytime to keep Premium after the trial.</p></div>`,
     }),
     premiumActivated: (name: string, plan: string) => ({
       subject: `You're on Shopa ${plan}, enjoy!`,
-      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to ${plan}, ${name}!</h2><p>Your payment went through and <b>${plan}</b> is now active on your store. Thanks for supporting Shopa.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Go to dashboard</a><p style="color:#888;font-size:12px;margin-top:24px">- The Shopa Team</p></div>`,
+      html: `<div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to ${plan}, ${name}!</h2><p>Your payment went through and <b>${plan}</b> is now active on your store. Thanks for supporting Shopa.</p><a href="${process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop"}/dashboard" style="display:inline-block;background:#ed7712;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none">Go to dashboard</a><p style="color:#888;font-size:12px;margin-top:24px">- The Shopa Team</p></div>`,
     }),
     orderReceiptBuyer: (d: OrderMail) => ({
       subject: `Receipt: ${d.productName} (₦${d.total.toLocaleString()})`,
@@ -270,7 +270,7 @@ function shell(title: string, preheader: string, body: string): string {
     <div style="background:#ffffff;border:1px solid #e8eaed;border-top:none;border-radius:0 0 12px 12px;padding:24px;">
       ${body}
     </div>
-    <p style="text-align:center;font-size:12px;color:#9aa0a6;margin:16px 0 0;">myshopa.com.ng, sell on WhatsApp.</p>
+    <p style="text-align:center;font-size:12px;color:#9aa0a6;margin:16px 0 0;">myshopa.shop, sell on WhatsApp.</p>
   </div>
 </div>`;
 }

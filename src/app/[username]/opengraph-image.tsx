@@ -147,7 +147,7 @@ export default async function Image({
               {count} {count === 1 ? "product" : "products"}
             </div>
             <div style={{ fontSize: 28, color: "rgba(255,255,255,0.9)", marginTop: 4 }}>
-              myshopa.com.ng/{username}
+              myshopa.shop/{username}
             </div>
           </div>
           <div style={{ display: "flex", gap: 16 }}>

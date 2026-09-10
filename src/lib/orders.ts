@@ -182,7 +182,7 @@ export async function markOrderPaid(
     }
   }
 
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop").replace(/\/$/, "");
   const sellerUsername = (seller as { username?: string | null } | null)?.username || null;
   const buyerName = order.buyer_name || "A buyer";
   const ref = reference || orderId.slice(0, 8);
@@ -314,7 +314,7 @@ export async function settleCart(orderIds: string[], source: "webhook" | "callba
     total += b.total;
   }
 
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop").replace(/\/$/, "");
   const { data: seller } = await supabase
     .from("users")
     .select("email, username, whatsapp_number")

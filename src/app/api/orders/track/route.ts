@@ -88,7 +88,7 @@ export async function POST(request: Request) {
   const variantNames = new Map((((variants as { id: string; name: string }[] | null) || [])).map((v) => [v.id, v.name]));
 
   const storeUsername = (seller as { username?: string } | null)?.username || null;
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.shop").replace(/\/$/, "");
 
   return NextResponse.json({
     reference: first.paystack_reference,

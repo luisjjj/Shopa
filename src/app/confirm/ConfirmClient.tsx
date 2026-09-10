@@ -413,7 +413,7 @@ function drawReceiptImage(details: {
     ctx.textAlign = "center";
     ctx.font = `20px ${RECEIPT_FONT}`;
     ctx.fillStyle = "#B0B0B0";
-    ctx.fillText("Track your order at myshopa.com.ng/track", W / 2, y);
+    ctx.fillText("Track your order at myshopa.shop/track", W / 2, y);
     y += 32;
     ctx.fillStyle = "#D95012";
     ctx.fillText("Thank you for shopping with Shopa", W / 2, y);

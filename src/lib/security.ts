@@ -6,7 +6,7 @@ import { createHash } from "crypto";
 export function getAppBaseUrl(): string {
   const env = (process.env.NEXT_PUBLIC_BASE_URL || "").replace(/\/$/, "");
   if (env && !env.includes("localhost")) return env;
-  return "https://myshopa.com.ng";
+  return "https://myshopa.shop";
 }
 
 export function requireSameOrigin(request: Request): boolean {
