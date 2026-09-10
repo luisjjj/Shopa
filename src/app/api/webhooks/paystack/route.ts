@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
-import { findOrderByReference, markOrderPaid } from "@/lib/orders";
+import { findOrderByReference, markOrderPaid, settleCart } from "@/lib/orders";
 import { NextResponse } from "next/server";
 
 // Paystack webhook, SOURCE OF TRUTH for purchase paid state.
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   }
 
   const data = event.data || {};
-  const meta = (data.metadata || {}) as { type?: string; orderId?: string };
+  const meta = (data.metadata || {}) as { type?: string; orderId?: string; orderIds?: unknown };
   const reference = data.reference as string | undefined;
 
   // Only settle Shopa product purchases here, subscription charges are
@@ -52,6 +52,16 @@ export async function POST(request: Request) {
   let orderId = meta.orderId;
   if (!orderId && reference) {
     orderId = (await findOrderByReference(reference))?.id;
+  }
+  const metaIds = Array.isArray(meta.orderIds)
+    ? meta.orderIds.filter((v): v is string => typeof v === "string")
+    : [];
+  if (metaIds.length > 1) {
+    const cart = await settleCart(metaIds, "webhook");
+    if (!cart.ok) {
+      return NextResponse.json({ error: cart.error }, { status: 404 });
+    }
+    return NextResponse.json({ ok: true, newlySettled: cart.newlySettled });
   }
   if (!orderId) {
     console.error("[webhook/paystack] charge.success with no matching order", reference);

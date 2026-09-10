@@ -218,6 +218,7 @@ export type OrderMail = {
   shopaFee?: number | null;
   paystackFee?: number | null;
   total: number;
+  lines?: { name: string; detail?: string | null; qty: number; amount: number }[];
 };
 
 function esc(s: string): string {
@@ -249,7 +250,13 @@ function totalRow(label: string, value: string): string {
 }
 
 function orderCard(d: OrderMail, lines: string[], totals: string[] = []): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#ffffff;border:1px solid #e8eaed;border-radius:12px;margin:16px 0;"><tr><td style="padding:16px 20px;"><table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">${lines.join("")}${totals.join("")}</table></td></tr></table>`;
+  const itemRows = (d.lines || [])
+    .map(
+      (l) =>
+        `<tr><td style="padding:7px 0;font-size:13px;color:#1a1a1a;vertical-align:top;">${esc(l.name)}${l.detail ? ` <span style="color:#9aa0a6;">(${esc(l.detail || "")})</span>` : ""}<span style="color:#9aa0a6;"> × ${l.qty}</span></td><td style="padding:7px 0;font-size:13px;color:#1a1a1a;font-weight:500;text-align:right;white-space:nowrap;">${naira(l.amount)}</td></tr>`
+    )
+    .join("");
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;background:#ffffff;border:1px solid #e8eaed;border-radius:12px;margin:16px 0;"><tr><td style="padding:16px 20px;"><table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">${lines.join("")}${itemRows}${totals.join("")}</table></td></tr></table>`;
 }
 
 function shell(title: string, preheader: string, body: string): string {

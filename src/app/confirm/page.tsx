@@ -98,6 +98,8 @@ export default async function ConfirmPage({ searchParams }: Props) {
       reference={typeof searchParams.reference === "string" ? searchParams.reference : null}
       orderId={typeof searchParams.orderId === "string" ? searchParams.orderId : null}
       paid={searchParams.paid === "1"}
+      isCart={searchParams.cart === "1"}
+      count={typeof searchParams.count === "string" ? searchParams.count : null}
       productPrice={typeof searchParams.productPrice === "string" ? searchParams.productPrice : null}
       shopaFee={typeof searchParams.shopaFee === "string" ? searchParams.shopaFee : null}
       paystackFee={typeof searchParams.paystackFee === "string" ? searchParams.paystackFee : null}

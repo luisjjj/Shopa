@@ -26,11 +26,18 @@ export async function POST(request: Request) {
 
   let fixed = 0;
   let failed = 0;
+  const verified = new Map<string, boolean>();
 
   for (const order of unpaidOrders) {
     try {
-      const result = await verifyTransaction(order.paystack_reference);
-      if (result.status && result.data.status === "success") {
+      // Cart lines share one reference: verify each reference only once.
+      let success = verified.get(order.paystack_reference);
+      if (success === undefined) {
+        const result = await verifyTransaction(order.paystack_reference);
+        success = !!(result.status && result.data.status === "success");
+        verified.set(order.paystack_reference, success);
+      }
+      if (success) {
         await supabase
           .from("orders")
           .update({ paid: true })

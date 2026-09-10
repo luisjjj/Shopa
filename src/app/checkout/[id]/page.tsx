@@ -160,6 +160,7 @@ export default async function CheckoutPage({ params }: Props) {
           productName={product.name}
           productPrice={product.price}
           sellerId={product.user_id}
+          sellerUsername={seller?.username || ""}
           sellerPayoutReady={!!seller?.paystack_subaccount_code}
           hasVariants={product.has_variants || false}
           variants={variants}

@@ -1,5 +1,5 @@
 import { verifyTransaction } from "@/lib/paystack";
-import { findOrderByReference, markOrderPaid } from "@/lib/orders";
+import { findOrderByReference, markOrderPaid, settleCart } from "@/lib/orders";
 import { getAppBaseUrl } from "@/lib/security";
 import { computeBuyerTotal } from "@/lib/platform";
 import { createServiceRoleClient } from "@/lib/supabase/service";
@@ -23,10 +23,33 @@ export async function GET(request: Request) {
     const meta = result?.data?.metadata || {};
 
     if (result.status && result.data?.status === "success" && meta.type === "purchase") {
-      const orderId: string | undefined = meta.orderId;
+      const metaIds = Array.isArray(meta.orderIds)
+        ? meta.orderIds.filter((v: unknown): v is string => typeof v === "string")
+        : [];
+      const orderId: string | undefined = metaIds[0] || meta.orderId;
       const target = orderId
         ? orderId
         : (await findOrderByReference(reference))?.id;
+
+      // Multi-line cart charge: settle every line, one consolidated email,
+      // then land on a cart receipt.
+      if (metaIds.length > 1 && target) {
+        const cart = await settleCart(metaIds, "callback");
+        if (cart.ok) {
+          const params = new URLSearchParams({
+            status: "success",
+            paid: "1",
+            cart: "1",
+            count: String(cart.count),
+            orderId: cart.firstOrderId,
+            reference: cart.reference || reference,
+            amount: String(cart.total),
+            product: `${cart.count} items${cart.storeUsername ? ` from ${cart.storeUsername}` : ""}`,
+            buyer: cart.buyerName,
+          });
+          return NextResponse.redirect(`${origin}/confirm?${params.toString()}`);
+        }
+      }
 
       if (target) {
         const settled = await markOrderPaid(target, "callback");

@@ -4,15 +4,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { ShopaMark } from "@/components/ShopaLogo";
 
-type TrackResult = {
-  reference: string;
+type TrackLine = {
+  id: string;
   productName: string;
+  variantName: string | null;
   amount: number;
   paid: boolean;
   fulfilled: boolean;
+};
+
+type TrackResult = {
+  reference: string;
+  count: number;
+  buyerName: string | null;
   createdAt: string;
   storeUsername: string | null;
   storeUrl: string | null;
+  lines: TrackLine[];
 };
 
 export default function TrackPage() {
@@ -46,7 +54,10 @@ export default function TrackPage() {
     setLoading(false);
   };
 
-  const step = !result ? 0 : result.fulfilled ? 3 : result.paid ? 2 : 1;
+  const allPaid = !!result && result.lines.every((l) => l.paid);
+  const allFulfilled = !!result && result.lines.every((l) => l.fulfilled);
+  const step = !result ? 0 : allFulfilled ? 3 : allPaid ? 2 : 1;
+  const total = result ? result.lines.reduce((n, l) => n + l.amount, 0) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a] flex flex-col items-center px-4 py-10">
@@ -97,28 +108,55 @@ export default function TrackPage() {
         {result && (
           <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/[0.06]">
             <div className="flex items-baseline justify-between gap-2 flex-wrap">
-              <p className="font-semibold text-gray-900 dark:text-white">{result.productName}</p>
+              <p className="font-semibold text-gray-900 dark:text-white">
+                {result.count} item{result.count === 1 ? "" : "s"}
+                {result.buyerName ? ` · ${result.buyerName}` : ""}
+              </p>
               <p className="font-bold text-brand-600 dark:text-brand-400">
-                ₦{result.amount.toLocaleString()}
+                ₦{total.toLocaleString()}
               </p>
             </div>
             <p className="text-xs text-gray-400 font-mono mt-1 break-all">Ref: {result.reference}</p>
+            <div className="mt-4 space-y-2">
+              {result.lines.map((line) => (
+                <div
+                  key={line.id}
+                  className="flex items-center justify-between gap-2 text-sm bg-gray-50 dark:bg-white/[0.03] rounded-xl px-3.5 py-2.5"
+                >
+                  <span className="text-gray-700 dark:text-gray-300 truncate min-w-0">
+                    {line.productName}
+                    {line.variantName ? ` (${line.variantName})` : ""}
+                  </span>
+                  <span
+                    className={`shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      line.fulfilled
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        : line.paid
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                          : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                    }`}
+                  >
+                    {line.fulfilled ? "Fulfilled" : line.paid ? "Paid" : "Pending"}
+                  </span>
+                </div>
+              ))}
+            </div>
             <div className="mt-5 space-y-0">
               <Step n={1} active={step >= 1} done={step > 1} label="Order placed" hint="We received your order" />
-              <Step n={2} active={step >= 2} done={step > 2} label="Paid" hint={result.paid ? "Payment confirmed" : "Waiting for payment"} />
-              <Step n={3} active={step >= 3} done={step >= 3} label="Fulfilled" hint={result.fulfilled ? "Seller has fulfilled it" : "Seller is preparing it"} />
+              <Step n={2} active={step >= 2} done={step > 2} label="Paid" hint={allPaid ? "Payment confirmed" : "Waiting for payment"} />
+              <Step n={3} active={step >= 3} done={step >= 3} label="Fulfilled" hint={allFulfilled ? "Seller has fulfilled it" : "Seller is preparing it"} />
             </div>
-            {!result.paid && (
+            {!allPaid && (
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-4">
                 Payment not confirmed yet. If you already paid, give it a few minutes then check again.
               </p>
             )}
-            {result.paid && !result.fulfilled && (
+            {allPaid && !allFulfilled && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
                 Paid. The seller has been notified and will fulfill it shortly.
               </p>
             )}
-            {result.fulfilled && (
+            {allFulfilled && (
               <p className="text-xs text-green-600 dark:text-green-400 mt-4">
                 Fulfilled. Contact the seller if anything is missing.
               </p>

@@ -11,6 +11,8 @@ type Props = {
   reference: string | null;
   orderId: string | null;
   paid: boolean;
+  isCart?: boolean;
+  count?: string | null;
   productPrice: string | null;
   shopaFee: string | null;
   paystackFee: string | null;
@@ -31,6 +33,8 @@ export default function ConfirmClient({
   reference,
   orderId,
   paid,
+  isCart,
+  count,
   productPrice,
   shopaFee,
   paystackFee,
@@ -63,6 +67,11 @@ export default function ConfirmClient({
             <h1 className="text-2xl font-bold mb-2" style={{ color: hasSettings ? textColor : undefined }}>
               {paid ? "Payment successful!" : "Order pending"}
             </h1>
+            {isCart && count && (
+              <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: hasSettings ? primaryColor : "#ed7712" }}>
+                {count} item{count === "1" ? "" : "s"} in this order
+              </p>
+            )}
             <p className="mb-6 text-sm leading-relaxed" style={{ color: hasSettings ? `${textColor}80` : undefined }}>
               {paid ? (
                 <>Thank you{buyer ? `, ${buyer}` : ""}! Your payment for{" "}

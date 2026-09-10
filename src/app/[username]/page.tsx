@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { PackageIcon } from "@/components/Icons";
 import { ProductRating } from "./ProductRating";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
+import { AddButton, CartBar, CartNavButton } from "@/components/CartButtons";
 import { isPremiumActive } from "@/lib/premium";
 import { readableTextOn } from "@/lib/contrast";
 
@@ -95,7 +96,7 @@ export default async function StorePage({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, price, image_url, description, stock")
+    .select("id, name, price, image_url, description, stock, has_variants")
     .eq("user_id", profile.id)
     .eq("is_active", true)
     .or("stock.is.null,stock.gt.0")
@@ -172,6 +173,7 @@ export default async function StorePage({
     image_url: string | null;
     description?: string | null;
     stock?: number | null;
+    has_variants?: boolean | null;
   }) {
     return (
       <a
@@ -184,6 +186,7 @@ export default async function StorePage({
           ...(isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" as const } : {}),
         }}
       >
+        {!p.has_variants && <AddButton sellerId={profile.id} productId={p.id} name={p.name} />}
         <div
           className={`${useDynamicImage ? "" : imageAspect} overflow-hidden ${imageRadius} mb-3 flex items-center justify-center ${useDynamicImage ? "" : imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
           style={s ? { background: `${textColor}08` } : undefined}
@@ -654,7 +657,7 @@ export default async function StorePage({
 
   // Full card classes
   const cardClasses = [
-    "group block overflow-hidden",
+    "group block overflow-hidden relative",
     cardRadius,
     cardPadding,
     cardBorder,
@@ -777,6 +780,7 @@ export default async function StorePage({
           >
             Contact
           </a>
+          <CartNavButton sellerId={profile.id} username={profile.username} color={s ? textColor : undefined} />
           {whatsappHref && (
             <a
               href={whatsappHref}
@@ -814,7 +818,7 @@ export default async function StorePage({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
-              className="fixed bottom-5 right-5 z-40 p-3.5 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95"
+              className="fixed bottom-24 right-5 z-40 p-3.5 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95"
               style={{ background: "#25D366" }}
             >
               <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -822,6 +826,7 @@ export default async function StorePage({
               </svg>
             </a>
           )}
+          <CartBar sellerId={profile.id} username={profile.username} />
         </>
       ) : (
       <>
@@ -1076,7 +1081,7 @@ export default async function StorePage({
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
-          className="fixed bottom-5 right-5 z-40 p-3.5 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95"
+          className="fixed bottom-24 right-5 z-40 p-3.5 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95"
           style={{ background: "#25D366" }}
         >
           <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -1113,6 +1118,7 @@ export default async function StorePage({
           )}
         </div>
       </footer>
+      <CartBar sellerId={profile.id} username={profile.username} />
       </>
       )}
     </div>

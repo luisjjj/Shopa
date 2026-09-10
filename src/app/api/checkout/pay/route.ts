@@ -4,34 +4,52 @@ import { computeBuyerTotal, isStarterSafeError, MIN_ORDER_KOBO, MIN_ORDER_NAIRA,
 import { getAppBaseUrl } from "@/lib/security";
 import { NextResponse } from "next/server";
 
+type PayOrder = {
+  id: string;
+  amount: number;
+  paid: boolean;
+  paystack_reference: string;
+  seller_id: string;
+};
+
+// Accepts a single orderId (buy-now) or orderIds[] (cart). Cart lines share
+// one Paystack reference, so one split charge settles the whole cart while
+// each order row keeps its own per-product settlement downstream.
 export async function POST(request: Request) {
-  const { orderId } = await request.json().catch(() => ({}));
-  if (!orderId || typeof orderId !== "string") {
+  const { orderId, orderIds } = await request.json().catch(() => ({}));
+  const ids = (
+    Array.isArray(orderIds) ? orderIds : orderId ? [orderId] : []
+  ).filter((v): v is string => typeof v === "string" && v.length > 0);
+
+  if (ids.length === 0) {
     return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+  }
+  if (ids.length > 100) {
+    return NextResponse.json({ error: "Too many items. Checkout in batches" }, { status: 400 });
   }
 
   const supabase = createServiceRoleClient();
 
-  const { data: order, error: orderError } = (await supabase
+  const { data: orders, error: orderError } = (await supabase
     .from("orders")
     .select("id, amount, paid, paystack_reference, seller_id")
-    .eq("id", orderId)
-    .single()) as unknown as {
-    data: {
-      id: string;
-      amount: number;
-      paid: boolean;
-      paystack_reference: string;
-      seller_id: string;
-    } | null;
-    error: { message: string } | null;
-  };
+    .in("id", ids)) as unknown as { data: PayOrder[] | null; error: { message: string } | null };
 
-  if (orderError || !order) {
+  if (orderError || !orders || orders.length !== ids.length) {
     console.error("[checkout/pay] order lookup failed", orderError);
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
-  if (order.paid) return NextResponse.json({ error: "Order already paid" }, { status: 400 });
+  if (orders.some((o) => o.paid)) {
+    return NextResponse.json({ error: "Order already paid" }, { status: 400 });
+  }
+  const sellerId = orders[0].seller_id;
+  if (orders.some((o) => o.seller_id !== sellerId)) {
+    return NextResponse.json({ error: "Orders span multiple stores" }, { status: 400 });
+  }
+  const reference = orders[0].paystack_reference;
+  if (orders.some((o) => o.paystack_reference !== reference)) {
+    return NextResponse.json({ error: "Orders do not belong together" }, { status: 400 });
+  }
 
   // buyer_email column may not exist yet (migration pending), fetch
   // defensively so checkout never breaks on schema lag.
@@ -40,7 +58,7 @@ export async function POST(request: Request) {
     const { data: emailRow } = (await supabase
       .from("orders")
       .select("buyer_email")
-      .eq("id", orderId)
+      .eq("id", ids[0])
       .single()) as unknown as { data: { buyer_email: string | null } | null };
     buyerEmail = emailRow?.buyer_email || null;
   } catch {
@@ -50,15 +68,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Buyer email missing. Restart checkout" }, { status: 400 });
   }
 
-  // Buyer-pays-fees: charge product + Shopa 1% + Paystack estimate on top,
-  // so the seller nets the FULL product price. order.amount stays as the
-  // product price (seller revenue); the total is derived, never trusted.
-  const breakdown = computeBuyerTotal(order.amount);
-  const amountKobo = nairaToKobo(breakdown.total);
-  const transactionChargeKobo = nairaToKobo(breakdown.total - breakdown.product);
+  // Buyer-pays-fees per PRODUCT, summed: each line's Shopa 1% + Paystack
+  // estimate is computed on its own unit price, then added up. The seller
+  // still nets the full product price on every line.
+  let productSum = 0;
+  let shopaSum = 0;
+  let paystackSum = 0;
+  let total = 0;
+  for (const o of orders) {
+    const b = computeBuyerTotal(o.amount);
+    productSum += b.product;
+    shopaSum += b.shopaFee;
+    paystackSum += b.paystackFee;
+    total += b.total;
+  }
+  const breakdown = { total, product: productSum, shopaFee: shopaSum, paystackFee: paystackSum };
+  const amountKobo = nairaToKobo(total);
+  const transactionChargeKobo = nairaToKobo(total - productSum);
   if (amountKobo < MIN_ORDER_KOBO) {
     return NextResponse.json(
-      { error: `This order (₦${order.amount.toLocaleString()}) is below the ₦${MIN_ORDER_NAIRA} Paystack minimum` },
+      { error: `This order (₦${productSum.toLocaleString()}) is below the ₦${MIN_ORDER_NAIRA} Paystack minimum` },
       { status: 400 }
     );
   }
@@ -66,7 +95,7 @@ export async function POST(request: Request) {
   const { data: seller } = (await supabase
     .from("users")
     .select("paystack_subaccount_code")
-    .eq("id", order.seller_id)
+    .eq("id", sellerId)
     .single()) as unknown as { data: { paystack_subaccount_code: string | null } | null };
 
   if (!seller?.paystack_subaccount_code) {
@@ -88,9 +117,9 @@ export async function POST(request: Request) {
       subaccount: seller.paystack_subaccount_code,
       transactionChargeKobo,
       bearer: "account", // platform (main account) bears Paystack processing fees
-      reference: order.paystack_reference,
-      callback_url: `${origin}/api/payments/callback?reference=${order.paystack_reference}`,
-      metadata: { type: "purchase", orderId: order.id, sellerId: order.seller_id },
+      reference,
+      callback_url: `${origin}/api/payments/callback?reference=${reference}`,
+      metadata: { type: "purchase", orderIds: ids, orderId: ids[0], sellerId },
     });
   } catch (e) {
     console.error("[checkout/pay] initialize failed", e);
@@ -107,11 +136,11 @@ export async function POST(request: Request) {
     // is cleared so the seller is routed back through payout setup instead
     // of every buyer hitting this error forever.
     if (/invalid subaccount/i.test(message)) {
-      console.error("[checkout/pay] clearing dead subaccount for seller", order.seller_id);
+      console.error("[checkout/pay] clearing dead subaccount for seller", sellerId);
       await supabase
         .from("users")
         .update({ paystack_subaccount_code: null, payout_setup_completed_at: null })
-        .eq("id", order.seller_id);
+        .eq("id", sellerId);
       return NextResponse.json(
         { error: "SELLER_PAYOUT_NOT_SETUP", message: "This seller hasn't set up payouts yet" },
         { status: 400 }
@@ -123,7 +152,8 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     authorization_url: result.data.authorization_url,
-    reference: order.paystack_reference,
+    reference,
     breakdown,
+    count: ids.length,
   });
 }

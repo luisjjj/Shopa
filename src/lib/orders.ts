@@ -3,8 +3,15 @@ import { sendEmail, emailTemplates } from "@/lib/email";
 import { computeBuyerTotal } from "@/lib/platform";
 import { buildWaLink, normalizePhone, sellerPaidAlertText, sendSellerWhatsAppAlert } from "@/lib/whatsapp";
 
+export type OrderSummary = {
+  orderId: string;
+  amount: number;
+  productName: string;
+  variantName: string | null;
+};
+
 export type SettleResult =
-  | { ok: true; alreadySettled: boolean; orderId: string }
+  | { ok: true; alreadySettled: boolean; orderId: string; summary?: OrderSummary }
   | { ok: false; error: string };
 
 type OrderRow = {
@@ -24,7 +31,11 @@ type OrderRow = {
 // there first wins; the loser is a no-op (guarded by paid=false).
 // NOTE on refunds: Paystack pulls refunds from OUR main balance, not from the
 // seller's settled share. A future refund feature needs manual reconciliation.
-export async function markOrderPaid(orderId: string, source: "webhook" | "callback"): Promise<SettleResult> {
+export async function markOrderPaid(
+  orderId: string,
+  source: "webhook" | "callback" | "backfill" | "cart",
+  opts?: { silent?: boolean }
+): Promise<SettleResult> {
   const supabase = createServiceRoleClient();
 
   const { data: order, error } = (await supabase
@@ -178,8 +189,9 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
   const dateStr = placedAt
     ? new Date(placedAt).toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })
     : new Date().toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+  const summary: OrderSummary = { orderId, amount: order.amount, productName, variantName };
 
-  if (seller?.email) {
+  if (!opts?.silent && seller?.email) {
     const waLink =
       sellerNumber && normalizePhone(sellerNumber)
         ? buildWaLink(
@@ -208,7 +220,7 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
     );
   }
 
-  if (buyerEmail) {
+  if (!opts?.silent && buyerEmail) {
     const b = computeBuyerTotal(order.amount);
     const t = emailTemplates().orderReceiptBuyer({
       buyerName,
@@ -231,7 +243,167 @@ export async function markOrderPaid(orderId: string, source: "webhook" | "callba
   }
 
   console.log(`[orders] order ${orderId} marked paid via ${source}`);
-  return { ok: true, alreadySettled: false, orderId };
+  return { ok: true, alreadySettled: false, orderId, summary };
+}
+
+export type CartSettle = {
+  ok: boolean;
+  error?: string;
+  count: number;
+  newlySettled: number;
+  productSum: number;
+  total: number;
+  buyerName: string;
+  storeUsername: string | null;
+  firstOrderId: string;
+  reference: string;
+};
+
+// Settles every line of a cart charge. Each line settles silently (stock,
+// promo, variant), then ONE consolidated email goes to seller and buyer —
+// but only if at least one line is newly paid (webhook replays stay quiet).
+export async function settleCart(orderIds: string[], source: "webhook" | "callback"): Promise<CartSettle> {
+  const supabase = createServiceRoleClient();
+  const empty = {
+    ok: false as const,
+    error: "Order not found",
+    count: 0,
+    newlySettled: 0,
+    productSum: 0,
+    total: 0,
+    buyerName: "A buyer",
+    storeUsername: null as string | null,
+    firstOrderId: orderIds[0] || "",
+    reference: "",
+  };
+
+  const { data: rows } = (await supabase
+    .from("orders")
+    .select("id, amount, buyer_name, seller_id, paystack_reference")
+    .in("id", orderIds)) as unknown as {
+    data: { id: string; amount: number; buyer_name: string | null; seller_id: string; paystack_reference: string }[] | null;
+  };
+  if (!rows || rows.length === 0) return empty;
+
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  const summaries: OrderSummary[] = [];
+  let newlySettled = 0;
+  for (const id of orderIds) {
+    if (!byId.has(id)) continue;
+    const r = await markOrderPaid(id, source, { silent: true });
+    if (r.ok && !r.alreadySettled) {
+      newlySettled++;
+      if (r.summary) summaries.push(r.summary);
+    } else if (!r.ok) {
+      console.error(`[orders] settleCart(${source}) line failed:`, r.error);
+    }
+  }
+
+  const sellerId = rows[0].seller_id;
+  const reference = rows[0].paystack_reference;
+  const buyerName = rows[0].buyer_name || "A buyer";
+  let productSum = 0;
+  let shopaSum = 0;
+  let paystackSum = 0;
+  let total = 0;
+  for (const r of rows) {
+    const b = computeBuyerTotal(r.amount);
+    productSum += b.product;
+    shopaSum += b.shopaFee;
+    paystackSum += b.paystackFee;
+    total += b.total;
+  }
+
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || "https://myshopa.com.ng").replace(/\/$/, "");
+  const { data: seller } = await supabase
+    .from("users")
+    .select("email, username, whatsapp_number")
+    .eq("id", sellerId)
+    .single();
+  const sellerUsername = (seller as { username?: string | null } | null)?.username || null;
+
+  let buyerEmail: string | null = null;
+  let buyerPhone: string | null = null;
+  try {
+    const { data: contact } = (await supabase
+      .from("orders")
+      .select("buyer_email, buyer_phone")
+      .eq("id", rows[0].id)
+      .single()) as unknown as { data: { buyer_email: string | null; buyer_phone: string | null } | null };
+    buyerEmail = contact?.buyer_email || null;
+    buyerPhone = contact?.buyer_phone || null;
+  } catch {
+    buyerEmail = null;
+  }
+
+  const dateStr = new Date().toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric" });
+  const grouped = new Map<string, { name: string; detail: string | null; qty: number; amount: number }>();
+  const source2 = summaries.length > 0 ? summaries : rows.map((r) => ({ orderId: r.id, amount: r.amount, productName: "Item", variantName: null as string | null }));
+  for (const s of source2) {
+    const k = `${s.productName}||${s.variantName || ""}`;
+    const g = grouped.get(k) || { name: s.productName, detail: s.variantName, qty: 0, amount: 0 };
+    g.qty += 1;
+    g.amount += s.amount;
+    grouped.set(k, g);
+  }
+  const lines = Array.from(grouped.values());
+
+  if (newlySettled > 0) {
+    const sellerEmail = (seller as { email?: string } | null)?.email;
+    if (sellerEmail) {
+      const t = emailTemplates().orderPaidSeller({
+        buyerName,
+        buyerPhone,
+        productName: `${rows.length} item${rows.length === 1 ? "" : "s"}`,
+        storeName: sellerUsername || "your store",
+        storeUrl: sellerUsername ? `${base}/${sellerUsername}` : `${base}/dashboard`,
+        trackUrl: `${base}/track`,
+        dashboardUrl: `${base}/dashboard`,
+        waForwardUrl: null,
+        reference,
+        date: dateStr,
+        price: productSum,
+        total: productSum,
+        lines,
+      });
+      sendEmail({ to: sellerEmail, subject: t.subject, html: t.html }).catch((e) =>
+        console.error("[orders] cart seller email failed", e)
+      );
+    }
+    if (buyerEmail) {
+      const t = emailTemplates().orderReceiptBuyer({
+        buyerName,
+        productName: `${rows.length} item${rows.length === 1 ? "" : "s"}`,
+        storeName: sellerUsername || "your store",
+        storeUrl: sellerUsername ? `${base}/${sellerUsername}` : base,
+        trackUrl: `${base}/track`,
+        dashboardUrl: `${base}/dashboard`,
+        reference,
+        date: dateStr,
+        price: productSum,
+        shopaFee: shopaSum,
+        paystackFee: paystackSum,
+        total,
+        lines,
+      });
+      sendEmail({ to: buyerEmail, subject: t.subject, html: t.html }).catch((e) =>
+        console.error("[orders] cart buyer email failed", e)
+      );
+    }
+  }
+
+  console.log(`[orders] cart ${reference} settled ${newlySettled}/${rows.length} new via ${source}`);
+  return {
+    ok: true,
+    count: rows.length,
+    newlySettled,
+    productSum,
+    total,
+    buyerName,
+    storeUsername: sellerUsername,
+    firstOrderId: rows[0].id,
+    reference,
+  };
 }
 
 export async function findOrderByReference(reference: string) {

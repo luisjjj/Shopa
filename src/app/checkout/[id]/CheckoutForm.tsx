@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { readableTextOn } from "@/lib/contrast";
+import { addToCart } from "@/lib/cart";
 
 type CheckoutSettings = {
   primaryColor: string;
@@ -26,6 +27,7 @@ type Props = {
   productName: string;
   productPrice: number;
   sellerId: string;
+  sellerUsername: string;
   sellerWhatsapp?: string;
   sellerPayoutReady: boolean;
   hasVariants: boolean;
@@ -50,6 +52,7 @@ export default function CheckoutForm({
   productName,
   productPrice,
   sellerId,
+  sellerUsername,
   sellerPayoutReady,
   hasVariants,
   variants,
@@ -80,6 +83,13 @@ export default function CheckoutForm({
   const [orderId, setOrderId] = useState("");
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState("");
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleAddToCart = () => {
+    addToCart(sellerId, productId, hasVariants ? selectedVariantId : null, 1);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   const s = settings;
   const primaryColor = s?.primaryColor || "#ed7712";
@@ -635,6 +645,29 @@ export default function CheckoutForm({
             Creating order...
           </>
         ) : `Pay ₦${displayPrice.toLocaleString()}`}
+      </button>
+
+      <button
+        type="button"
+        onClick={handleAddToCart}
+        className={s ? "" : "w-full mt-2 py-3 rounded-xl font-semibold text-sm border border-gray-200 dark:border-white/[0.08] text-gray-700 dark:text-gray-200 transition-all active:scale-[0.98] hover:border-gray-300 dark:hover:border-white/20"}
+        style={s ? {
+          width: "100%",
+          marginTop: "0.5rem",
+          padding: "0.75rem 1.5rem",
+          borderRadius: "0.75rem",
+          background: "transparent",
+          color: textColor,
+          fontWeight: 600,
+          fontSize: "inherit",
+          fontFamily: "inherit",
+          border: `1px solid ${textColor}25`,
+          cursor: "pointer",
+        } : undefined}
+      >
+        {addedToCart ? (
+          <>Added to cart ✓ <a href={`/cart/${sellerUsername}`} className="underline ml-1" onClick={(e) => e.stopPropagation()}>View cart</a></>
+        ) : "Add to cart"}
       </button>
 
       <div className="flex items-center justify-center gap-2 mt-4">
