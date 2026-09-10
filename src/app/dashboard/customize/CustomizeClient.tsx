@@ -310,6 +310,44 @@ export default function CustomizeClient({
     setSaved(false);
   };
 
+  const addStatementBlock = () => {
+    setSections((prev) => {
+      if (!prev) return prev;
+      if (prev.some((s) => s.type === "statement")) return prev;
+      const at = prev.findIndex((s) => s.type === "products");
+      const next: StoreSection = {
+        id: `new-${Date.now()}`,
+        type: "statement" as SectionType,
+        position: prev.length,
+        visible: true,
+        settings: { heading: "Made for you", body: "", align: "center" },
+      };
+      const list = [...prev];
+      list.splice(at >= 0 ? at : list.length, 0, next);
+      return list.map((s, i) => ({ ...s, position: i }));
+    });
+    setSaved(false);
+  };
+
+  const addReviewsBlock = () => {
+    setSections((prev) => {
+      if (!prev) return prev;
+      if (prev.some((s) => s.type === "reviews")) return prev;
+      const next: StoreSection[] = [
+        ...prev,
+        {
+          id: `new-${Date.now()}`,
+          type: "reviews" as SectionType,
+          position: prev.length,
+          visible: true,
+          settings: { heading: "Loved by our buyers" },
+        },
+      ];
+      return next;
+    });
+    setSaved(false);
+  };
+
   const applyTemplate = (tpl: StoreTemplate) => {
     setSettings({ ...DEFAULTS, ...tpl.settings } as StorefrontSettings);
     setSections((prev) => {
@@ -319,8 +357,35 @@ export default function CustomizeClient({
         type: t.type,
         position: i,
         visible: t.visible,
-        settings: {},
+        settings: { ...(t.settings || {}) },
       }));
+      // Every theme gets the editorial rhythm automatically: a style
+      // statement after the hero (from the theme tagline) and buyer
+      // reviews before the footer. Sellers can hide either with the eye.
+      if (!built.some((s) => s.type === "statement")) {
+        const tagline = (tpl.settings.tagline as string | null) || null;
+        const anchor = Math.max(
+          built.findIndex((s) => s.type === "banner"),
+          built.findIndex((s) => s.type === "header")
+        );
+        built.splice(anchor >= 0 ? anchor + 1 : built.length, 0, {
+          id: `tpl-${tpl.id}-statement-${Date.now()}`,
+          type: "statement",
+          position: 0,
+          visible: !!tagline,
+          settings: { heading: tagline || "", body: "", align: "center" },
+        });
+      }
+      if (!built.some((s) => s.type === "reviews")) {
+        const footerAt = built.findIndex((s) => s.type === "footer");
+        built.splice(footerAt >= 0 ? footerAt : built.length, 0, {
+          id: `tpl-${tpl.id}-reviews-${Date.now()}`,
+          type: "reviews",
+          position: 0,
+          visible: true,
+          settings: { heading: "Loved by our buyers" },
+        });
+      }
       const anchor = built.findIndex((s) => s.type === "products");
       const footerAt = built.findIndex((s) => s.type === "footer");
       const at = anchor >= 0 ? anchor + 1 : footerAt >= 0 ? footerAt : built.length;
@@ -759,13 +824,29 @@ export default function CustomizeClient({
                         </SortableContext>
                       </DndContext>
                     </div>
-                    <button
-                      type="button"
-                      onClick={addTextBlock}
-                      className="w-full py-2.5 text-sm font-medium text-brand-600 dark:text-brand-400 border border-dashed border-brand-300 dark:border-brand-800 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
-                    >
-                      + Add text block
-                    </button>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={addTextBlock}
+                        className="py-2.5 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 border border-dashed border-brand-300 dark:border-brand-800 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
+                      >
+                        + Text
+                      </button>
+                      <button
+                        type="button"
+                        onClick={addStatementBlock}
+                        className="py-2.5 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 border border-dashed border-brand-300 dark:border-brand-800 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
+                      >
+                        + Statement
+                      </button>
+                      <button
+                        type="button"
+                        onClick={addReviewsBlock}
+                        className="py-2.5 text-xs sm:text-sm font-medium text-brand-600 dark:text-brand-400 border border-dashed border-brand-300 dark:border-brand-800 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors"
+                      >
+                        + Reviews
+                      </button>
+                    </div>
                     {sectionsError && (
                       <p className="text-xs text-red-500">{sectionsError}</p>
                     )}
@@ -1364,11 +1445,13 @@ function SortableSectionRow({
           onClick={onToggleExpand}
           className="flex-1 text-left min-w-0"
         >
-          <span className="block text-sm font-medium text-gray-900 dark:text-white truncate">
-            {sec.type === "text"
-              ? String(sec.settings.heading || meta.label)
-              : meta.label}
-          </span>
+                          <span className="block text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {sec.type === "text" || sec.type === "statement"
+                              ? String(sec.settings.heading || meta.label)
+                              : sec.type === "reviews"
+                                ? String(sec.settings.heading || meta.label)
+                                : meta.label}
+                          </span>
           <span className="block text-[11px] text-gray-400 dark:text-gray-500 truncate">
             {meta.hint}
           </span>
@@ -1462,36 +1545,74 @@ function SortableSectionRow({
               </select>
             </div>
           )}
-          {sec.type === "text" && (
-            <>
-              <TextField
-                label="Heading"
-                value={String(sec.settings.heading || "")}
-                placeholder="e.g. Our story"
-                onChange={(v) => updateSectionSettings(sec.id, { heading: v })}
-              />
-              <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Message</label>
-                <textarea
-                  value={String(sec.settings.body || "")}
-                  onChange={(e) => updateSectionSettings(sec.id, { body: e.target.value })}
-                  placeholder="e.g. We source quality fabrics in Lagos..."
-                  rows={3}
-                  className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300 placeholder-gray-400 resize-none"
-                />
-              </div>
-              <SelectField
-                label="Alignment"
-                value={String(sec.settings.align || "center")}
-                options={[
-                  { value: "left", label: "Left" },
-                  { value: "center", label: "Center" },
-                  { value: "right", label: "Right" },
-                ]}
-                onChange={(v) => updateSectionSettings(sec.id, { align: v })}
-              />
-            </>
-          )}
+                          {sec.type === "text" && (
+                            <>
+                              <TextField
+                                label="Heading"
+                                value={String(sec.settings.heading || "")}
+                                placeholder="e.g. Our story"
+                                onChange={(v) => updateSectionSettings(sec.id, { heading: v })}
+                              />
+                              <div>
+                                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Message</label>
+                                <textarea
+                                  value={String(sec.settings.body || "")}
+                                  onChange={(e) => updateSectionSettings(sec.id, { body: e.target.value })}
+                                  placeholder="e.g. We source quality fabrics in Lagos..."
+                                  rows={3}
+                                  className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300 placeholder-gray-400 resize-none"
+                                />
+                              </div>
+                              <SelectField
+                                label="Alignment"
+                                value={String(sec.settings.align || "center")}
+                                options={[
+                                  { value: "left", label: "Left" },
+                                  { value: "center", label: "Center" },
+                                  { value: "right", label: "Right" },
+                                ]}
+                                onChange={(v) => updateSectionSettings(sec.id, { align: v })}
+                              />
+                            </>
+                          )}
+                          {sec.type === "statement" && (
+                            <>
+                              <TextField
+                                label="Headline"
+                                value={String(sec.settings.heading || "")}
+                                placeholder="e.g. Designed for living"
+                                onChange={(v) => updateSectionSettings(sec.id, { heading: v })}
+                              />
+                              <div>
+                                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Subtext (optional)</label>
+                                <textarea
+                                  value={String(sec.settings.body || "")}
+                                  onChange={(e) => updateSectionSettings(sec.id, { body: e.target.value })}
+                                  placeholder="e.g. Small-batch pieces, made to last..."
+                                  rows={2}
+                                  className="w-full text-sm bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 text-gray-700 dark:text-gray-300 placeholder-gray-400 resize-none"
+                                />
+                              </div>
+                              <SelectField
+                                label="Alignment"
+                                value={String(sec.settings.align || "center")}
+                                options={[
+                                  { value: "left", label: "Left" },
+                                  { value: "center", label: "Center" },
+                                  { value: "right", label: "Right" },
+                                ]}
+                                onChange={(v) => updateSectionSettings(sec.id, { align: v })}
+                              />
+                            </>
+                          )}
+                          {sec.type === "reviews" && (
+                            <TextField
+                              label="Heading"
+                              value={String(sec.settings.heading || "")}
+                              placeholder="e.g. Loved by our buyers"
+                              onChange={(v) => updateSectionSettings(sec.id, { heading: v })}
+                            />
+                          )}
           {sec.type === "footer" && (
             <TextField
               label="Footer note"

@@ -107,9 +107,10 @@ export async function PUT(request: Request) {
       type,
       position: i,
       visible: raw.visible !== false,
-      // Text blocks carry heading/body/align, sanitized + length-capped.
+      // Text and statement blocks carry heading/body/align, sanitized +
+      // length-capped. Reviews blocks carry an optional heading.
       settings:
-        type === "text"
+        type === "text" || type === "statement"
           ? {
               heading: String(settings.heading || "").replace(/[<>"']/g, "").slice(0, 80) || null,
               body: String(settings.body || "").replace(/[<>"']/g, "").slice(0, 500) || null,
@@ -117,7 +118,11 @@ export async function PUT(request: Request) {
                 ? String(settings.align)
                 : "center",
             }
-          : {},
+          : type === "reviews"
+            ? {
+                heading: String(settings.heading || "").replace(/[<>"']/g, "").slice(0, 80) || null,
+              }
+            : {},
     });
   }
 

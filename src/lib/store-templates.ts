@@ -14,7 +14,7 @@ export type StoreTemplate = {
   industry: string;
   swatches: { primary: string; bg: string; text: string };
   settings: TemplateSettings;
-  sections: { type: SectionType; visible: boolean }[];
+  sections: { type: SectionType; visible: boolean; settings?: Record<string, unknown> }[];
 };
 
 export const STORE_TEMPLATES: StoreTemplate[] = [
@@ -182,7 +182,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#7c2d12",
       accent_color: "#e11d48",
       card_background: "#ffffff",
-      banner_url: "/landing/showcase-1.jpg",
+      banner_url: "/templates/sunset-streetwear.jpg",
       font_style: "bold",
       font_size: "large",
       layout: "grid3",
@@ -389,7 +389,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#4c0519",
       accent_color: "#fb7185",
       card_background: "#ffffff",
-      banner_url: "/landing/sell-ig.jpg",
+      banner_url: "/templates/glow-skincare.jpg",
       font_style: "rounded",
       font_size: "medium",
       layout: "grid",
@@ -801,7 +801,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#422006",
       accent_color: "#ca8a04",
       card_background: "#ffffff",
-      banner_url: "/landing/auth-side.jpg",
+      banner_url: "/templates/noir-parfum.jpg",
       font_style: "elegant",
       font_size: "large",
       layout: "grid",
@@ -905,7 +905,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#f7fee7",
       accent_color: "#a3e635",
       card_background: "#171717",
-      banner_url: "/landing/hero-seller.jpg",
+      banner_url: "/templates/court-sneakers.jpg",
       font_style: "bold",
       font_size: "large",
       layout: "horizontal",
@@ -1059,7 +1059,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#172554",
       accent_color: "#f97316",
       card_background: "#ffffff",
-      banner_url: "/landing/hero-seller.jpg",
+      banner_url: "/templates/sole-wall.jpg",
       font_style: "bold",
       font_size: "large",
       layout: "grid3",
@@ -1111,7 +1111,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#134e4a",
       accent_color: "#d97706",
       card_background: "#ffffff",
-      banner_url: null,
+      banner_url: "/templates/ankara-bags.jpg",
       font_style: "elegant",
       font_size: "medium",
       layout: "grid",
@@ -1144,9 +1144,9 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
     sections: [
       { type: "announcement", visible: true },
       { type: "header", visible: true },
+      { type: "banner", visible: true },
       { type: "products", visible: true },
       { type: "featured", visible: true },
-      { type: "banner", visible: false },
       { type: "socials", visible: true },
       { type: "footer", visible: true },
     ],

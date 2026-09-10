@@ -8,6 +8,8 @@ export type SectionType =
   | "featured"
   | "products"
   | "text"
+  | "statement"
+  | "reviews"
   | "socials"
   | "footer";
 
@@ -29,6 +31,8 @@ export const SECTION_META: Record<
   featured: { label: "Featured product", hint: "Big spotlight card", repeatable: false },
   products: { label: "Product grid", hint: "All products", repeatable: false },
   text: { label: "Text block", hint: "Heading + message", repeatable: true },
+  statement: { label: "Style statement", hint: "Big editorial headline", repeatable: true },
+  reviews: { label: "Buyer reviews", hint: "Social proof from verified orders", repeatable: false },
   socials: { label: "Social links", hint: "Instagram, WhatsApp, etc.", repeatable: false },
   footer: { label: "Footer", hint: "Footer note (always on)", repeatable: false, locked: true },
 };
@@ -39,6 +43,8 @@ export const DEFAULT_SECTION_ORDER: SectionType[] = [
   "header",
   "featured",
   "products",
+  "statement",
+  "reviews",
   "text",
   "socials",
   "footer",

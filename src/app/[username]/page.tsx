@@ -101,6 +101,28 @@ export default async function StorePage({
     .or("stock.is.null,stock.gt.0")
     .order("created_at", { ascending: false });
 
+  // Social proof for the reviews section: latest verified buyer reviews
+  // across this seller's products. Empty = section hides itself.
+  type SellerReview = { rating: number; comment: string | null; buyer_name: string; product_name: string | null };
+  let sellerReviews: SellerReview[] = [];
+  const reviewProductIds = (products || []).map((p) => p.id);
+  if (reviewProductIds.length > 0) {
+    const { data: revs } = (await supabase
+      .from("product_reviews")
+      .select("rating, comment, buyer_name, products(name)")
+      .in("product_id", reviewProductIds)
+      .order("created_at", { ascending: false })
+      .limit(3)) as unknown as {
+      data: { rating: number; comment: string | null; buyer_name: string; products: { name: string } | null }[] | null;
+    };
+    sellerReviews = (revs || []).map((r) => ({
+      rating: r.rating,
+      comment: r.comment,
+      buyer_name: r.buyer_name,
+      product_name: r.products?.name || null,
+    }));
+  }
+
   const s = settings || null;
 
   const { data: featured } =
@@ -213,27 +235,52 @@ export default async function StorePage({
         return showAnnouncement ? (
           <div
             key={sec.id}
-            className="w-full text-center text-xs sm:text-sm font-medium px-4 py-2.5"
-            style={{ background: accentColor, color: readableTextOn(accentColor, "#ffffff") }}
+            className="w-full overflow-hidden py-2.5"
+            style={{ background: accentColor }}
           >
-            {s?.announcement_text}
+            <div className="flex w-max animate-marquee">
+              {[0, 1].map((copy) => (
+                <div key={copy} aria-hidden={copy === 1} className="flex items-center shrink-0">
+                  {[0, 1, 2].map((i) => (
+                    <span key={i} className="flex items-center whitespace-nowrap">
+                      <span className="px-6 text-xs sm:text-sm font-medium" style={{ color: readableTextOn(accentColor, "#ffffff") }}>
+                        {s?.announcement_text}
+                      </span>
+                      <span style={{ color: readableTextOn(accentColor, "#ffffff") }}>•</span>
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         ) : null;
       case "banner":
         return s?.banner_url ? (
           <div key={sec.id} className={`w-full ${bannerHeight} overflow-hidden relative`}>
-            <img src={s.banner_url} alt="Store banner" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
-            {s.banner_overlay && <div className="absolute inset-0 bg-black/40" />}
-            {s.banner_overlay && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-                <h2 className="text-white text-2xl sm:text-4xl font-bold break-words max-w-xl" style={{ fontFamily }}>
-                  {s.tagline || profile.username}
-                </h2>
-                <a href="#shop" className="mt-4 text-sm font-semibold px-7 py-3 rounded-xl text-white transition-transform hover:scale-105 active:scale-95" style={{ background: accentColor }}>
-                  Shop now →
-                </a>
-              </div>
-            )}
+            <img src={s.banner_url} alt="Store banner" fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+            {s.banner_overlay ? (
+              <>
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.05))" }} />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80 mb-3">
+                    {profile.username}
+                  </p>
+                  <h2 className="text-white text-3xl sm:text-5xl font-bold break-words max-w-2xl leading-tight" style={{ fontFamily }}>
+                    {s.tagline || `Welcome to ${profile.username}`}
+                  </h2>
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    <a href="#shop" className="text-sm font-semibold px-7 py-3 rounded-xl text-white transition-transform hover:scale-105 active:scale-95" style={{ background: accentColor }}>
+                      Shop now →
+                    </a>
+                    {whatsappHref && (
+                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold px-7 py-3 rounded-xl text-white border border-white/60 transition-transform hover:scale-105 active:scale-95">
+                        WhatsApp us
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null;
       case "header":
@@ -319,6 +366,53 @@ export default async function StorePage({
                   <p className="text-sm mt-2 leading-relaxed break-words" style={{ color: `${cardText}90` }}>{body}</p>
                 )}
               </div>
+            </div>
+          </div>
+        );
+      }
+      case "statement": {
+        const heading = String(sec.settings.heading || "");
+        const body = String(sec.settings.body || "");
+        if (!heading && !body) return null;
+        const align = sec.settings.align === "left" ? "text-left" : sec.settings.align === "right" ? "text-right" : "text-center";
+        return (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
+            <div className={align}>
+              {heading && (
+                <h2 className="text-3xl sm:text-4xl font-bold break-words tracking-tight leading-tight" style={{ color: textColor, fontFamily }}>{heading}</h2>
+              )}
+              {body && (
+                <p className="text-sm sm:text-base mt-3 leading-relaxed break-words max-w-xl mx-auto" style={{ color: `${textColor}70` }}>{body}</p>
+              )}
+            </div>
+          </div>
+        );
+      }
+      case "reviews": {
+        if (!sellerReviews || sellerReviews.length === 0) return null;
+        const heading = String(sec.settings.heading || "Loved by our buyers");
+        return (
+          <div key={sec.id} className={`${containerMax} mx-auto px-4 ${sectionPadding}`}>
+            <h2 className="text-xl sm:text-2xl font-bold break-words text-center" style={{ color: textColor, fontFamily }}>{heading}</h2>
+            <div className="grid sm:grid-cols-3 gap-3 mt-6">
+              {sellerReviews.map((r, i) => (
+                <div key={i} className={`overflow-hidden ${cardRadius} ${cardBorder} ${cardShadow} p-5`} style={{ ...cardBgStyle, ...cardInlineStyle }}>
+                  <p className="text-sm tracking-widest" style={{ color: "#f59e0b" }}>
+                    {"★".repeat(Math.max(1, Math.min(5, r.rating)))}
+                    <span style={{ color: `${textColor}25` }}>{"★".repeat(5 - Math.max(1, Math.min(5, r.rating)))}</span>
+                  </p>
+                  {r.comment && (
+                    <p className="text-sm mt-2 leading-relaxed break-words line-clamp-3" style={{ color: `${cardText}90` }}>{r.comment}</p>
+                  )}
+                  <p className="text-xs mt-3 font-semibold" style={{ color: cardText }}>
+                    {r.buyer_name}
+                    <span className="font-normal" style={{ color: `${cardText}60` }}> · Verified buyer</span>
+                  </p>
+                  {r.product_name && (
+                    <p className="text-[11px] mt-0.5 truncate" style={{ color: `${cardText}50` }}>{r.product_name}</p>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         );
