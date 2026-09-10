@@ -1621,11 +1621,16 @@ function SortableSectionRow({
               onChange={(v) => update("footer_text", v || null)}
             />
           )}
-          {(sec.type === "banner" || sec.type === "header" || sec.type === "products" || sec.type === "socials") && (
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Content for this block is edited in the matching section below.
-            </p>
-          )}
+                          {(sec.type === "header" || sec.type === "products" || sec.type === "socials") && (
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                              Content for this block is edited in the matching section below.
+                            </p>
+                          )}
+                          {sec.type === "banner" && (
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                              Upload a photo for a full hero, or leave empty for a designed gradient hero. The header hides itself while the hero shows your name.
+                            </p>
+                          )}
         </div>
       )}
     </div>

@@ -22,6 +22,9 @@ export default function NewProductPage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [igUrl, setIgUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
   const [hasVariants, setHasVariants] = useState(false);
   const [variants, setVariants] = useState<Variant[]>([]);
   const [isProPlus, setIsProPlus] = useState<boolean | null>(null);
@@ -72,6 +75,31 @@ export default function NewProductPage() {
       setError("Could not process that image. Try another.");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!igUrl.trim() || importing) return;
+    setImporting(true);
+    setImportError("");
+    try {
+      const res = await fetch("/api/import/instagram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: igUrl.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setImportError(data.error || "Could not import from Instagram. Try again.");
+        return;
+      }
+      if (typeof data.name === "string" && data.name) setName(data.name);
+      if (typeof data.price === "number" && Number.isFinite(data.price)) setPrice(String(data.price));
+      if (typeof data.imageUrl === "string" && data.imageUrl) setImageUrl(data.imageUrl);
+    } catch {
+      setImportError("Could not import from Instagram. Try again.");
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -165,6 +193,32 @@ export default function NewProductPage() {
 
       <main className="max-w-2xl mx-auto px-5 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Product</h1>
+
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark mb-4">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Import from Instagram
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={igUrl}
+              onChange={(e) => setIgUrl(e.target.value)}
+              className="input-base min-w-0 flex-1"
+              placeholder="Paste Instagram post / reel link"
+            />
+            <button
+              type="button"
+              onClick={handleImport}
+              disabled={importing || !igUrl.trim()}
+              className="btn-primary shrink-0 disabled:opacity-50"
+            >
+              {importing ? "Importing..." : "Import"}
+            </button>
+          </div>
+          {importError && (
+            <p className="text-red-600 dark:text-red-400 text-sm mt-2">{importError}</p>
+          )}
+        </div>
 
         <form
           onSubmit={handleSubmit}

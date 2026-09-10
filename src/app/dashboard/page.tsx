@@ -7,6 +7,7 @@ import { AnalyticsSection } from "@/components/AnalyticsSection";
 import { isPremiumActive } from "@/lib/premium";
 import DashboardShell from "@/components/DashboardShell";
 import OnboardingChecklist from "@/components/OnboardingChecklist";
+import { ShareStoreCard } from "@/components/ShareStoreCard";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -189,6 +190,11 @@ export default async function DashboardPage() {
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Fulfill purchases</p>
         </Link>
       </div>
+      <ShareStoreCard
+        username={profile.username}
+        storeUrl={`https://myshopa.com.ng/${profile.username}`}
+        isPremium={isPremium}
+      />
     </DashboardShell>
   );
 }

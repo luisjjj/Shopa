@@ -2,9 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PackageIcon } from "@/components/Icons";
-import { ProductRating } from "./ProductRating";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
-import { AddButton, CartBar, CartNavButton } from "@/components/CartButtons";
+import { CartBar, CartNavButton } from "@/components/CartButtons";
+import ProductGrid from "./ProductGrid";
 import { isPremiumActive } from "@/lib/premium";
 import { readableTextOn } from "@/lib/contrast";
 
@@ -25,6 +25,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${profile.username}'s Store | Shopa`,
     description: `Shop ${profile.username}'s products on Shopa`,
+    openGraph: {
+      title: `${profile.username}'s Store | Shopa`,
+      description: `Shop ${profile.username}'s products on Shopa`,
+      images: [{ url: `/${profile.username}/opengraph-image` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${profile.username}'s Store | Shopa`,
+      images: [`/${profile.username}/opengraph-image`],
+    },
   };
 }
 
@@ -96,11 +106,31 @@ export default async function StorePage({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, price, image_url, description, stock, has_variants")
+    .select("id, name, price, image_url, description, stock, has_variants, category")
     .eq("user_id", profile.id)
     .eq("is_active", true)
     .or("stock.is.null,stock.gt.0")
     .order("created_at", { ascending: false });
+
+  // Variants for quick-view + price floors, one batched query.
+  const variantProductIds = (products || []).filter((p) => p.has_variants).map((p) => p.id);
+  const variantsByProduct: Record<string, { id: string; name: string; stock: number | null; price_override: number | null }[]> = {};
+  if (variantProductIds.length > 0) {
+    const { data: vars } = await supabase
+      .from("product_variants")
+      .select("id, product_id, name, stock, price_override")
+      .in("product_id", variantProductIds)
+      .eq("is_active", true)
+      .order("created_at", { ascending: true });
+    for (const v of (vars as { id: string; product_id: string; name: string; stock: number | null; price_override: number | null }[] | null) || []) {
+      (variantsByProduct[v.product_id] = variantsByProduct[v.product_id] || []).push({
+        id: v.id,
+        name: v.name,
+        stock: v.stock,
+        price_override: v.price_override,
+      });
+    }
+  }
 
   // Social proof for the reviews section: latest verified buyer reviews
   // across this seller's products. Empty = section hides itself.
@@ -166,70 +196,13 @@ export default async function StorePage({
   }
   const hasSections = sectionList.length > 0;
 
-  function productCard(p: {
-    id: string;
-    name: string;
-    price: number;
-    image_url: string | null;
-    description?: string | null;
-    stock?: number | null;
-    has_variants?: boolean | null;
-  }) {
-    return (
-      <a
-        key={p.id}
-        href={`/checkout/${p.id}`}
-        className={cardClasses}
-        style={{
-          ...cardBgStyle,
-          ...cardInlineStyle,
-          ...(isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" as const } : {}),
-        }}
-      >
-        {!p.has_variants && <AddButton sellerId={profile.id} productId={p.id} name={p.name} />}
-        <div
-          className={`${useDynamicImage ? "" : imageAspect} overflow-hidden ${imageRadius} mb-3 flex items-center justify-center ${useDynamicImage ? "" : imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
-          style={s ? { background: `${textColor}08` } : undefined}
-        >
-          {p.image_url ? (
-            <div className="relative w-full">
-              <img
-                src={p.image_url}
-                alt={p.name}
-                loading="lazy"
-                decoding="async"
-                className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
-              />
-              {s?.show_stock_badge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
-                <span
-                  className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
-                  style={{ background: accentColor }}
-                >
-                  Only {p.stock} left
-                </span>
-              )}
-            </div>
-          ) : (
-            <div className={`w-full ${useDynamicImage ? "h-48" : "h-full aspect-square"} flex items-center justify-center bg-gray-50 dark:bg-white/[0.04]`}>
-              <PackageIcon size={40} style={s ? { color: `${textColor}25` } : undefined} className={s ? "" : "text-gray-300 dark:text-gray-600"} />
-            </div>
-          )}
-        </div>
-        <div className={isList ? "flex items-center justify-between gap-2" : ""}>
-          <h3
-            className={`${nameWeight} ${nameSize} truncate min-w-0 ${isList ? "flex-1" : ""} ${s ? "" : "text-gray-900 dark:text-white"}`}
-            style={s ? { color: cardText } : undefined}
-          >
-            {p.name}
-          </h3>
-          <p className={`${priceClasses} shrink-0`} style={priceStyle}>
-            ₦{p.price.toLocaleString()}
-          </p>
-          <ProductRating productId={p.id} />
-        </div>
-      </a>
-    );
-  }
+  // The hero owns name + tagline whenever the banner block can show them
+  // (photo or tagline present). The header section compacts itself away in
+  // that case so the name never repeats twice in a row.
+  const heroBannerSection = hasSections
+    ? sectionList.find((sec) => sec.type === "banner" && sec.visible)
+    : null;
+  const heroActive = !!heroBannerSection && (!!s?.banner_url || !!s?.tagline);
 
   function renderSection(sec: SectionRow) {
     if (!sec.visible) return null;
@@ -257,11 +230,26 @@ export default async function StorePage({
             </div>
           </div>
         ) : null;
-      case "banner":
-        return s?.banner_url ? (
+      case "banner": {
+        const heroTitle = s?.tagline || `Welcome to ${profile.username}`;
+        const heroReadable = s?.banner_url
+          ? "#ffffff"
+          : readableTextOn(primaryColor, "#ffffff");
+        if (!s?.banner_url && !s?.tagline) return null;
+        return (
           <div key={sec.id} className={`w-full ${bannerHeight} overflow-hidden relative`}>
-            <img src={s.banner_url} alt="Store banner" fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
-            {s.banner_overlay ? (
+            {s?.banner_url ? (
+              <img src={s.banner_url} alt="Store banner" fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}>
+                <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 blur-2xl" />
+                <div className="absolute -bottom-20 -left-10 w-72 h-72 rounded-full bg-black/10 blur-2xl" />
+                <div className="absolute top-8 left-8 w-2 h-2 rounded-full bg-white/40" />
+                <div className="absolute top-16 left-16 w-1.5 h-1.5 rounded-full bg-white/30" />
+                <div className="absolute bottom-12 right-12 w-2.5 h-2.5 rounded-full bg-white/30" />
+              </div>
+            )}
+            {s?.banner_url && s.banner_overlay ? (
               <>
                 <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.05))" }} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
@@ -269,7 +257,7 @@ export default async function StorePage({
                     {profile.username}
                   </p>
                   <h2 className="text-white text-3xl sm:text-5xl font-bold break-words max-w-2xl leading-tight" style={{ fontFamily }}>
-                    {s.tagline || `Welcome to ${profile.username}`}
+                    {heroTitle}
                   </h2>
                   <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                     <a href="#shop" className="text-sm font-semibold px-7 py-3 rounded-xl text-white transition-transform hover:scale-105 active:scale-95" style={{ background: accentColor }}>
@@ -283,10 +271,29 @@ export default async function StorePage({
                   </div>
                 </div>
               </>
+            ) : !s?.banner_url ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: heroReadable, opacity: 0.8 }}>
+                  {profile.username}
+                </p>
+                <h2 className="text-3xl sm:text-5xl font-bold break-words max-w-2xl leading-tight" style={{ fontFamily, color: heroReadable }}>
+                  {heroTitle}
+                </h2>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  <a href="#shop" className="text-sm font-semibold px-7 py-3 rounded-xl transition-transform hover:scale-105 active:scale-95" style={{ background: accentColor, color: readableTextOn(accentColor, "#ffffff") }}>
+                    Shop now →
+                  </a>
+                  <span className="text-xs font-medium px-4 py-3 rounded-xl" style={{ color: heroReadable, border: `1px solid ${heroReadable}40` }}>
+                    {products?.length || 0} product{(products?.length || 0) === 1 ? "" : "s"}
+                  </span>
+                </div>
+              </div>
             ) : null}
           </div>
-        ) : null;
+        );
+      }
       case "header":
+        if (heroActive) return null;
         return (
           <div key={sec.id} className="border-b" style={{ borderColor: `${textColor}15` }}>
             <div className={`${containerMax} mx-auto px-4 ${sectionPadding} ${headerAlign}`}>
@@ -347,9 +354,47 @@ export default async function StorePage({
                 <p className="text-sm mt-1" style={{ color: `${textColor}60` }}>Check back soon!</p>
               </div>
             ) : (
-              <div className={`${isHorizontal ? "flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" : `grid ${gridCols} ${gapSize}`}`}>
-                {products.map((p) => productCard(p))}
-              </div>
+              <ProductGrid
+                products={products}
+                variantsByProduct={variantsByProduct}
+                theme={{
+                  cardClasses,
+                  cardBgStyle,
+                  cardInlineStyle,
+                  useDynamicImage,
+                  imageAspect,
+                  imageRadius,
+                  textColor,
+                  accentColor,
+                  cardText,
+                  nameWeight,
+                  nameSize,
+                  priceClasses,
+                  priceStyle,
+                  gridCols,
+                  gapSize,
+                  isHorizontal,
+                  isList,
+                  themed: !!s,
+                  showStockBadge: !!s?.show_stock_badge,
+                }}
+                modalTheme={
+                  s
+                    ? {
+                        primaryColor: s.primary_color || "#ed7712",
+                        bgColor: s.background_color || "#faf9f7",
+                        textColor: s.text_color || "#1a1a1a",
+                        cardBg: s.card_background || "#ffffff",
+                        fontFamily,
+                        fontSize,
+                        cardBorderRadius: s.card_border_radius || "md",
+                        cardStyle: s.card_style || "minimal",
+                      }
+                    : null
+                }
+                sellerId={profile.id}
+                username={profile.username}
+              />
             )}
           </div>
         );
@@ -713,10 +758,10 @@ export default async function StorePage({
   // Banner height
   const bannerHeight =
     s?.banner_height === "short"
-      ? "h-32"
+      ? "h-56"
       : s?.banner_height === "tall"
-        ? "h-72"
-        : "h-48";
+        ? "h-[26rem] sm:h-[32rem]"
+        : "h-80";
 
   // Header style
   const headerAlign =
@@ -963,66 +1008,47 @@ export default async function StorePage({
             <p className={s ? "text-sm mt-1" : "text-sm mt-1 text-gray-500 dark:text-gray-400"} style={s ? { color: `${textColor}60` } : undefined}>Check back soon!</p>
           </div>
         ) : (
-          <div
-            className={`${isHorizontal ? "flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" : `grid ${gridCols} ${gapSize}`}`}
-          >
-            {products.map((product) => (
-              <a
-                key={product.id}
-                href={`/checkout/${product.id}`}
-                className={cardClasses}
-                style={{
-                  ...cardBgStyle,
-                  ...cardInlineStyle,
-                  ...(isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" } : {}),
-                }}
-              >
-                <div
-                  className={`${useDynamicImage ? "" : imageAspect} overflow-hidden ${imageRadius} mb-3 flex items-center justify-center ${useDynamicImage ? "" : imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
-                  style={s ? { background: `${textColor}08` } : undefined}
-                >
-                  {product.image_url ? (
-                    <div className="relative w-full">
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        loading="lazy"
-                        decoding="async"
-                        className={useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
-                      />
-                      {s?.show_stock_badge && product.stock != null && product.stock > 0 && product.stock <= 5 && (
-                        <span
-                          className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
-                          style={{ background: accentColor }}
-                        >
-                          Only {product.stock} left
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={`w-full ${useDynamicImage ? "h-48" : "h-full aspect-square"} flex items-center justify-center bg-gray-50 dark:bg-white/[0.04]`}>
-                      <PackageIcon size={40} style={s ? { color: `${textColor}25` } : undefined} className={s ? "" : "text-gray-300 dark:text-gray-600"} />
-                    </div>
-                  )}
-                </div>
-                <div className={isList ? "flex items-center justify-between" : ""}>
-                  <h3
-                    className={`${nameWeight} ${nameSize} ${isList ? "" : "truncate"} ${s ? "" : "text-gray-900 dark:text-white"}`}
-                    style={s ? { color: readableTextOn(cardBg, textColor) } : undefined}
-                  >
-                    {product.name}
-                  </h3>
-                  <p
-                    className={priceClasses}
-                    style={priceStyle}
-                  >
-                    ₦{product.price.toLocaleString()}
-                  </p>
-                  <ProductRating productId={product.id} />
-                </div>
-              </a>
-            ))}
-          </div>
+          <ProductGrid
+            products={products}
+            variantsByProduct={variantsByProduct}
+            theme={{
+              cardClasses,
+              cardBgStyle,
+              cardInlineStyle,
+              useDynamicImage,
+              imageAspect,
+              imageRadius,
+              textColor,
+              accentColor,
+              cardText,
+              nameWeight,
+              nameSize,
+              priceClasses,
+              priceStyle,
+              gridCols,
+              gapSize,
+              isHorizontal,
+              isList,
+              themed: !!s,
+              showStockBadge: !!s?.show_stock_badge,
+            }}
+            modalTheme={
+              s
+                ? {
+                    primaryColor: s.primary_color || "#ed7712",
+                    bgColor: s.background_color || "#faf9f7",
+                    textColor: s.text_color || "#1a1a1a",
+                    cardBg: s.card_background || "#ffffff",
+                    fontFamily,
+                    fontSize,
+                    cardBorderRadius: s.card_border_radius || "md",
+                    cardStyle: s.card_style || "minimal",
+                  }
+                : null
+            }
+            sellerId={profile.id}
+            username={profile.username}
+          />
         )}
       </div>
 

@@ -4,16 +4,22 @@ export type CartLine = { productId: string; variantId: string | null; qty: numbe
 
 export const CART_EVENT = "shopa-cart-updated";
 
+const mem = new Map<string, CartLine[]>();
+
 function key(sellerId: string): string {
   return `shopa-cart:${sellerId}`;
+}
+
+function snapshot(lines: CartLine[]): CartLine[] {
+  return lines.map((l) => ({ productId: l.productId, variantId: l.variantId, qty: l.qty }));
 }
 
 export function loadCart(sellerId: string): CartLine[] {
   try {
     const raw = localStorage.getItem(key(sellerId));
     const parsed = raw ? (JSON.parse(raw) as CartLine[]) : [];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
+    if (!Array.isArray(parsed)) return snapshot(mem.get(sellerId) ?? []);
+    const cleaned = parsed.filter(
       (l) =>
         l &&
         typeof l.productId === "string" &&
@@ -22,17 +28,21 @@ export function loadCart(sellerId: string): CartLine[] {
         l.qty > 0 &&
         l.qty <= 99
     );
+    mem.set(sellerId, snapshot(cleaned));
+    return snapshot(cleaned);
   } catch {
-    return [];
+    return snapshot(mem.get(sellerId) ?? []);
   }
 }
 
 function save(sellerId: string, lines: CartLine[]) {
+  const next = snapshot(lines);
+  mem.set(sellerId, snapshot(next));
   try {
-    if (lines.length === 0) localStorage.removeItem(key(sellerId));
-    else localStorage.setItem(key(sellerId), JSON.stringify(lines));
+    if (next.length === 0) localStorage.removeItem(key(sellerId));
+    else localStorage.setItem(key(sellerId), JSON.stringify(next));
   } catch {
-    // storage unavailable
+    mem.set(sellerId, snapshot(next));
   }
   window.dispatchEvent(new CustomEvent(CART_EVENT, { detail: { sellerId } }));
 }

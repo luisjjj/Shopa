@@ -50,6 +50,25 @@ export default function ProfileClient({
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [payoutNote, setPayoutNote] = useState("");
+  const [pinging, setPinging] = useState(false);
+  const [pingResult, setPingResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  const handleTestPing = async () => {
+    setPinging(true);
+    setPingResult(null);
+    try {
+      const res = await fetch("/api/alerts/whatsapp/test", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setPingResult({ ok: true, message: "Test ping sent. Check your WhatsApp." });
+      } else {
+        setPingResult({ ok: false, message: data.error || "Could not send the test ping" });
+      }
+    } catch {
+      setPingResult({ ok: false, message: "Could not send the test ping" });
+    }
+    setPinging(false);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -184,6 +203,33 @@ export default function ProfileClient({
               value={`myshopa.com.ng/${storeName}`}
               mono
             />
+          </div>
+        </section>
+
+        {/* Order alerts */}
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Order alerts</h2>
+          </div>
+          <div className="p-5 space-y-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {phone ? `WhatsApp number saved: ${phone}` : "No WhatsApp number saved yet"}
+            </p>
+            <button
+              onClick={handleTestPing}
+              disabled={pinging || !phone}
+              className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 ${pinging || !phone ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              {pinging ? "Sending..." : "Send test ping"}
+            </button>
+            {pingResult && (
+              <p className={`text-xs ${pingResult.ok ? "text-green-600 dark:text-green-400" : "text-red-500"}`}>
+                {pingResult.message}
+              </p>
+            )}
+            <p className="text-[11px] text-gray-400 dark:text-gray-500">
+              Save your number above first, then ping to confirm order alerts reach you.
+            </p>
           </div>
         </section>
 
