@@ -6,6 +6,7 @@ import DashboardSidebar, { DashboardMenuButton } from "@/components/DashboardSid
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import StoreSwitcher from "@/components/StoreSwitcher";
+import SupportWidget from "@/components/SupportWidget";
 import TrialClaimer from "@/components/TrialClaimer";
 import { isPremiumActive, isProPlusActive, daysLeft } from "@/lib/premium";
 
@@ -98,6 +99,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
           {children}
         </main>
       </div>
+      <SupportWidget />
     </div>
   );
 }

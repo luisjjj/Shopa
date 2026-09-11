@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AdminInbox from "./AdminInbox";
 
 type Stats = {
   launchDate: string;
@@ -17,6 +18,7 @@ type Stats = {
 export default function AdminClient() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState("");
+  const [tab, setTab] = useState<"stats" | "messages">("stats");
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -46,6 +48,27 @@ export default function AdminClient() {
           </Link>
         </div>
 
+        <div className="flex gap-2 mb-6">
+          {(["stats", "messages"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all capitalize ${
+                tab === t
+                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.06]"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {tab === "messages" ? (
+          <AdminInbox />
+        ) : (
+          <>
         {error && (
           <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-5">
             <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
@@ -98,6 +121,8 @@ export default function AdminClient() {
               </div>
             </>
           )
+        )}
+          </>
         )}
       </div>
     </div>

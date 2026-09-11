@@ -34,6 +34,7 @@ import {
   Upload,
   User,
   Warning,
+  Headset,
 } from "phosphor-react";
 
 interface IconProps {
@@ -79,6 +80,7 @@ export const ImageIcon = wrap(Image);
 export const TypeIcon = wrap(Type);
 export const GridIcon = wrap(Grid);
 export const ListIcon = wrap(List);
+export const HeadsetIcon = wrap(Headset);
 export const UploadIcon = wrap(Upload);
 export const UserIcon = wrap(User);
 export const WarningIcon = wrap(Warning);

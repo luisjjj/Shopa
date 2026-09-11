@@ -400,6 +400,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="relative z-10 max-w-3xl mx-auto px-6 pb-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
+          Questions, answered
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8">
+          Everything sellers usually ask before starting.
+        </p>
+        <FaqAccordion />
+      </section>
+
       <footer className="relative z-10 border-t border-gray-100 dark:border-white/[0.06] py-12">
         <div className="max-w-6xl mx-auto px-6 grid sm:grid-cols-4 gap-8">
           <div>
@@ -435,6 +445,77 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+const FAQS = [
+  {
+    q: "How do I get paid?",
+    a: "Buyers pay you directly through Paystack checkout into your own bank account. Set it up once in Dashboard → Payouts. Shopa keeps 1% plus the Paystack processing fee, which the buyer covers, so you net your full price.",
+  },
+  {
+    q: "Is there really a free trial?",
+    a: "Yes. Tap Start free trial on the pricing section and you get 7 days of Premium free, no card required. It drops back to the Free plan automatically unless you upgrade.",
+  },
+  {
+    q: "How do buyers track their orders?",
+    a: "Every buyer gets an order reference and can follow Paid → Fulfilled status at myshopa.shop/track with the phone number or email used at checkout. No account needed.",
+  },
+  {
+    q: "Do I need a laptop to run my store?",
+    a: "No. Everything, products, orders, payouts, customization, works from your phone's browser. Most sellers never touch a computer.",
+  },
+  {
+    q: "Can buyers buy more than one product at once?",
+    a: "Yes. Buyers add items to a cart on your storefront and pay once. Each item still settles as its own order row so your stock and payouts stay exact.",
+  },
+  {
+    q: "How fast is delivery handled?",
+    a: "You handle delivery yourself with any rider or waybill after payment. Mark the order Fulfilled in your dashboard and the buyer sees it update on the Track page.",
+  },
+  {
+    q: "What if I need help?",
+    a: "Open the headset icon in your dashboard for instant answers from support chat. A human follows up right in the chat and by email when needed.",
+  },
+];
+
+function FaqAccordion() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <div className="space-y-2">
+      {FAQS.map((f, i) => {
+        const isOpen = open === i;
+        return (
+          <div
+            key={i}
+            className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark"
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(isOpen ? null : i)}
+              aria-expanded={isOpen}
+              className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
+            >
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{f.q}</span>
+              <svg
+                className={`w-4 h-4 shrink-0 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            {isOpen && (
+              <p className="px-5 pb-5 text-sm leading-relaxed text-gray-500 dark:text-gray-400 animate-fade-up">
+                {f.a}
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
