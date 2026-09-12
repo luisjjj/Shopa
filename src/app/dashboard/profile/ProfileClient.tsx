@@ -382,8 +382,103 @@ export default function ProfileClient({
             year: "numeric",
           })}
         </p>
+
+        <DeleteAccountSection />
       </main>
     </div>
+  );
+}
+
+function DeleteAccountSection() {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [typed, setTyped] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDelete = async () => {
+    if (typed !== "DELETE" || deleting) return;
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/account", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: typed }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Could not delete your account. Try again.");
+        setDeleting(false);
+        return;
+      }
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+      window.location.href = "/";
+    } catch {
+      setError("Network error. Try again.");
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <section className="bg-white dark:bg-[#141414] border border-red-200/60 dark:border-red-900/30 rounded-2xl overflow-hidden">
+      <div className="px-5 py-4">
+        <h2 className="text-sm font-semibold text-red-600 dark:text-red-400">Danger zone</h2>
+        {!confirmOpen ? (
+          <>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Permanently delete your account, store, products, and orders. This cannot be undone.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmOpen(true);
+                setTyped("");
+                setError("");
+              }}
+              className="mt-3 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+            >
+              Delete account
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Type <span className="font-mono font-bold text-gray-700 dark:text-gray-300">DELETE</span> below to erase everything.
+            </p>
+            <input
+              type="text"
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              placeholder="DELETE"
+              autoComplete="off"
+              className="mt-3 w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-red-500 transition-colors placeholder:text-gray-400 font-mono"
+            />
+            {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={typed !== "DELETE" || deleting}
+                className="text-sm font-semibold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+              >
+                {deleting ? "Deleting..." : "Yes, delete everything"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmOpen(false);
+                  setTyped("");
+                  setError("");
+                }}
+                className="text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 
