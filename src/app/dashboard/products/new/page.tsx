@@ -210,7 +210,7 @@ export default function NewProductPage() {
               type="button"
               onClick={handleImport}
               disabled={importing || !igUrl.trim()}
-              className="btn-primary shrink-0 disabled:opacity-50"
+              className="shrink-0 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-60 active:scale-[0.98]"
             >
               {importing ? "Importing..." : "Import"}
             </button>
