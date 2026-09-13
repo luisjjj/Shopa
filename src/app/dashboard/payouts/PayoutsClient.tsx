@@ -11,6 +11,7 @@ type Bank = PaystackBankOption;
 
 type Payout = {
   paystack_subaccount_code: string | null;
+  bank_code?: string | null;
   bank_name: string | null;
   account_number: string | null;
   account_name: string | null;
@@ -21,8 +22,8 @@ export default function PayoutsClient({ username, payout }: { username: string; 
   const router = useRouter();
   const [banks, setBanks] = useState<Bank[]>([]);
   const [banksLoading, setBanksLoading] = useState(true);
-  const [bankCode, setBankCode] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
+  const [bankCode, setBankCode] = useState(payout.bank_code || "");
+  const [accountNumber, setAccountNumber] = useState(payout.account_number || "");
   const [resolvedName, setResolvedName] = useState<string | null>(null);
   const [manualMode, setManualMode] = useState(false);
   const [typedName, setTypedName] = useState("");
@@ -35,11 +36,22 @@ export default function PayoutsClient({ username, payout }: { username: string; 
     fetch("/api/payouts/banks")
       .then((r) => r.json())
       .then((data) => {
-        if (data.banks) setBanks(data.banks);
+        if (data.banks) {
+          setBanks(data.banks);
+          // Prefill from bank details saved during onboarding (which had no
+          // subaccount yet): match old name-only records to a live bank code.
+          if (!payout.paystack_subaccount_code && !payout.bank_code && payout.bank_name) {
+            const match = (data.banks as Bank[]).find(
+              (b) => b.name.toLowerCase() === String(payout.bank_name).toLowerCase()
+            );
+            if (match) setBankCode(match.code);
+          }
+        }
         else setError(data.error || "Could not load banks");
       })
       .catch(() => setError("Could not load banks. Check your connection"))
       .finally(() => setBanksLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const bankName = banks.find((b) => b.code === bankCode)?.name || "";
@@ -129,6 +141,13 @@ export default function PayoutsClient({ username, payout }: { username: string; 
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
           Shopa takes 1% per sale.
         </p>
+        {(payout.bank_name || payout.account_number) && (
+          <div className="rounded-xl px-4 py-3 mb-5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
+            <p className="text-sm text-amber-700 dark:text-amber-400">
+              We have your saved details{payout.bank_name ? ` (${payout.bank_name}, ${payout.account_number || ""})` : ""} but payouts aren&apos;t active yet. Verify below to activate.
+            </p>
+          </div>
+        )}
 
         {done ? (
           <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark">

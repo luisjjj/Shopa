@@ -35,6 +35,9 @@ import {
   User,
   Warning,
   Headset,
+  LockKey,
+  WhatsappLogo,
+  Truck,
 } from "phosphor-react";
 
 interface IconProps {
@@ -84,3 +87,6 @@ export const HeadsetIcon = wrap(Headset);
 export const UploadIcon = wrap(Upload);
 export const UserIcon = wrap(User);
 export const WarningIcon = wrap(Warning);
+export const LockIcon = wrap(LockKey);
+export const WhatsappIcon = wrap(WhatsappLogo);
+export const TruckIcon = wrap(Truck);

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon, BankIcon } from "@/components/Icons";
-import BankPicker from "@/components/BankPicker";
+import PaystackBankSelect, { PaystackBankOption } from "@/components/PaystackBankSelect";
 import TrialClaimer from "@/components/TrialClaimer";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import { AuthSidePanel } from "@/components/AuthSidePanel";
@@ -17,9 +17,12 @@ export default function OnboardingPage() {
   const [createNew, setCreateNew] = useState(false);
   const [username, setUsername] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [bankName, setBankName] = useState("");
+  const [banks, setBanks] = useState<PaystackBankOption[]>([]);
+  const [banksLoading, setBanksLoading] = useState(true);
+  const [bankCode, setBankCode] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
+  const [manualMode, setManualMode] = useState(false);
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
@@ -27,6 +30,16 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
+
+  useEffect(() => {
+    fetch("/api/payouts/banks")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.banks) setBanks(data.banks);
+      })
+      .catch(() => {})
+      .finally(() => setBanksLoading(false));
+  }, []);
 
   useEffect(() => {
     const checkExisting = async () => {
@@ -96,9 +109,47 @@ export default function OnboardingPage() {
     setChecking(false);
   };
 
+  const setupPayouts = async (bank_code: string, bank_name: string, account_number: string, manual: boolean) => {
+    const res = await fetch("/api/payouts/setup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bank_code,
+        bank_name,
+        account_number,
+        ...(manual ? { manual_confirm: true, account_name: accountName.trim() } : {}),
+      }),
+    });
+    return { res, data: await res.json().catch(() => ({})) } as {
+      res: Response;
+      data: { ok?: boolean; error?: string; message?: string };
+    };
+  };
+
+  const handleManualConfirm = async () => {
+    if (!accountName.trim()) {
+      setError("Type the account name exactly as your bank shows it");
+      return;
+    }
+    const bankName = banks.find((b) => b.code === bankCode)?.name || "";
+    setSaving(true);
+    setError("");
+    const { res, data } = await setupPayouts(bankCode, bankName, accountNumber, true);
+    setSaving(false);
+    if (!res.ok) {
+      setError(data.error || data.message || "Payout setup failed. Finish on the payouts page");
+      return;
+    }
+    router.push("/dashboard");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!available || username.length < 3) return;
+    if (manualMode) {
+      await handleManualConfirm();
+      return;
+    }
     setSaving(true);
     setError("");
 
@@ -117,9 +168,6 @@ export default function OnboardingPage() {
       email: user.email!,
       username,
       whatsapp_number: whatsapp || null,
-      bank_name: bankName || null,
-      account_number: accountNumber || null,
-      account_name: accountName || null,
     });
 
     if (insertError) {
@@ -128,7 +176,34 @@ export default function OnboardingPage() {
       return;
     }
 
-    router.push("/dashboard");
+    const wantsPayouts = !!bankCode && accountNumber.length === 10;
+    const partialBank = (!!bankCode || !!accountNumber) && !wantsPayouts;
+    if (partialBank) {
+      router.push("/dashboard/payouts");
+      return;
+    }
+    if (!wantsPayouts) {
+      router.push("/dashboard");
+      return;
+    }
+
+    const bankName = banks.find((b) => b.code === bankCode)?.name || "";
+    const { res, data } = await setupPayouts(bankCode, bankName, accountNumber, false);
+    if (res.ok) {
+      router.push("/dashboard");
+      return;
+    }
+    // Paystack verification unavailable: keep the store (already created)
+    // and let the seller confirm their typed name to finish activation.
+    if (data.error === "RESOLVE_UNAVAILABLE") {
+      setManualMode(true);
+      setSaving(false);
+      return;
+    }
+    // Any other failure: raw details failed verification. Send them to the
+    // payouts page to fix rather than silently dropping the bank info.
+    setSaving(false);
+    router.push("/dashboard/payouts");
   };
 
   if (existingStore && !createNew) {
@@ -260,22 +335,31 @@ export default function OnboardingPage() {
             />
           </div>
 
-          {/* Bank Details */}
+          {/* Bank Details - verified via Paystack, same as payouts page */}
           <div className="mb-8 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-1">
               <BankIcon size={16} className="text-brand-600" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Bank details
               </span>
-              <span className="text-xs text-gray-400">(for receiving payments)</span>
+              <span className="text-xs text-gray-400">(optional, for receiving payments)</span>
             </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+              Verified instantly with Paystack. Skip to add it later in Dashboard → Payouts.
+            </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  Bank name
+                  Bank
                 </label>
-                <BankPicker value={bankName} onChange={setBankName} variant="underline" />
+                <PaystackBankSelect
+                  banks={banks}
+                  value={bankCode}
+                  onChange={(code) => { setBankCode(code); setManualMode(false); setError(""); }}
+                  disabled={banksLoading && banks.length === 0}
+                  loading={banksLoading}
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -283,25 +367,28 @@ export default function OnboardingPage() {
                 </label>
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onChange={(e) => { setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setManualMode(false); setError(""); }}
                   placeholder="0123456789"
                   maxLength={10}
                   className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
                 />
               </div>
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  Account name
-                </label>
-                <input
-                  type="text"
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
-                />
-              </div>
+              {manualMode && (
+                <div className="rounded-xl px-3 py-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+                    Automatic verification is unavailable. Type the account name exactly as your bank shows it:
+                  </p>
+                  <input
+                    type="text"
+                    value={accountName}
+                    onChange={(e) => setAccountName(e.target.value)}
+                    placeholder="e.g. ADAEZE OKONKWO"
+                    className="w-full border-b-2 border-amber-300 dark:border-amber-800 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -314,7 +401,7 @@ export default function OnboardingPage() {
             disabled={!available || saving}
             className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
           >
-            {saving ? "Creating store..." : "Create my store"}
+            {saving ? "Creating store..." : manualMode ? "Confirm details & activate payouts" : "Create my store"}
           </button>
         </form>
         </div>

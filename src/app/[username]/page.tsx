@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { PackageIcon } from "@/components/Icons";
+import { PackageIcon, LockIcon, WhatsappIcon, TruckIcon } from "@/components/Icons";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { CartBar, CartNavButton } from "@/components/CartButtons";
 import ProductGrid from "./ProductGrid";
@@ -496,9 +496,9 @@ export default async function StorePage({
           <footer key={sec.id} id="contact" className="border-t py-8 scroll-mt-20" style={{ borderColor: `${textColor}10` }}>
             <div className="text-center px-4">
               <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4 text-xs font-medium" style={{ color: `${textColor}60` }}>
-                <span>🔒 Secure Paystack checkout</span>
-                <span>💬 WhatsApp support</span>
-                <span>🚚 Nationwide delivery</span>
+                <span className="inline-flex items-center gap-1.5"><LockIcon size={14} /> Secure Paystack checkout</span>
+                <span className="inline-flex items-center gap-1.5"><WhatsappIcon size={14} /> WhatsApp support</span>
+                <span className="inline-flex items-center gap-1.5"><TruckIcon size={14} /> Nationwide delivery</span>
               </div>
               <div className="flex items-center justify-center gap-6 mb-4 text-sm font-semibold" style={{ color: textColor }}>
                 <a href="#shop" className="hover:opacity-70 transition-opacity">Shop</a>
@@ -1119,9 +1119,9 @@ export default async function StorePage({
       <footer id="contact" className="border-t py-8 border-gray-100 dark:border-white/10 scroll-mt-20" style={s ? { borderColor: `${textColor}10` } : undefined}>
         <div className="text-center px-4">
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4 text-xs font-medium text-gray-400 dark:text-gray-500" style={s ? { color: `${textColor}60` } : undefined}>
-            <span>🔒 Secure Paystack checkout</span>
-            <span>💬 WhatsApp support</span>
-            <span>🚚 Nationwide delivery</span>
+            <span className="inline-flex items-center gap-1.5"><LockIcon size={14} /> Secure Paystack checkout</span>
+            <span className="inline-flex items-center gap-1.5"><WhatsappIcon size={14} /> WhatsApp support</span>
+            <span className="inline-flex items-center gap-1.5"><TruckIcon size={14} /> Nationwide delivery</span>
           </div>
           <div className="flex items-center justify-center gap-6 mb-4 text-sm font-semibold text-gray-700 dark:text-gray-300" style={s ? { color: textColor } : undefined}>
             <a href="#shop" className="hover:opacity-70 transition-opacity">Shop</a>

@@ -12,7 +12,7 @@ export default async function PayoutsPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("username, paystack_subaccount_code, bank_name, account_number, account_name, payout_setup_completed_at")
+    .select("username, paystack_subaccount_code, bank_code, bank_name, account_number, account_name, payout_setup_completed_at")
     .eq("id", user.id)
     .single();
 
@@ -23,6 +23,7 @@ export default async function PayoutsPage() {
       username={(profile as { username: string }).username}
       payout={profile as {
         paystack_subaccount_code: string | null;
+        bank_code: string | null;
         bank_name: string | null;
         account_number: string | null;
         account_name: string | null;
