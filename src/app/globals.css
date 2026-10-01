@@ -215,3 +215,69 @@ body::before {
   background: rgba(237, 119, 18, 0.15);
   color: inherit;
 }
+
+/* ---------- PWA: browser vs installed-app layout ---------- */
+
+/* App-only chrome is hidden in a normal browser tab … */
+.pwa-app-only {
+  display: none;
+}
+
+/* … and shown when launched from the home screen (see PwaMode). */
+html.pwa-standalone .pwa-app-only {
+  display: block;
+}
+
+html.pwa-standalone .pwa-app-only-flex {
+  display: flex;
+}
+
+/* Browser-only chrome (sidebar + wide header) hides in the installed app. */
+html.pwa-standalone .pwa-browser-only {
+  display: none !important;
+}
+
+/* Content goes full-width in the installed app (no sidebar offset). */
+html.pwa-standalone .pwa-content {
+  padding-left: 0 !important;
+}
+
+/* Room for the bottom tab bar in the installed app. */
+html.pwa-standalone .pwa-main {
+  padding-bottom: 6.5rem;
+}
+
+/* App feel: no rubber-band overscroll, no tap highlight. */
+html.pwa-standalone body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes install-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-install-sheet {
+  animation: install-sheet-in 0.3s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-install-sheet {
+    animation: none;
+  }
+}

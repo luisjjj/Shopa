@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingIcons from "@/components/FloatingIcons";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { PwaMode } from "@/components/PwaMode";
+import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -32,6 +34,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
+  applicationName: "Shopa",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Shopa",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+  },
   openGraph: {
     type: "website",
     siteName: "Shopa",
@@ -57,8 +70,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   themeColor: "#ed7712",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -81,7 +97,9 @@ export default function RootLayout({
         <ThemeProvider initialTheme={initialTheme}>
           <FloatingIcons />
           <ServiceWorkerRegistration />
+          <PwaMode />
           {children}
+          <PwaInstallBanner />
           <Analytics />
         </ThemeProvider>
       </body>

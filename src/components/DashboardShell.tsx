@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { UserIcon } from "@/components/Icons";
 import DashboardSidebar, { DashboardMenuButton } from "@/components/DashboardSidebar";
+import { DashboardBottomNav } from "@/components/DashboardBottomNav";
+import { DashboardAppHeader } from "@/components/DashboardAppHeader";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShopaLogo } from "@/components/ShopaLogo";
 import StoreSwitcher from "@/components/StoreSwitcher";
@@ -55,14 +57,17 @@ export default async function DashboardShell({ children }: { children: React.Rea
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
-      <DashboardSidebar
-        username={profile.username}
-        planName={planName}
-        planDetail={planDetail}
-        showUpgrade={!isPremium}
-      />
-      <div className="lg:pl-60 min-w-0">
-        <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
+      {/* Browser layout: fixed sidebar + wide header */}
+      <div className="pwa-browser-only">
+        <DashboardSidebar
+          username={profile.username}
+          planName={planName}
+          planDetail={planDetail}
+          showUpgrade={!isPremium}
+        />
+      </div>
+      <div className="pwa-content lg:pl-60 min-w-0">
+        <header className="pwa-browser-only bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
           <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-1">
               <DashboardMenuButton />
@@ -94,10 +99,17 @@ export default async function DashboardShell({ children }: { children: React.Rea
           </div>
         </header>
 
-        <main className="max-w-5xl mx-auto px-5 py-8 animate-fade-up">
+        <DashboardAppHeader username={profile.username} />
+
+        <main className="pwa-main max-w-5xl mx-auto px-4 sm:px-5 py-6 sm:py-8 animate-fade-up">
           <TrialClaimer />
           {children}
         </main>
+        <DashboardBottomNav
+          username={profile.username}
+          planName={planName}
+          showUpgrade={!isPremium}
+        />
       </div>
       <SupportWidget />
     </div>

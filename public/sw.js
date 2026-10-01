@@ -1,3 +1,16 @@
+self.addEventListener("install", function () {
+  // Activate immediately so the PWA installability check sees a live SW.
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(self.clients.claim());
+});
+
+// Pass-through fetch handler: required by Chromium for installability
+// (beforeinstallprompt). No caching — network only.
+self.addEventListener("fetch", function () {});
+
 self.addEventListener("push", function (event) {
   const data = event.data ? event.data.json() : {};
   const title = data.title || "Shopa";
