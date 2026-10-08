@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingIcons from "@/components/FloatingIcons";
@@ -101,6 +102,13 @@ export default function RootLayout({
           {children}
           <PwaInstallBanner />
           <Analytics />
+          <Script
+            async
+            src="https://www.sabilytics.com/script.js"
+            data-site="ncmjvav99f1c"
+            data-domain="myshopa.shop"
+            strategy="afterInteractive"
+          />
         </ThemeProvider>
       </body>
     </html>
