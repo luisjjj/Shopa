@@ -33,10 +33,6 @@ const config: Config = {
         "card-hover": "0 8px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04)",
         "card-dark": "0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15)",
         "card-dark-hover": "0 8px 25px rgba(0,0,0,0.35), 0 4px 10px rgba(0,0,0,0.2)",
-        "soft": "0 1px 2px rgba(24,15,5,0.05), 0 10px 30px -12px rgba(24,15,5,0.10)",
-        "soft-lg": "0 1px 3px rgba(24,15,5,0.05), 0 28px 64px -28px rgba(24,15,5,0.18)",
-        "soft-dark": "0 1px 2px rgba(0,0,0,0.3), 0 10px 30px -12px rgba(0,0,0,0.5)",
-        "soft-lg-dark": "0 1px 3px rgba(0,0,0,0.35), 0 28px 64px -28px rgba(0,0,0,0.65)",
       },
       animation: {
         "float": "float 6s ease-in-out infinite",
@@ -44,9 +40,6 @@ const config: Config = {
         "float-slow": "float 8s ease-in-out 1s infinite",
         "fade-in": "fadeIn 0.6s ease-out",
         "slide-up": "slideUp 0.6s ease-out",
-        "slide-up-1": "slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.08s both",
-        "slide-up-2": "slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.16s both",
-        "slide-up-3": "slideUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.26s both",
         "scale-in": "scaleIn 0.3s ease-out",
       },
       keyframes: {
