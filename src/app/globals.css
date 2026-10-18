@@ -178,6 +178,35 @@ body::before {
   animation: fade-up 0.35s ease-out both;
 }
 
+/* ---------- Landing: scroll reveal + edge fade ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+.mask-x {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-float, .hero-float-delayed, .animate-marquee, .rotate-word, .shape-drift, .shape-drift-delayed, .shape-drift-slow, .animate-slide-in-left, .animate-shimmer, .animate-fade-up {
     animation: none;
