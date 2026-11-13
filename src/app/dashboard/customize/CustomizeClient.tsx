@@ -603,14 +603,20 @@ export default function CustomizeClient({
   return (
     <div className="h-screen flex flex-col bg-gray-50 dark:bg-[#0a0a0a]">
       {/* Header */}
-      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10 shrink-0">
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 md:gap-4 min-w-0">
-            <Link href="/dashboard" className="text-lg font-bold text-brand-600 shrink-0">
-              Shopa
+      <header className="bg-white/90 dark:bg-[#0e0e0e]/90 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] shrink-0">
+        <div className="px-4 sm:px-5 h-16 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1.5 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+              <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <span className="text-sm text-gray-400 hidden md:inline">/</span>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden md:inline">
+            <span className="text-gray-300 dark:text-gray-700 hidden md:inline" aria-hidden="true">/</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white hidden md:inline truncate">
               Customize Store
             </span>
           </div>
@@ -618,7 +624,7 @@ export default function CustomizeClient({
             <Link
               href={`/${username}`}
               target="_blank"
-              className="text-xs md:text-sm text-gray-500 dark:text-gray-400 hover:text-brand-600 transition-colors hidden sm:inline"
+              className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors hidden sm:inline"
             >
               View store ↗
             </Link>
@@ -626,10 +632,10 @@ export default function CustomizeClient({
             <button
               onClick={handleSave}
               disabled={saving}
-              className={`flex items-center gap-1.5 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors ${
+              className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-[0.98] ${
                 saved
                   ? "bg-green-500 text-white"
-                  : "bg-brand-500 hover:bg-brand-600 text-white"
+                  : "bg-brand-500 hover:bg-brand-600 text-white shadow-brand"
               } ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {saved ? (
@@ -653,23 +659,23 @@ export default function CustomizeClient({
       </header>
 
       {/* Mobile Tab Bar */}
-      <div className="flex md:hidden border-b border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414] shrink-0">
+      <div className="flex md:hidden border-b border-gray-200/70 dark:border-white/10 bg-white dark:bg-[#141414] shrink-0 p-1.5 gap-1">
         <button
           onClick={() => setActiveTab("edit")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
             activeTab === "edit"
-              ? "text-brand-600 border-b-2 border-brand-500"
-              : "text-gray-500"
+              ? "bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-300"
+              : "text-gray-500 hover:bg-gray-50 dark:hover:bg-white/[0.04]"
           }`}
         >
           Edit
         </button>
         <button
           onClick={() => setActiveTab("preview")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
             activeTab === "preview"
-              ? "text-brand-600 border-b-2 border-brand-500"
-              : "text-gray-500"
+              ? "bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-300"
+              : "text-gray-500 hover:bg-gray-50 dark:hover:bg-white/[0.04]"
           }`}
         >
           Preview

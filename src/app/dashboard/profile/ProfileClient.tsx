@@ -49,6 +49,23 @@ export default function ProfileClient({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const newStoreUrl = `https://${storeName}.myshopa.shop`;
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(newStoreUrl);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = newStoreUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
   const [payoutNote, setPayoutNote] = useState("");
   const [pinging, setPinging] = useState(false);
   const [pingResult, setPingResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -116,32 +133,46 @@ export default function ProfileClient({
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
+    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
       {/* Header */}
-      <header className="bg-white dark:bg-[#141414] border-b border-gray-100 dark:border-white/10">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-xl font-bold text-brand-600">
-              Shopa
+      <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Link
+              href="/dashboard"
+              aria-label="Back to dashboard"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-2.5 py-2 -ml-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+              <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <span className="text-sm text-gray-400">/</span>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-gray-300 dark:text-gray-700 hidden sm:inline" aria-hidden="true">/</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
               Profile
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-4 sm:space-y-5">
+        <div className="mb-2">
+          <p className="eyebrow mb-2">Settings</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Your profile</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Store details, order alerts and payout account.
+          </p>
+        </div>
+
         {/* Account Info */}
-        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
+          <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Account</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">How buyers find and reach your store</p>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-white/10">
+          <div className="divide-y divide-gray-100 dark:divide-white/[0.06]">
             <div className="px-5 py-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <span className="text-gray-400 shrink-0">
@@ -156,18 +187,18 @@ export default function ProfileClient({
                       setStoreName(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20))
                     }
                     minLength={3}
-                    className="text-sm text-gray-900 dark:text-white bg-transparent outline-none mt-0.5 w-full font-medium placeholder:text-gray-400"
+                    className="text-sm font-medium text-gray-900 dark:text-white bg-transparent border-b border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none mt-1 pb-1 w-full transition-colors placeholder:text-gray-400"
                   />
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
                     Changing this changes your store link
                   </p>
                 </div>
               </div>
               <a
-                href={`/${storeName}`}
+                href={`https://${storeName}.myshopa.shop`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-brand-600 hover:text-brand-700 shrink-0"
+                className="text-xs font-medium text-brand-600 hover:text-brand-700 shrink-0"
               >
                 View store ↗
               </a>
@@ -189,9 +220,9 @@ export default function ProfileClient({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="2348012345678"
-                    className="text-sm text-gray-900 dark:text-white bg-transparent outline-none mt-0.5 w-full placeholder:text-gray-400"
+                    className="text-sm text-gray-900 dark:text-white bg-transparent border-b border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none mt-1 pb-1 w-full transition-colors placeholder:text-gray-400"
                   />
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
                     Instant WhatsApp pings for new paid orders go here
                   </p>
                 </div>
@@ -200,16 +231,47 @@ export default function ProfileClient({
             <InfoRow
               icon={<GlobeIcon size={16} />}
               label="Store URL"
-              value={`myshopa.shop/${storeName}`}
+              value={`${storeName}.myshopa.shop`}
               mono
             />
           </div>
         </section>
 
+        <section className="bg-brand-50/80 dark:bg-brand-950/20 border border-brand-200/70 dark:border-brand-900/30 rounded-2xl overflow-hidden">
+          <div className="p-5">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400 bg-brand-100 dark:bg-brand-900/40 px-2 py-0.5 rounded-full">New</span>
+            </div>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white mt-2">Your store has a new address</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+              Share this cleaner link. Your old myshopa.shop/{username} links still redirect automatically.
+            </p>
+            <div className="mt-3 flex items-center gap-2 bg-white dark:bg-white/5 border border-brand-200/60 dark:border-brand-900/30 rounded-xl px-3 py-2.5">
+              <span className="flex-1 min-w-0 truncate text-sm font-mono text-gray-900 dark:text-white">{newStoreUrl.replace("https://", "")}</span>
+              <button
+                type="button"
+                onClick={handleCopyUrl}
+                className="shrink-0 text-xs font-semibold bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                {copied ? "Copied ✓" : "Copy"}
+              </button>
+            </div>
+            <a
+              href={newStoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-3 text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+            >
+              View new link ↗
+            </a>
+          </div>
+        </section>
+
         {/* Order alerts */}
-        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
+          <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Order alerts</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">Test that WhatsApp pings reach you</p>
           </div>
           <div className="p-5 space-y-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -218,7 +280,7 @@ export default function ProfileClient({
             <button
               onClick={handleTestPing}
               disabled={pinging || !phone}
-              className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 ${pinging || !phone ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`text-sm font-semibold px-4 py-2.5 rounded-xl transition-all bg-gray-900 hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 ${pinging || !phone ? "opacity-50 cursor-not-allowed" : "active:scale-[0.98]"}`}
             >
               {pinging ? "Sending..." : "Send test ping"}
             </button>
@@ -234,25 +296,25 @@ export default function ProfileClient({
         </section>
 
         {/* Bank Details */}
-        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
+          <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
             <div className="flex items-center gap-2">
-              <BankIcon size={16} className="text-brand-600" />
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bank Details</h2>
+              <BankIcon size={16} className="text-brand-600 dark:text-brand-400" />
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Bank details</h2>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
               Saving verifies the account and activates payouts.
             </p>
           </div>
           <div className="p-5 space-y-4">
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                 Bank name
               </label>
               <BankPicker value={bank} onChange={setBank} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                 Account number
               </label>
               <input
@@ -261,11 +323,11 @@ export default function ProfileClient({
                 onChange={(e) => setAccountNum(e.target.value.replace(/\D/g, "").slice(0, 10))}
                 placeholder="0123456789"
                 maxLength={10}
-                className="w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-brand-500 transition-colors placeholder:text-gray-400"
+                className="input-base font-mono tracking-widest tnum"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                 Account name
               </label>
               <input
@@ -273,7 +335,7 @@ export default function ProfileClient({
                 value={accountNm}
                 onChange={(e) => setAccountNm(e.target.value)}
                 placeholder="John Doe"
-                className="w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-brand-500 transition-colors placeholder:text-gray-400"
+                className="input-base"
               />
             </div>
           </div>
@@ -284,10 +346,10 @@ export default function ProfileClient({
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-lg transition-colors ${
+            className={`inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-[0.98] ${
               saved
                 ? "bg-green-500 text-white"
-                : "bg-brand-500 hover:bg-brand-600 text-white"
+                : "bg-brand-500 hover:bg-brand-600 text-white shadow-brand"
             } ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             {saved ? (
@@ -303,9 +365,10 @@ export default function ProfileClient({
         </div>
 
         {/* Plan */}
-        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10">
+        <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
+          <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Plan</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">Your current subscription</p>
           </div>
           <div className="p-5 space-y-4">
             {effectiveProPlus && (
@@ -420,12 +483,12 @@ function DeleteAccountSection() {
   };
 
   return (
-    <section className="bg-white dark:bg-[#141414] border border-red-200/60 dark:border-red-900/30 rounded-2xl overflow-hidden">
+    <section className="bg-white dark:bg-[#141414] border border-red-200/60 dark:border-red-900/30 rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
       <div className="px-5 py-4">
         <h2 className="text-sm font-semibold text-red-600 dark:text-red-400">Danger zone</h2>
         {!confirmOpen ? (
           <>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
               Permanently delete your account, store, products, and orders. This cannot be undone.
             </p>
             <button
@@ -435,7 +498,7 @@ function DeleteAccountSection() {
                 setTyped("");
                 setError("");
               }}
-              className="mt-3 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+              className="mt-3 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-4 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
             >
               Delete account
             </button>
@@ -451,7 +514,7 @@ function DeleteAccountSection() {
               onChange={(e) => setTyped(e.target.value)}
               placeholder="DELETE"
               autoComplete="off"
-              className="mt-3 w-full text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 outline-none focus:border-red-500 transition-colors placeholder:text-gray-400 font-mono"
+              className="input-base mt-3 font-mono"
             />
             {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
             <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -459,7 +522,7 @@ function DeleteAccountSection() {
                 type="button"
                 onClick={handleDelete}
                 disabled={typed !== "DELETE" || deleting}
-                className="text-sm font-semibold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                className="text-sm font-semibold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
               >
                 {deleting ? "Deleting..." : "Yes, delete everything"}
               </button>
@@ -470,7 +533,7 @@ function DeleteAccountSection() {
                   setTyped("");
                   setError("");
                 }}
-                className="text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
+                className="text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
               >
                 Cancel
               </button>

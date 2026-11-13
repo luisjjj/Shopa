@@ -99,6 +99,11 @@ export default function OnboardingPage() {
     setUsername(value);
     setAvailable(null);
     if (value.length < 3) return;
+    const reserved = ["www", "api", "admin", "dashboard", "onboarding", "login", "signup", "auth", "cart", "checkout", "track", "confirm"];
+    if (reserved.includes(value)) {
+      setAvailable(false);
+      return;
+    }
     setChecking(true);
     const { data } = await supabase
       .from("users")
@@ -208,12 +213,12 @@ export default function OnboardingPage() {
 
   if (existingStore && !createNew) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50 dark:bg-[#0a0a0a]">
         <div className="w-full max-w-md">
           <div className="flex justify-end mb-4">
             <button
               onClick={toggle}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+              className="p-2.5 rounded-xl hover:bg-white dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
               aria-label="Toggle dark mode"
             >
               {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
@@ -222,26 +227,26 @@ export default function OnboardingPage() {
 
           <div className="text-center mb-8">
             <ShopaLogo className="justify-center" markClassName="w-10 h-10" textClassName="font-bold text-brand-600 leading-none" size={42} />
-            <p className="text-gray-500 dark:text-gray-400 mt-2">You already have a store</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">You already have a store</p>
           </div>
 
-          <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-8 text-center">
-            <p className="text-gray-700 dark:text-gray-300 mb-2">
+          <div className="bg-white dark:bg-[#141414] rounded-3xl shadow-card dark:shadow-card-dark border border-gray-100 dark:border-white/[0.06] p-7 sm:p-8 text-center">
+            <p className="text-gray-700 dark:text-gray-300 mb-2 text-sm">
               You already have a store:
             </p>
-            <p className="text-lg font-bold text-brand-600 mb-6">{existingStore}</p>
+            <p className="text-lg font-bold text-brand-600 dark:text-brand-400 mb-6 tracking-tight">{existingStore}</p>
 
             <div className="space-y-3">
               <button
                 onClick={() => router.push("/dashboard")}
-                className="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 rounded-xl transition-colors"
+                className="btn-primary"
               >
                 Go to dashboard
               </button>
               {isProPlus && (
                 <button
                   onClick={() => setCreateNew(true)}
-                  className="w-full bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300 font-medium py-3 rounded-xl transition-colors"
+                  className="btn-secondary"
                 >
                   Create another store
                 </button>
@@ -254,8 +259,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-[#0f0f0f]">
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50 dark:bg-[#0a0a0a]">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
         <div className="hidden lg:block sticky top-6 min-w-0">
           <AuthSidePanel />
         </div>
@@ -264,7 +269,7 @@ export default function OnboardingPage() {
         <div className="flex justify-end mb-4">
           <button
             onClick={toggle}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+            className="p-2.5 rounded-xl hover:bg-white dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
             aria-label="Toggle dark mode"
           >
             {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
@@ -273,7 +278,7 @@ export default function OnboardingPage() {
 
         <div className="grid grid-cols-3 gap-2 mb-6">
           {["/landing/step-add.jpg", "/landing/step-style.jpg", "/landing/step-paid.jpg"].map((src, i) => (
-            <div key={i} className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 aspect-[4/3]">
+            <div key={i} className="rounded-xl overflow-hidden border border-gray-100 dark:border-white/[0.06] aspect-[4/3] shadow-sm">
               <img src={src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" />
             </div>
           ))}
@@ -281,41 +286,44 @@ export default function OnboardingPage() {
 
         <div className="text-center mb-8">
           <ShopaLogo className="justify-center" markClassName="w-10 h-10" textClassName="font-bold text-brand-600 leading-none" size={42} />
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
+          <h1 className="mt-3 text-[1.75rem] font-bold tracking-tight text-gray-900 dark:text-white">
             {createNew ? "Create another store" : "Set up your store"}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">
+            Pick a link and get paid through Paystack
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-8"
+          className="bg-white dark:bg-[#141414] rounded-3xl shadow-card dark:shadow-card-dark border border-gray-100 dark:border-white/[0.06] p-7 sm:p-8"
         >
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Pick your store link
             </label>
-            <div className="flex items-center min-w-0">
-              <span className="text-gray-400 text-sm mr-1 shrink-0">myshopa.shop/</span>
+            <div className="flex items-center input-base !px-0 overflow-hidden">
               <input
                 type="text"
                 value={username}
                 onChange={(e) =>
                   checkUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
                 }
-                className="flex-1 min-w-0 border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 text-lg font-medium transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+                className="flex-1 min-w-0 bg-transparent border-none outline-none py-3 pl-4 pr-0 text-lg font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-right"
                 placeholder="yourstore"
                 required
                 minLength={3}
               />
+              <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 pr-4 pl-1">.myshopa.shop</span>
             </div>
             {checking && (
-              <p className="text-xs text-gray-400 mt-1">Checking...</p>
+              <p className="text-xs text-gray-400 mt-1.5">Checking...</p>
             )}
             {available === true && (
-              <p className="text-xs text-green-600 mt-1">Available!</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1.5">Available!</p>
             )}
             {available === false && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-red-500 mt-1.5">
                 Already taken. Try another.
               </p>
             )}
@@ -324,33 +332,35 @@ export default function OnboardingPage() {
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               WhatsApp number{" "}
-              <span className="text-gray-400">(optional, for order alerts)</span>
+              <span className="text-gray-400 dark:text-gray-500 font-normal">(optional, for order alerts)</span>
             </label>
             <input
               type="tel"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
-              className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400"
+              className="input-base"
               placeholder="+234 801 234 5678"
             />
           </div>
 
           {/* Bank Details - verified via Paystack, same as payouts page */}
-          <div className="mb-8 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+          <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-gray-50/80 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06]">
             <div className="flex items-center gap-2 mb-1">
-              <BankIcon size={16} className="text-brand-600" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="w-7 h-7 rounded-lg bg-brand-50 dark:bg-brand-950/40 flex items-center justify-center shrink-0">
+                <BankIcon size={15} className="text-brand-600 dark:text-brand-400" />
+              </span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
                 Bank details
               </span>
-              <span className="text-xs text-gray-400">(optional, for receiving payments)</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">(optional)</span>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4 pl-9">
               Verified instantly with Paystack. Skip to add it later in Dashboard → Payouts.
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
                   Bank
                 </label>
                 <PaystackBankSelect
@@ -362,7 +372,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
                   Account number
                 </label>
                 <input
@@ -372,12 +382,12 @@ export default function OnboardingPage() {
                   onChange={(e) => { setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setManualMode(false); setError(""); }}
                   placeholder="0123456789"
                   maxLength={10}
-                  className="w-full border-b-2 border-gray-200 dark:border-white/10 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
+                  className="input-base !text-sm tnum"
                 />
               </div>
               {manualMode && (
-                <div className="rounded-xl px-3 py-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
-                  <p className="text-xs text-amber-700 dark:text-amber-400 mb-2">
+                <div className="rounded-xl px-3.5 py-3.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
+                  <p className="text-xs text-amber-700 dark:text-amber-400 mb-2 leading-relaxed">
                     Automatic verification is unavailable. Type the account name exactly as your bank shows it:
                   </p>
                   <input
@@ -385,7 +395,7 @@ export default function OnboardingPage() {
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
                     placeholder="e.g. ADAEZE OKONKWO"
-                    className="w-full border-b-2 border-amber-300 dark:border-amber-800 focus:border-brand-500 outline-none py-2 transition-colors bg-transparent text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-amber-200 dark:border-amber-900/40 bg-white dark:bg-white/[0.04] focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 outline-none transition-all text-gray-900 dark:text-white text-sm placeholder:text-gray-400"
                   />
                 </div>
               )}
@@ -393,13 +403,15 @@ export default function OnboardingPage() {
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm mb-4">{error}</p>
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3 mb-4">
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={!available || saving}
-            className="w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors"
+            className="btn-primary"
           >
             {saving ? "Creating store..." : manualMode ? "Confirm details & activate payouts" : "Create my store"}
           </button>

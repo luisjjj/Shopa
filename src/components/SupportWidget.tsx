@@ -87,22 +87,25 @@ export default function SupportWidget() {
           onClick={() => setOpen(true)}
           aria-label="Chat with support"
           title="Chat with support"
-          className="fixed bottom-5 right-5 z-40 w-12 h-12 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+          className="fixed bottom-5 right-5 z-40 w-12 h-12 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-brand flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
         >
           <HeadsetIcon size={22} />
         </button>
       )}
 
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-sm bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-fade-up max-h-[70vh]">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03]">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center shrink-0">
-                <HeadsetIcon size={16} />
+        <div className="fixed bottom-5 right-5 z-50 w-[calc(100vw-2.5rem)] max-w-sm bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fade-up max-h-[70vh]">
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#141414]">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-brand-500/25">
+                <HeadsetIcon size={17} />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">Support</p>
-                <p className="text-[11px] text-green-600 dark:text-green-400 leading-tight">Online, replies instantly</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">Shopa support</p>
+                <p className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Online, replies instantly
+                </p>
               </div>
             </div>
             <button
@@ -151,7 +154,7 @@ export default function SupportWidget() {
               type="submit"
               disabled={sending || !input.trim()}
               aria-label="Send message"
-              className="shrink-0 w-10 h-10 rounded-xl bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center transition-all disabled:opacity-50 active:scale-95"
+              className="shrink-0 w-10 h-10 rounded-xl bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center transition-all disabled:opacity-50 shadow-sm shadow-brand-500/25 active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />

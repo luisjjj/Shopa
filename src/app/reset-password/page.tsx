@@ -47,15 +47,15 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50/50 dark:bg-[#0a0a0a]">
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
         <AuthSidePanel />
         <div className="w-full max-w-md min-w-0 mx-auto lg:mx-0 flex flex-col justify-center">
         <div className="text-center mb-8">
           <ShopaMark className="w-12 h-12 mx-auto mb-4" title="Shopa" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">New password</h1>
+          <h1 className="text-[1.75rem] font-bold tracking-tight text-gray-900 dark:text-white">New password</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Choose a new password</p>
         </div>
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-3xl p-7 sm:p-8 shadow-card dark:shadow-card-dark">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New password</label>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input-base" placeholder="Min 6 characters" required minLength={6} disabled={!ready && !!error} />

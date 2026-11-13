@@ -34,24 +34,24 @@ export function ShareStoreCard({ username, storeUrl, isPremium }: ShareStoreCard
     a.click();
   }
   return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark mt-4">
+    <div className="card p-5 sm:p-6 mt-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-5">
         <div className="relative mx-auto sm:mx-0 shrink-0">
-          <div className={isPremium ? "" : "blur-md select-none pointer-events-none"}>
+          <div className={`rounded-2xl border border-gray-100 dark:border-white/[0.06] bg-white p-2.5 ${isPremium ? "" : "blur-md select-none pointer-events-none"}`}>
             <QRCodeSVG
               value={storeUrl}
-              size={160}
+              size={144}
               bgColor="#ffffff"
               fgColor="#ed7712"
               level="H"
-              imageSettings={{ src: "/icon.svg", width: 40, height: 40, excavate: true }}
+              imageSettings={{ src: "/icon.svg", width: 36, height: 36, excavate: true }}
             />
           </div>
           {!isPremium && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 dark:bg-black/40 rounded-xl">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 dark:bg-black/40 rounded-2xl">
               <Link
                 href="/dashboard/upgrade"
-                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98]"
+                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98]"
               >
                 Upgrade
               </Link>
@@ -70,20 +70,20 @@ export function ShareStoreCard({ username, storeUrl, isPremium }: ShareStoreCard
         </div>
         <div className="flex-1 min-w-0 text-center sm:text-left">
           <p className="text-sm font-semibold text-gray-900 dark:text-white">Share your store</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 break-all">{storeUrl}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 break-all leading-relaxed">{storeUrl}</p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center sm:justify-start gap-2 mt-4">
             <button
               type="button"
               onClick={handleCopy}
               className="bg-gray-900 dark:bg-white hover:opacity-90 text-white dark:text-gray-900 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all active:scale-[0.98]"
             >
-              {copied ? "Copied" : "Copy link"}
+              {copied ? "Copied ✓" : "Copy link"}
             </button>
             {isPremium && (
               <button
                 type="button"
                 onClick={handleDownload}
-                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98]"
+                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98]"
               >
                 Download PNG
               </button>
@@ -91,7 +91,7 @@ export function ShareStoreCard({ username, storeUrl, isPremium }: ShareStoreCard
             {!isPremium && (
               <Link
                 href="/dashboard/upgrade"
-                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98] text-center"
+                className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98] text-center"
               >
                 Upgrade
               </Link>

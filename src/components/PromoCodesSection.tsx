@@ -116,13 +116,18 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">Promo Codes</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+          {promos.length > 0 ? `Your codes (${promos.length})` : "Your codes"}
+        </h2>
         {isProPlus && !showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-brand-500/20 active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98]"
           >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
             Create promo
           </button>
         )}
@@ -168,7 +173,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="e.g. SAVE20"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                className="input-base font-mono uppercase tracking-wide"
                 required
               />
             </div>
@@ -209,7 +214,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
                   placeholder={discountType === "percent" ? "e.g. 20" : "e.g. 500"}
                   min="1"
                   max={discountType === "percent" ? "100" : undefined}
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                  className="input-base flex-1 tnum"
                   required
                 />
               </div>
@@ -226,7 +231,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
                   onChange={(e) => setMaxUses(e.target.value)}
                   placeholder="0"
                   min="0"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-white/[0.03] text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                  className="input-base tnum"
                 />
               </div>
               <div>
@@ -259,12 +264,12 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
       {loading ? (
         <div className="space-y-2">
           {[1, 2].map((i) => (
-            <div key={i} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 h-16 animate-pulse" />
+            <div key={i} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-4 h-16 animate-pulse" />
           ))}
         </div>
       ) : promos.length === 0 ? (
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
-          <EmptyIllustration variant="promo" className="mb-3 opacity-90" />
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-10 text-center shadow-card dark:shadow-card-dark">
+          <EmptyIllustration variant="promo" className="mb-3 opacity-90 mx-auto" />
           <p className="text-gray-900 dark:text-white font-semibold">No promo codes yet</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Create one to offer discounts to buyers</p>
         </div>
@@ -273,7 +278,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
           {promos.map((promo) => (
             <div
               key={promo.id}
-              className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 shadow-card dark:shadow-card-dark flex items-center gap-4"
+              className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-4 shadow-card dark:shadow-card-dark flex items-center gap-4 transition-shadow hover:shadow-card-hover dark:hover:shadow-card-dark-hover"
             >
               <div className="w-10 h-10 bg-brand-50 dark:bg-brand-950/40 rounded-xl flex items-center justify-center shrink-0">
                 <TagIcon className="text-brand-600 dark:text-brand-400" size={18} />

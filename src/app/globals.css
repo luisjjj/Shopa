@@ -7,29 +7,59 @@
   --foreground: #1a1a1a;
   --brand: #ed7712;
   --brand-dark: #de5c08;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.1);
+  --surface: #ffffff;
+  --surface-muted: #f5f4f1;
+  --border-subtle: rgba(17, 24, 39, 0.07);
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.03);
+  --shadow-md: 0 2px 6px rgba(17, 24, 39, 0.04), 0 8px 24px rgba(17, 24, 39, 0.06);
+  --shadow-lg: 0 4px 12px rgba(17, 24, 39, 0.05), 0 16px 48px rgba(17, 24, 39, 0.09);
+  --shadow-xl: 0 8px 24px rgba(17, 24, 39, 0.06), 0 28px 72px rgba(17, 24, 39, 0.12);
+  --ring-brand: 0 0 0 3px rgba(237, 119, 18, 0.18);
 }
 
 .dark {
   --background: #0a0a0a;
   --foreground: #e8e6e3;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.4);
-  --shadow-xl: 0 20px 60px rgba(0,0,0,0.5);
+  --surface: #141414;
+  --surface-muted: #1a1a1a;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.18);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.28), 0 8px 24px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.3), 0 16px 48px rgba(0, 0, 0, 0.42);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.34), 0 28px 72px rgba(0, 0, 0, 0.5);
+  --ring-brand: 0 0 0 3px rgba(237, 119, 18, 0.28);
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Consistent, accessible keyboard focus across app chrome. */
+:focus-visible {
+  outline: 2px solid rgba(237, 119, 18, 0.55);
+  outline-offset: 2px;
+}
+
+/* Respect users who reduce transparency / increase contrast where supported. */
+@media (prefers-reduced-transparency: reduce) {
+  .backdrop-blur-xl,
+  .backdrop-blur-lg,
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur {
+    backdrop-filter: none !important;
+  }
 }
 
 /* Subtle noise texture overlay (own compositor layer so it never repaints on scroll) */
@@ -55,6 +85,15 @@ body::before {
     text-wrap: balance;
   }
 
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
   .card {
     @apply bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl;
     box-shadow: var(--shadow-sm);
@@ -64,25 +103,74 @@ body::before {
     @apply card transition-all duration-200;
   }
 
-  .card-hover:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+  @media (hover: hover) {
+    .card-hover:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+
+  .surface-muted {
+    @apply bg-gray-50/80 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-2xl;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500;
+  }
+
+  .divider {
+    @apply border-t border-gray-100 dark:border-white/[0.06];
   }
 
   .input-base {
     @apply w-full bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all duration-200;
   }
 
+  @media (hover: hover) {
+    .input-base:hover {
+      @apply border-gray-300 dark:border-white/[0.14];
+    }
+  }
+
   .input-base:focus {
-    @apply border-brand-400 dark:border-brand-500 ring-2 ring-brand-500/10;
+    @apply border-brand-400 dark:border-brand-500 bg-white dark:bg-white/[0.05];
+    box-shadow: var(--ring-brand);
   }
 
   .btn-primary {
-    @apply w-full bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-all duration-200;
+    @apply w-full inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200;
+    box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08), 0 6px 16px rgba(237, 119, 18, 0.2);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 2px 4px rgba(17, 24, 39, 0.1), 0 10px 24px rgba(237, 119, 18, 0.26);
   }
 
   .btn-primary:active:not(:disabled) {
     transform: scale(0.98);
+    box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+  }
+
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-brand), 0 6px 16px rgba(237, 119, 18, 0.2);
+  }
+
+  .btn-secondary {
+    @apply w-full inline-flex items-center justify-center gap-2 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.1] hover:border-gray-300 dark:hover:border-white/[0.18] hover:bg-gray-50 dark:hover:bg-white/[0.08] text-gray-700 dark:text-gray-200 font-semibold py-3 px-4 rounded-xl transition-all duration-200;
+  }
+
+  .btn-secondary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
 

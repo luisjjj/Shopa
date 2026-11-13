@@ -67,30 +67,31 @@ export default async function DashboardShell({ children }: { children: React.Rea
         />
       </div>
       <div className="pwa-content lg:pl-60 min-w-0">
-        <header className="pwa-browser-only bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
-          <div className="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-1">
+        <header className="pwa-browser-only bg-white/75 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
               <DashboardMenuButton />
-              <Link href="/" aria-label="Shopa home">
+              <Link href="/" aria-label="Shopa home" className="flex items-center py-1">
                 <ShopaLogo markClassName="w-7 h-7" textClassName="font-bold text-gray-900 dark:text-white leading-none" size={25} />
               </Link>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {isProPlus && (
                 <StoreSwitcher username={profile.username} userId={user.id} stores={stores} />
               )}
               <Link
                 href="/dashboard/profile"
-                className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors text-gray-500 dark:text-gray-400"
+                className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] active:scale-95 transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 title="Profile"
               >
-                <UserIcon size={16} />
+                <UserIcon size={18} />
               </Link>
               <ThemeToggle />
+              <span className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-white/10 mx-1" aria-hidden="true" />
               <form action="/api/auth/signout" method="post" className="hidden sm:block">
                 <button
                   type="submit"
-                  className="text-sm text-gray-400 hover:text-red-500 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20"
                 >
                   Sign out
                 </button>
@@ -101,7 +102,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
 
         <DashboardAppHeader username={profile.username} />
 
-        <main className="pwa-main max-w-5xl mx-auto px-4 sm:px-5 py-6 sm:py-8 animate-fade-up">
+        <main className="pwa-main max-w-6xl mx-auto px-4 sm:px-6 py-7 sm:py-10 animate-fade-up">
           <TrialClaimer />
           {children}
         </main>

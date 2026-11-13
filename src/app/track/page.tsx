@@ -66,8 +66,9 @@ export default function TrackPage() {
         <span className="font-bold text-lg text-gray-900 dark:text-white">Shopa</span>
       </Link>
       <div className="w-full max-w-md bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 sm:p-8 shadow-card dark:shadow-card-dark">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Track your order</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
+        <p className="eyebrow mb-2">Order status</p>
+        <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Track your order</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6 leading-relaxed">
           Enter your order reference plus the phone number or email you used at checkout.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,7 +97,7 @@ export default function TrackPage() {
             />
           </div>
           {error && (
-            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl px-4 py-3">
+            <div className="bg-red-50/80 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl px-4 py-3">
               <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
             </div>
           )}
@@ -112,28 +113,28 @@ export default function TrackPage() {
                 {result.count} item{result.count === 1 ? "" : "s"}
                 {result.buyerName ? ` · ${result.buyerName}` : ""}
               </p>
-              <p className="font-bold text-brand-600 dark:text-brand-400">
+              <p className="font-bold text-brand-600 dark:text-brand-400 tnum">
                 ₦{total.toLocaleString()}
               </p>
             </div>
-            <p className="text-xs text-gray-400 font-mono mt-1 break-all">Ref: {result.reference}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 font-mono mt-1 break-all">Ref: {result.reference}</p>
             <div className="mt-4 space-y-2">
               {result.lines.map((line) => (
                 <div
                   key={line.id}
-                  className="flex items-center justify-between gap-2 text-sm bg-gray-50 dark:bg-white/[0.03] rounded-xl px-3.5 py-2.5"
+                  className="flex items-center justify-between gap-2 text-sm bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.05] rounded-xl px-3.5 py-2.5"
                 >
                   <span className="text-gray-700 dark:text-gray-300 truncate min-w-0">
                     {line.productName}
                     {line.variantName ? ` (${line.variantName})` : ""}
                   </span>
                   <span
-                    className={`shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                    className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                       line.fulfilled
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         : line.paid
                           ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                          : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                          : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
                     }`}
                   >
                     {line.fulfilled ? "Fulfilled" : line.paid ? "Paid" : "Pending"}

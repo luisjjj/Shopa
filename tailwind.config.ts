@@ -29,10 +29,13 @@ const config: Config = {
         mono: ["var(--font-geist-mono)", "monospace"],
       },
       boxShadow: {
-        "card": "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
-        "card-hover": "0 8px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04)",
-        "card-dark": "0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15)",
-        "card-dark-hover": "0 8px 25px rgba(0,0,0,0.35), 0 4px 10px rgba(0,0,0,0.2)",
+        "card": "0 1px 2px rgba(17,24,39,0.04), 0 2px 6px rgba(17,24,39,0.03)",
+        "card-hover": "0 2px 6px rgba(17,24,39,0.04), 0 12px 32px rgba(17,24,39,0.08)",
+        "card-dark": "0 1px 2px rgba(0,0,0,0.24), 0 2px 6px rgba(0,0,0,0.2)",
+        "card-dark-hover": "0 2px 6px rgba(0,0,0,0.3), 0 12px 32px rgba(0,0,0,0.4)",
+        "brand": "0 6px 16px rgba(237,119,18,0.22)",
+        "brand-lg": "0 10px 28px rgba(237,119,18,0.3)",
+        "inset-line": "inset 0 1px 0 rgba(255,255,255,0.06)",
       },
       animation: {
         "float": "float 6s ease-in-out infinite",

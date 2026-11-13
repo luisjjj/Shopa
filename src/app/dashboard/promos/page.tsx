@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PromoCodesSection } from "@/components/PromoCodesSection";
 import { isProPlusActive } from "@/lib/premium";
 import DashboardShell from "@/components/DashboardShell";
+import { PageHeader } from "@/components/PageHeader";
 
 export default async function PromosPage() {
   const supabase = createClient();
@@ -22,7 +23,10 @@ export default async function PromosPage() {
 
   return (
     <DashboardShell>
-      <h1 className="text-lg font-bold text-gray-900 dark:text-white mb-5">Promo Codes</h1>
+      <PageHeader
+        title="Promo Codes"
+        description="Create discount codes your buyers can use at checkout."
+      />
       <PromoCodesSection isProPlus={isProPlusActive(profile)} />
     </DashboardShell>
   );

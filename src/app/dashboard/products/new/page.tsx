@@ -177,11 +177,11 @@ export default function NewProductPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
-      <header className="bg-white/80 dark:bg-[#141414]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.06] sticky top-0 z-20">
-        <div className="max-w-2xl mx-auto px-5 py-4">
+      <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group px-2.5 py-2 -ml-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
           >
             <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -191,12 +191,21 @@ export default function NewProductPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-5 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Product</h1>
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="mb-6">
+          <p className="eyebrow mb-2">Products</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Add product</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            List something new for your buyers.
+          </p>
+        </div>
 
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark mb-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 sm:p-6 shadow-card dark:shadow-card-dark mb-4">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
             Import from Instagram
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mb-3">
+            Paste a post or reel link and we&apos;ll fill in the details.
           </p>
           <div className="flex gap-2">
             <input
@@ -204,13 +213,13 @@ export default function NewProductPage() {
               value={igUrl}
               onChange={(e) => setIgUrl(e.target.value)}
               className="input-base min-w-0 flex-1"
-              placeholder="Paste Instagram post / reel link"
+              placeholder="Instagram post / reel link"
             />
             <button
               type="button"
               onClick={handleImport}
               disabled={importing || !igUrl.trim()}
-              className="shrink-0 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-60 active:scale-[0.98]"
+              className="shrink-0 bg-brand-500 hover:bg-brand-600 active:bg-brand-700 disabled:bg-gray-200 dark:disabled:bg-gray-800 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-all disabled:opacity-60 active:scale-[0.98] shadow-brand"
             >
               {importing ? "Importing..." : "Import"}
             </button>
@@ -222,7 +231,7 @@ export default function NewProductPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-6 shadow-card dark:shadow-card-dark"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 sm:p-6 shadow-card dark:shadow-card-dark"
         >
           {/* Image Upload */}
           <div className="mb-6">
@@ -261,16 +270,16 @@ export default function NewProductPage() {
                 onClick={(e) => {
                   if (uploading) e.preventDefault();
                 }}
-                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
+                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/[0.1] bg-gray-50/60 dark:bg-white/[0.02] rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 hover:bg-brand-50/40 dark:hover:bg-brand-950/10 transition-all cursor-pointer"
               >
                 {uploading ? (
-                  <span>Uploading...</span>
+                  <span className="text-sm font-medium">Uploading...</span>
                 ) : (
                   <>
                     <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-sm">Tap to upload image</span>
+                    <span className="text-sm font-medium">Tap to upload image</span>
                   </>
                 )}
               </label>

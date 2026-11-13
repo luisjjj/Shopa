@@ -67,27 +67,34 @@ export function NotificationBanner() {
   if (!visible || dismissed) return null;
 
   return (
-    <div className="bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-800/50 rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-brand-700 dark:text-brand-300">
-          Enable notifications
-        </p>
-        <p className="text-xs text-brand-500 dark:text-brand-400 mt-0.5">
-          Get notified when you receive a new order
-        </p>
+    <div className="bg-brand-50/80 dark:bg-brand-950/20 border border-brand-200/70 dark:border-brand-900/40 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex items-start sm:items-center gap-3 min-w-0">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          </svg>
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-brand-800 dark:text-brand-300">
+            Enable notifications
+          </p>
+          <p className="text-xs text-brand-700/70 dark:text-brand-400/70 mt-0.5">
+            Get notified when you receive a new order
+          </p>
+        </div>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0 sm:pl-2">
         <button
           onClick={handleEnable}
           disabled={loading}
-          className="text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+          className="text-sm font-semibold bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl transition-all shadow-brand active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100"
         >
           {loading ? "Enabling..." : "Enable"}
         </button>
         <button
           onClick={handleDismiss}
           aria-label="Dismiss"
-          className="p-2.5 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 text-brand-400 transition-colors"
+          className="p-2.5 rounded-xl hover:bg-brand-100/80 dark:hover:bg-brand-900/40 text-brand-500 dark:text-brand-400 transition-colors"
         >
           <XIcon size={14} />
         </button>

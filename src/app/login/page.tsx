@@ -106,15 +106,15 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <ShopaMark className="w-12 h-12 mx-auto mb-4 drop-shadow-lg" title="Shopa" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back</h1>
+          <ShopaMark className="w-12 h-12 mx-auto mb-4" title="Shopa" />
+          <h1 className="text-[1.75rem] font-bold tracking-tight text-gray-900 dark:text-white">Welcome back</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1.5 text-sm">Sign in to manage your store</p>
         </div>
 
         {/* Form card */}
         <form
           onSubmit={handleLogin}
-          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 shadow-card dark:shadow-card-dark"
+          className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-3xl p-7 sm:p-8 shadow-card dark:shadow-card-dark"
         >
           <div className="mb-5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

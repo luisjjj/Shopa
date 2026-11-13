@@ -4,22 +4,26 @@ import { FulfilledToggle } from "@/components/FulfilledToggle";
 import { RemindButton } from "@/components/RemindButton";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import DashboardShell from "@/components/DashboardShell";
+import { PageHeader } from "@/components/PageHeader";
 
 export default async function OrdersPage() {
   return (
     <DashboardShell>
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-lg font-bold text-gray-900 dark:text-white">Orders</h1>
-        <a
-          href="/api/orders/export"
-          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] flex items-center gap-1.5"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-          </svg>
-          Export CSV
-        </a>
-      </div>
+      <PageHeader
+        title="Orders"
+        description="Track payments, fulfill purchases and reach buyers."
+        actions={
+          <a
+            href="/api/orders/export"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.04] hover:bg-gray-50 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/[0.16] transition-all active:scale-[0.98]"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Export CSV
+          </a>
+        }
+      />
       <OrderList />
     </DashboardShell>
   );
@@ -41,16 +45,16 @@ async function OrderList() {
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-red-200/60 dark:border-red-900/30 rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
-        <p className="text-red-500 text-sm">Could not load orders. Try again.</p>
+      <div className="card p-8 sm:p-10 text-center">
+        <p className="text-red-500 text-sm font-medium">Could not load orders. Try again.</p>
       </div>
     );
   }
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-8 text-center shadow-card dark:shadow-card-dark">
-        <EmptyIllustration variant="orders" className="mb-4 opacity-90" />
+      <div className="card p-10 sm:p-14 text-center">
+        <EmptyIllustration variant="orders" className="mb-4 opacity-90 mx-auto" />
         <p className="text-gray-900 dark:text-white font-semibold">No orders yet</p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Orders appear here when buyers purchase</p>
       </div>
@@ -70,19 +74,19 @@ async function OrderList() {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {orders.map((order) => {
         const product = order.products as { name: string; image_url: string | null } | null;
         return (
           <div
             key={order.id}
-            className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-xl p-4 shadow-card dark:shadow-card-dark flex flex-wrap items-center gap-3 sm:gap-4"
+            className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-4 sm:p-5 shadow-card dark:shadow-card-dark flex flex-wrap items-center gap-3 sm:gap-4 transition-shadow hover:shadow-card-hover dark:hover:shadow-card-dark-hover"
           >
             {product?.image_url ? (
-              <img src={product.image_url} alt="" loading="lazy" decoding="async" className="w-11 h-11 rounded-lg object-cover shrink-0" />
+              <img src={product.image_url} alt="" loading="lazy" decoding="async" className="w-12 h-12 rounded-xl object-cover shrink-0 ring-1 ring-black/[0.04] dark:ring-white/[0.06]" />
             ) : (
-              <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
-                <PackageIcon className="text-gray-300 dark:text-gray-600" size={18} />
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
+                <PackageIcon className="text-gray-400 dark:text-gray-500" size={20} />
               </div>
             )}
 
@@ -97,27 +101,27 @@ async function OrderList() {
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {product?.name || "Unknown product"}
                 </span>
               </div>
               {order.delivery_address && (
-                <div className="mt-0.5">
-                  <span className="text-[10px] text-gray-300 dark:text-gray-600 truncate block">
-                    📍 {order.delivery_address}
+                <div className="mt-1">
+                  <span className="text-[11px] text-gray-400 dark:text-gray-500 line-clamp-1 break-all">
+                    {order.delivery_address}
                   </span>
                 </div>
               )}
             </div>
 
             <div className="text-right shrink-0">
-              <div className="font-bold text-gray-900 dark:text-white text-sm">
+              <div className="font-bold text-gray-900 dark:text-white text-sm tnum">
                 ₦{order.amount.toLocaleString()}
               </div>
               <div className="mt-1">
                 {order.paid ? (
                   order.fulfilled ? (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                       Fulfilled
                     </span>
                   ) : (
@@ -125,13 +129,13 @@ async function OrderList() {
                   )
                 ) : order.confirmed_by_buyer ? (
                   <span
-                    className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.05] text-gray-500"
+                    className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-white/[0.05] text-gray-500"
                     title="Order from before the Paystack migration"
                   >
                     Awaiting seller (legacy)
                   </span>
                 ) : (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
                     Pending
                   </span>
                 )}
