@@ -42,6 +42,7 @@ export type GridTheme = {
   gapSize: string;
   isHorizontal: boolean;
   isList: boolean;
+  isMasonry: boolean;
   themed: boolean;
   showStockBadge: boolean;
 };
@@ -64,6 +65,7 @@ export default function ProductGrid({
   modalTheme,
   sellerId,
   username,
+  vibe = "modern",
 }: {
   products: GridProduct[];
   variantsByProduct: Record<string, GridVariant[]>;
@@ -71,6 +73,7 @@ export default function ProductGrid({
   modalTheme: ModalTheme;
   sellerId: string;
   username: string;
+  vibe?: string;
 }) {
   const t = theme;
   const categories = useMemo(() => {
@@ -105,19 +108,29 @@ export default function ProductGrid({
     }
   };
 
-  return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3 mb-5">
-        <h2 className="text-lg font-bold" style={{ color: t.textColor }}>
-          Shop all
-        </h2>
-        <span className="text-sm shrink-0" style={{ color: `${t.textColor}60` }}>
-          {products.length} product{products.length === 1 ? "" : "s"}
-        </span>
-      </div>
+  const chipClass = vibe === "street" || vibe === "market" ? "rounded-md" : "rounded-full";
 
+  // Avoid a lonely orphan card when a store has a handful of products.
+  const effectiveGridCols = useMemo(() => {
+    if (!t.gridCols.includes("xl:grid-cols-4")) return t.gridCols;
+    switch (visible.length) {
+      case 1:
+        return "grid-cols-1 max-w-sm mx-auto";
+      case 2:
+        return "grid-cols-2";
+      case 3:
+        return "grid-cols-2 sm:grid-cols-3";
+      case 5:
+        return "grid-cols-2 md:grid-cols-3";
+      default:
+        return t.gridCols;
+    }
+  }, [t.gridCols, visible.length]);
+
+  return (
+    <div id="shop" className="scroll-mt-24">
       {categories.length >= 2 && (
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-2 -mx-1 px-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 mb-6 -mx-1 px-1">
           {["All", ...categories].map((c) => {
             const active = c === "All" ? activeCat === null : activeCat === c;
             return (
@@ -125,13 +138,13 @@ export default function ProductGrid({
                 key={c}
                 type="button"
                 onClick={() => setActiveCat(c === "All" ? null : c)}
-                className={`shrink-0 text-xs font-semibold px-4 py-2 rounded-full border transition-all active:scale-95 ${
+                className={`shrink-0 text-xs font-semibold px-4 py-2 border transition-all active:scale-95 ${chipClass} ${
                   active ? "text-white border-transparent" : ""
                 }`}
                 style={
                   active
                     ? { background: t.accentColor }
-                    : { color: `${t.textColor}80`, borderColor: `${t.textColor}20` }
+                    : { color: `${t.textColor}85`, borderColor: `${t.textColor}20` }
                 }
               >
                 {c}
@@ -142,17 +155,113 @@ export default function ProductGrid({
       )}
 
       {visible.length === 0 ? (
-        <p className="text-sm text-center py-8" style={{ color: `${t.textColor}60` }}>
+        <p className="text-sm text-center py-10" style={{ color: `${t.textColor}60` }}>
           Nothing in this category yet.
         </p>
       ) : (
-        <div className={`${t.isHorizontal ? "flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory" : `grid ${t.gridCols} ${t.gapSize}`}`}>
-          {visible.map((p) => {
+        <div
+          className={
+            t.isHorizontal
+              ? "flex gap-4 overflow-x-auto pb-4 -mx-1 px-1 snap-x snap-mandatory"
+              : t.isList
+                ? "space-y-2.5"
+                : t.isMasonry
+                  ? "columns-2 lg:columns-3 gap-4 lg:gap-5 [column-fill:_balance]"
+                  : `grid ${effectiveGridCols} ${t.gapSize}`
+          }
+        >
+          {visible.map((p, index) => {
             const vars = variantsByProduct[p.id] || [];
             const minPrice =
               p.has_variants && vars.length > 0
                 ? Math.min(...vars.map((v) => (v.price_override != null ? v.price_override : p.price)))
                 : null;
+            const masonryAspect =
+              index % 3 === 0 ? "aspect-[3/4]" : index % 3 === 1 ? "aspect-square" : "aspect-[4/3]";
+            const aspect = t.isMasonry ? masonryAspect : t.useDynamicImage ? "" : t.imageAspect;
+
+            const media = (
+              <div
+                className={`relative overflow-hidden ${t.imageRadius} flex items-center justify-center ${
+                  t.isList ? "w-24 sm:w-28 shrink-0" : "mb-3"
+                } ${aspect} ${aspect ? "bg-gray-50 dark:bg-white/[0.04]" : "min-h-[180px]"}`}
+                style={t.themed ? { background: `${t.textColor}08` } : undefined}
+              >
+                <span
+                  className="absolute inset-0 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <span
+                    className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                    style={{ background: t.themed ? `${t.textColor}10` : "rgba(0,0,0,0.04)" }}
+                  >
+                    <PackageIcon
+                      size={26}
+                      style={t.themed ? { color: `${t.textColor}60` } : undefined}
+                      className={t.themed ? "" : "text-gray-300 dark:text-gray-600"}
+                    />
+                  </span>
+                </span>
+                {p.image_url && (
+                  <>
+                    <img
+                      src={p.image_url}
+                      alt={p.name}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      className={
+                        t.useDynamicImage && !t.isMasonry
+                          ? "relative z-10 w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-500"
+                          : "relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                      }
+                      style={{ background: t.themed ? `${t.textColor}08` : "#ffffff" }}
+                    />
+                    {t.showStockBadge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
+                      <span
+                        className="absolute z-20 top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
+                        style={{ background: t.accentColor }}
+                      >
+                        Only {p.stock} left
+                      </span>
+                    )}
+                  </>
+                )}
+                {!p.has_variants && <CardStepper sellerId={sellerId} productId={p.id} name={p.name} />}
+              </div>
+            );
+
+            const info = (
+              <div className={`min-w-0 ${t.isList ? "flex-1" : ""}`}>
+                <div className={t.isList ? "flex items-start justify-between gap-3" : ""}>
+                  <h3
+                    className={`${t.nameWeight} ${t.nameSize} leading-snug ${t.isList ? "" : "line-clamp-2"} ${
+                      t.themed ? "" : "text-gray-900 dark:text-white"
+                    }`}
+                    style={t.themed ? { color: t.cardText } : undefined}
+                  >
+                    {p.name}
+                  </h3>
+                  <p className={`${t.priceClasses} shrink-0 ${t.isList ? "mt-0" : "mt-0.5"}`} style={t.priceStyle}>
+                    {minPrice != null && minPrice !== p.price
+                      ? `From ₦${minPrice.toLocaleString()}`
+                      : `₦${p.price.toLocaleString()}`}
+                  </p>
+                </div>
+                {p.description && (
+                  <p
+                    className="text-xs mt-1.5 leading-relaxed line-clamp-2"
+                    style={{ color: t.themed ? `${t.cardText}70` : undefined }}
+                  >
+                    {p.description}
+                  </p>
+                )}
+                <ProductRating productId={p.id} />
+              </div>
+            );
+
             return (
               <div
                 key={p.id}
@@ -166,63 +275,27 @@ export default function ProductGrid({
                     setQuickViewId(p.id);
                   }
                 }}
-                className={`${t.cardClasses} cursor-pointer`}
+                className={`${t.cardClasses} cursor-pointer ${
+                  t.isList ? "" : "transition-transform duration-300 hover:-translate-y-0.5"
+                } ${t.isMasonry ? "mb-4 break-inside-avoid block w-full" : ""}`}
                 style={{
                   ...t.cardBgStyle,
                   ...t.cardInlineStyle,
-                  ...(t.isHorizontal ? { minWidth: "200px", flexShrink: 0, scrollSnapAlign: "start" as const } : {}),
+                  ...(t.isHorizontal
+                    ? { minWidth: "240px", flexShrink: 0, scrollSnapAlign: "start" as const }
+                    : {}),
                 }}
               >
-                {!p.has_variants && (
-                  <CardStepper sellerId={sellerId} productId={p.id} name={p.name} />
-                )}
-                <div
-                  className={`${t.useDynamicImage ? "" : t.imageAspect} overflow-hidden ${t.imageRadius} mb-3 flex items-center justify-center ${t.useDynamicImage ? "" : t.imageAspect ? "bg-gray-50 dark:bg-white/[0.04]" : ""}`}
-                  style={t.themed ? { background: `${t.textColor}08` } : undefined}
-                >
-                  {p.image_url ? (
-                    <div className="relative w-full">
-                      <img
-                        src={p.image_url}
-                        alt={p.name}
-                        loading="lazy"
-                        decoding="async"
-                        className={t.useDynamicImage ? "w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-300" : "w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"}
-                      />
-                      {t.showStockBadge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
-                        <span
-                          className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
-                          style={{ background: t.accentColor }}
-                        >
-                          Only {p.stock} left
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={`w-full ${t.useDynamicImage ? "h-48" : "h-full aspect-square"} flex items-center justify-center bg-gray-50 dark:bg-white/[0.04]`}>
-                      <PackageIcon size={40} style={t.themed ? { color: `${t.textColor}25` } : undefined} className={t.themed ? "" : "text-gray-300 dark:text-gray-600"} />
-                    </div>
-                  )}
-                </div>
-                <div className={t.isList ? "flex items-center justify-between gap-2" : ""}>
-                  <h3
-                    className={`${t.nameWeight} ${t.nameSize} truncate min-w-0 ${t.isList ? "flex-1" : ""} ${t.themed ? "" : "text-gray-900 dark:text-white"}`}
-                    style={t.themed ? { color: t.cardText } : undefined}
-                  >
-                    {p.name}
-                  </h3>
-                  <p className={`${t.priceClasses} shrink-0`} style={t.priceStyle}>
-                    {minPrice != null && minPrice !== p.price ? `From ₦${minPrice.toLocaleString()}` : `₦${p.price.toLocaleString()}`}
-                  </p>
-                  <ProductRating productId={p.id} />
-                </div>
-                {p.description && (
-                  <p
-                    className="text-xs mt-1.5 leading-relaxed line-clamp-2"
-                    style={{ color: t.themed ? `${t.cardText}70` : undefined }}
-                  >
-                    {p.description}
-                  </p>
+                {t.isList ? (
+                  <div className="flex items-center gap-4">
+                    {media}
+                    {info}
+                  </div>
+                ) : (
+                  <>
+                    {media}
+                    {info}
+                  </>
                 )}
               </div>
             );

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   SparkleIcon,
   CheckIcon,
@@ -133,40 +132,7 @@ export default function ProfileClient({
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <Link
-              href="/dashboard"
-              aria-label="Back to dashboard"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-2.5 py-2 -ml-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-              <span className="hidden sm:inline">Dashboard</span>
-            </Link>
-            <span className="text-gray-300 dark:text-gray-700 hidden sm:inline" aria-hidden="true">/</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-              Profile
-            </span>
-          </div>
-          <ThemeToggle />
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <div className="mb-6">
-          <p className="eyebrow mb-2">Settings</p>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Your profile</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Store details, order alerts and payout account.
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-5 items-start">
+    <div className="grid lg:grid-cols-3 gap-5 items-start">
           <div className="lg:col-span-2 min-w-0 space-y-4">
         {/* Account Info */}
         <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
@@ -369,7 +335,7 @@ export default function ProfileClient({
         </div>
           </div>
 
-          <aside className="space-y-4">
+          <aside className="space-y-4 lg:sticky lg:top-24">
         {/* Plan */}
         <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
           <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
@@ -454,8 +420,6 @@ export default function ProfileClient({
 
         <DeleteAccountSection />
           </aside>
-        </div>
-      </main>
     </div>
   );
 }

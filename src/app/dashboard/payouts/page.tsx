@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import PayoutsClient from "./PayoutsClient";
+import DashboardShell from "@/components/DashboardShell";
+import { PageHeader } from "@/components/PageHeader";
 
 export default async function PayoutsPage() {
   const supabase = createClient();
@@ -19,16 +21,22 @@ export default async function PayoutsPage() {
   if (!profile) redirect("/onboarding");
 
   return (
-    <PayoutsClient
-      username={(profile as { username: string }).username}
-      payout={profile as {
-        paystack_subaccount_code: string | null;
-        bank_code: string | null;
-        bank_name: string | null;
-        account_number: string | null;
-        account_name: string | null;
-        payout_setup_completed_at: string | null;
-      }}
-    />
+    <DashboardShell>
+      <PageHeader
+        title="Payout setup"
+        description="Shopa takes 1% per sale, you keep the rest."
+      />
+      <PayoutsClient
+        username={(profile as { username: string }).username}
+        payout={profile as {
+          paystack_subaccount_code: string | null;
+          bank_code: string | null;
+          bank_name: string | null;
+          account_number: string | null;
+          account_name: string | null;
+          payout_setup_completed_at: string | null;
+        }}
+      />
+    </DashboardShell>
   );
 }

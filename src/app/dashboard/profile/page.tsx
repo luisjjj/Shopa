@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ProfileClient from "./ProfileClient";
+import DashboardShell from "@/components/DashboardShell";
+import { PageHeader } from "@/components/PageHeader";
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -19,18 +21,24 @@ export default async function ProfilePage() {
   if (!profile) redirect("/onboarding");
 
   return (
-    <ProfileClient
-      username={profile.username}
-      email={profile.email}
-      whatsappNumber={profile.whatsapp_number || ""}
-      bankName={profile.bank_name || ""}
-      accountNumber={profile.account_number || ""}
-      accountName={profile.account_name || ""}
-      isPremium={profile.is_premium}
-      premiumUntil={profile.premium_until}
-      isProPlus={profile.is_pro_plus}
-      proPlusUntil={profile.pro_plus_until}
-      createdAt={profile.created_at}
-    />
+    <DashboardShell>
+      <PageHeader
+        title="Your profile"
+        description="Store details, order alerts and payout account."
+      />
+      <ProfileClient
+        username={profile.username}
+        email={profile.email}
+        whatsappNumber={profile.whatsapp_number || ""}
+        bankName={profile.bank_name || ""}
+        accountNumber={profile.account_number || ""}
+        accountName={profile.account_name || ""}
+        isPremium={profile.is_premium}
+        premiumUntil={profile.premium_until}
+        isProPlus={profile.is_pro_plus}
+        proPlusUntil={profile.pro_plus_until}
+        createdAt={profile.created_at}
+      />
+    </DashboardShell>
   );
 }
