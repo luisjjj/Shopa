@@ -18,6 +18,19 @@ import {
 import { ShopaLogo, ShopaMark } from "@/components/ShopaLogo";
 import { RotatingHeadline } from "@/components/RotatingHeadline";
 
+const CATEGORIES = [
+  "Fashion",
+  "Thrift",
+  "Food",
+  "Beauty",
+  "Sneakers",
+  "Hair",
+  "Accessories",
+  "Cakes",
+  "Perfumes",
+  "Home goods",
+];
+
 export default function HomePage() {
   const { theme, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -140,18 +153,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative z-10 border-y border-gray-100 dark:border-white/[0.06] bg-gray-50/60 dark:bg-white/[0.01] py-5 overflow-hidden">
-        <div className="flex w-max animate-marquee whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
-          {[0, 1].map((copy) => (
-            <div key={copy} aria-hidden={copy === 1} className="flex items-center">
-              {["Fashion", "Thrift", "Food", "Beauty", "Sneakers", "Hair", "Accessories", "Cakes", "Perfumes", "Home goods"].map((c) => (
-                <span key={c} className="flex items-center">
-                  <span className="px-6">{c}</span>
-                  <span className="text-brand-500">•</span>
+      <section className="relative z-10 border-y border-gray-100 dark:border-white/[0.06] bg-gray-50/60 dark:bg-white/[0.01]">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500 text-center sm:text-left shrink-0">
+            Built for
+          </p>
+          <ul className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1.5 min-w-0">
+            {CATEGORIES.map((category, i) => (
+              <li
+                key={category}
+                className="flex items-center gap-3 animate-fade-up"
+                style={{ animationDelay: `${i * 25}ms` }}
+              >
+                {i > 0 && <span className="h-3 w-px bg-gray-200 dark:bg-white/10" aria-hidden="true" />}
+                <span className="text-[13px] font-medium text-gray-500 dark:text-gray-400">
+                  {category}
                 </span>
-              ))}
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
