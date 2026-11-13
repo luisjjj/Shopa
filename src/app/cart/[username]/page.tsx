@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ShopaMark } from "@/components/ShopaLogo";
 import { readableTextOn } from "@/lib/contrast";
+
+export const metadata: Metadata = { title: "Your cart · Shopa" };
 import CartClient, { type CartTheme } from "./CartClient";
 
 type Props = {
@@ -77,6 +81,8 @@ export default async function CartPage({ params }: Props) {
         cardStyle: s.card_style || "minimal",
       }
     : null;
+  const onSubdomain = !!headers().get("x-shopa-subdomain");
+  const backHref = onSubdomain ? "/" : `/${seller.username}`;
 
   return (
     <div className={s ? "" : "min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]"} style={pageStyle}>
@@ -87,7 +93,7 @@ export default async function CartPage({ params }: Props) {
             <span className="font-bold" style={{ color: s ? readable : undefined }}>Shopa</span>
           </Link>
           <Link
-            href={`/${seller.username}`}
+            href={backHref}
             className="text-sm hover:opacity-80 transition-opacity"
             style={{ color: s ? `${readable}90` : undefined }}
           >

@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { readableTextOn } from "@/lib/contrast";
 import CheckoutForm from "./CheckoutForm";
+
+export const metadata: Metadata = { title: "Checkout · Shopa" };
 
 type Props = {
   params: { id: string };

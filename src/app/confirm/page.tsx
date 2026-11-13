@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import type { Metadata } from "next";
 import ConfirmClient from "./ConfirmClient";
+
+export const metadata: Metadata = { title: "Order confirmed · Shopa" };
 
 type Props = {
   searchParams: { [key: string]: string | string[] | undefined };
