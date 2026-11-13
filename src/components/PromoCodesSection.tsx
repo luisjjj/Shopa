@@ -134,13 +134,15 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
         </a>
       )}
 
+        {isProPlus && (
+          <>
         <div className={`bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark ${showForm ? "block" : "hidden lg:block"}`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">New Promo Code</h3>
             <button
               onClick={() => { setShowForm(false); setError(""); }}
               aria-label="Close promo form"
-              className="p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-400 transition-colors"
+              className="lg:hidden p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] text-gray-400 transition-colors"
             >
               <XIcon size={16} />
             </button>
@@ -251,6 +253,8 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
             <li className="flex gap-2"><span className="text-brand-500">•</span>Set a usage limit or an expiry date, or leave both open.</li>
           </ul>
         </div>
+          </>
+        )}
       </div>
 
       <div className="lg:col-span-3 min-w-0">
