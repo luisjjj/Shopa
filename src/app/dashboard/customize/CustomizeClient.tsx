@@ -1020,6 +1020,8 @@ export default function CustomizeClient({
                       { value: "centered", label: "Centered" },
                       { value: "left", label: "Left aligned" },
                       { value: "minimal", label: "Minimal" },
+                      { value: "immersive", label: "Full-bleed photo" },
+                      { value: "magazine", label: "Magazine cover" },
                     ]}
                     onChange={(v) => update("header_style", v)}
                   />
@@ -1088,6 +1090,7 @@ export default function CustomizeClient({
                       { value: "list", label: "Full-width List" },
                       { value: "horizontal", label: "Horizontal Scroll" },
                       { value: "masonry", label: "Masonry" },
+                      { value: "spotlight", label: "Spotlight (lead product)" },
                     ]}
                     onChange={(v) => update("layout", v)}
                   />

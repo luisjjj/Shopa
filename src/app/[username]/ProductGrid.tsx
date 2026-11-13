@@ -43,6 +43,7 @@ export type GridTheme = {
   isHorizontal: boolean;
   isList: boolean;
   isMasonry: boolean;
+  isSpotlight: boolean;
   themed: boolean;
   showStockBadge: boolean;
   textAlign?: "left" | "center" | "right";
@@ -179,7 +180,12 @@ export default function ProductGrid({
                 : null;
             const masonryAspect =
               index % 3 === 0 ? "aspect-[3/4]" : index % 3 === 1 ? "aspect-square" : "aspect-[4/3]";
-            const aspect = t.isMasonry ? masonryAspect : t.imageAspect;
+            const isLead = t.isSpotlight && index === 0;
+            const aspect = isLead
+              ? "aspect-[4/3] sm:aspect-[21/9]"
+              : t.isMasonry
+                ? masonryAspect
+                : t.imageAspect;
 
             const media = (
               <div
@@ -277,7 +283,9 @@ export default function ProductGrid({
                 }}
                 className={`${t.cardClasses} cursor-pointer ${
                   t.isList ? "" : "transition-transform duration-300 hover:-translate-y-0.5"
-                } ${t.isMasonry ? "mb-4 break-inside-avoid block w-full" : ""}`}
+                } ${t.isMasonry ? "mb-4 break-inside-avoid block w-full" : ""} ${
+                  isLead ? "col-span-2 sm:col-span-3" : ""
+                }`}
                 style={{
                   ...t.cardBgStyle,
                   ...t.cardInlineStyle,

@@ -57,6 +57,16 @@ export async function PUT(request: Request) {
   const pick = (v: unknown, fallback: string) => (typeof v === "string" && v ? v : fallback);
   const color = (v: unknown, fallback: string) => (isHexColor(v) ? (v as string).trim() : fallback);
   const link = (v: unknown) => (isHttpsUrl(v) ? (v as string).trim().slice(0, 500) : null);
+  // Template banners ship as same-origin paths; only absolute https URLs and
+  // clean root-relative paths are allowed.
+  const banner = (v: unknown) => {
+    if (typeof v !== "string") return null;
+    const raw = v.trim();
+    if (raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("\\") && !raw.includes("..")) {
+      return raw.slice(0, 300);
+    }
+    return isHttpsUrl(raw) ? raw.slice(0, 500) : null;
+  };
 
   const settings = {
     user_id: user.id,
@@ -65,7 +75,7 @@ export async function PUT(request: Request) {
     text_color: color(body.text_color, "#1a1a1a"),
     accent_color: color(body.accent_color, "#ed7712"),
     card_background: color(body.card_background, "#ffffff"),
-    banner_url: link(body.banner_url),
+    banner_url: banner(body.banner_url),
     font_style: body.font_style || "sans",
     font_size: body.font_size || "medium",
     layout: body.layout || "grid",

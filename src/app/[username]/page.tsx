@@ -158,11 +158,7 @@ const SOCIAL_LABEL: Record<string, string> = {
   email: "Email",
 };
 
-export default async function StorePage({
-  params,
-}: {
-  params: { username: string };
-}) {
+export default async function StorePage({ params }: { params: { username: string } }) {
   const supabase = createClient();
 
   const { data: profileRaw } = await supabase
@@ -361,6 +357,8 @@ export default async function StorePage({
         return "grid-cols-1";
       case "horizontal":
         return "grid-cols-2";
+      case "spotlight":
+        return "grid-cols-2 sm:grid-cols-3";
       default:
         return "grid-cols-2 md:grid-cols-3 xl:grid-cols-4";
     }
@@ -369,6 +367,7 @@ export default async function StorePage({
   const isHorizontal = s?.layout === "horizontal";
   const isList = s?.layout === "list";
   const isMasonry = s?.layout === "masonry";
+  const isSpotlight = s?.layout === "spotlight";
 
   const gapSize = (() => {
     switch (s?.spacing) {
@@ -606,6 +605,105 @@ export default async function StorePage({
     const overlayTint = s?.banner_overlay && image ? (
       <div className="absolute inset-0 bg-black/25" aria-hidden="true" />
     ) : null;
+
+    // Image-led heroes are opt-in per template. They replace the font-derived
+    // vibe layout so a photo covers the whole opening instead of sitting in a
+    // card beside the copy.
+    if (s?.header_style === "immersive") {
+      const immersiveMin =
+        s?.banner_height === "short"
+          ? "min-h-[440px] sm:min-h-[520px]"
+          : s?.banner_height === "tall"
+            ? "min-h-[600px] sm:min-h-[720px]"
+            : "min-h-[520px] sm:min-h-[620px]";
+      return (
+        <section className="relative w-full overflow-hidden" style={{ background: textColor }}>
+          {image ? (
+            <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0" style={{ background: `linear-gradient(145deg, ${primaryColor}, ${accentColor})` }} />
+          )}
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.38) 52%, rgba(0,0,0,0.82) 100%)" }}
+            aria-hidden="true"
+          />
+          {overlayTint}
+          <div className={`relative mx-auto flex w-full flex-col items-center justify-end px-4 pb-14 pt-28 text-center sm:px-6 sm:pb-20 sm:pt-36 ${containerMax} ${immersiveMin}`}>
+            <p className="inline-flex items-center rounded-full bg-black/45 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90 backdrop-blur-sm">
+              {profile.username} <span className="mx-2 text-white/40">/</span> {productLabel}
+            </p>
+            <h1
+              className="mt-4 max-w-4xl text-4xl font-bold leading-[1.02] tracking-tight text-white break-words sm:text-6xl lg:text-7xl"
+              style={{ fontFamily }}
+            >
+              {heroTitle}
+            </h1>
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-white/75">{heroSub}</p>
+            <div className="flex justify-center">{heroActions(true)}</div>
+          </div>
+          <span
+            className="pointer-events-none absolute inset-x-3 top-3 bottom-3 rounded-[1.75rem] border border-white/25 sm:inset-x-5 sm:top-5 sm:bottom-5"
+            aria-hidden="true"
+          />
+        </section>
+      );
+    }
+
+    if (s?.header_style === "magazine") {
+      const magazineHeight =
+        s?.banner_height === "short"
+          ? "h-[280px] sm:h-[340px]"
+          : s?.banner_height === "tall"
+            ? "h-[420px] sm:h-[520px]"
+            : "h-[340px] sm:h-[420px]";
+      return (
+        <div className={`${containerMax} mx-auto px-4 sm:px-6 pt-4 sm:pt-6`}>
+          <div className="relative">
+            <div
+              className={`relative overflow-hidden ${s ? cardRadius : "rounded-3xl"} ${magazineHeight}`}
+              style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}
+            >
+              {image ? (
+                <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <span className="absolute -bottom-12 right-2 text-[16rem] font-black leading-none text-white/10 select-none">
+                  {profile.username.charAt(0)}
+                </span>
+              )}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.02) 45%, rgba(0,0,0,0.5) 100%)" }}
+                aria-hidden="true"
+              />
+              <p className="absolute left-5 top-5 inline-flex items-center rounded-full bg-black/45 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 backdrop-blur-sm">
+                {profile.username} <span className="mx-1.5 text-white/40">/</span> {productLabel}
+              </p>
+            </div>
+            <div
+              className="relative z-10 mx-3 -mt-16 rounded-2xl border p-6 shadow-sm sm:mx-10 sm:-mt-24 sm:p-10"
+              style={{ background: cardBg, borderColor: `${textColor}14` }}
+            >
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em]" style={{ color: accentColor }}>
+                  {copy.eyebrow}
+                </p>
+                <h1
+                  className="mt-3 text-3xl font-bold leading-[1.04] tracking-tight break-words sm:text-5xl"
+                  style={{ fontFamily, color: cardText }}
+                >
+                  {heroTitle}
+                </h1>
+                <p className="mt-4 max-w-lg text-sm leading-relaxed" style={{ color: `${cardText}75` }}>
+                  {heroSub}
+                </p>
+                {heroActions(false)}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     if (vibe === "street") {
       return (
@@ -960,6 +1058,7 @@ export default async function StorePage({
                   isHorizontal,
                   isList,
                   isMasonry,
+                  isSpotlight,
                   themed: !!s,
                   showStockBadge: !!s?.show_stock_badge,
                   textAlign: cardTextAlign,
