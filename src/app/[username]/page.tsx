@@ -5,7 +5,9 @@ import { PackageIcon, LockIcon, WhatsappIcon, TruckIcon } from "@/components/Ico
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { CartBar, CartNavButton } from "@/components/CartButtons";
 import ProductGrid from "./ProductGrid";
+import HeroImage from "./HeroImage";
 import { isPremiumActive } from "@/lib/premium";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { readableTextOn } from "@/lib/contrast";
 
 type Props = {
@@ -123,24 +125,38 @@ function getFontSize(size?: string): string {
 }
 
 function socialHref(type: string, value: string): string {
-  const handle = value.replace("@", "");
+  const raw = value.trim();
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const handle = raw.replace(/^@+/, "").replace(/\s+/g, "");
   switch (type) {
     case "instagram":
       return `https://instagram.com/${handle}`;
     case "twitter":
       return `https://x.com/${handle}`;
     case "tiktok":
-      return `https://tiktok.com/${handle}`;
+      return `https://tiktok.com/@${handle}`;
+    case "facebook":
+      return `https://facebook.com/${handle}`;
     case "whatsapp":
-      return `https://wa.me/${value.replace("+", "")}`;
+      return `https://wa.me/${raw.replace(/[^\d]/g, "")}`;
     case "phone":
-      return `tel:${value}`;
+      return `tel:${raw.replace(/\s+/g, "")}`;
     case "email":
-      return `mailto:${value}`;
+      return `mailto:${raw}`;
     default:
-      return value;
+      return raw;
   }
 }
+
+const SOCIAL_LABEL: Record<string, string> = {
+  instagram: "Instagram",
+  twitter: "X (Twitter)",
+  tiktok: "TikTok",
+  facebook: "Facebook",
+  whatsapp: "WhatsApp",
+  phone: "Call",
+  email: "Email",
+};
 
 export default async function StorePage({
   params,
@@ -243,9 +259,13 @@ export default async function StorePage({
     settings: Record<string, unknown>;
   };
 
+  // Sections are public storefront content but the table only grants the
+  // service role access, so the anon client would silently fall back to the
+  // legacy layout and ignore every template's section order.
   let sectionList: SectionRow[] = [];
   try {
-    const { data: sectionRows } = await supabase
+    const admin = createServiceRoleClient();
+    const { data: sectionRows } = await admin
       .from("storefront_sections")
       .select("id, type, position, visible, settings")
       .eq("user_id", profile.id)
@@ -283,8 +303,15 @@ export default async function StorePage({
           { id: "legacy-footer", type: "footer", visible: true, settings: {} },
         ];
 
-  const heroBannerSection = sections.find((sec) => sec.type === "banner" && sec.visible);
-  const heroActive = !!heroBannerSection;
+  const visibleSections = sections.filter((sec) => sec.visible);
+  // The banner is only a hero when it opens the page. When a template places
+  // it further down it becomes an editorial image band instead, so the header
+  // still introduces the store and the text isn't duplicated.
+  const firstContentSection = visibleSections.find((sec) => sec.type !== "announcement");
+  const heroActive = firstContentSection?.type === "banner";
+  const featuredVisible = !!featured && visibleSections.some((sec) => sec.type === "featured");
+  const productsVisible = visibleSections.some((sec) => sec.type === "products");
+  const shopHref = productsVisible ? "#shop" : featuredVisible ? "#featured" : "#contact";
 
   const vibe = resolveVibe(s as Record<string, unknown> | null);
   const copy = VIBE_COPY[vibe];
@@ -534,6 +561,8 @@ export default async function StorePage({
   })();
 
   const heroTitle = s?.tagline || DEFAULT_HEADLINE[vibe];
+  const cardTextAlign =
+    s?.text_align === "left" || s?.text_align === "right" || s?.text_align === "center" ? s.text_align : undefined;
   const ctaTextColor = readableTextOn(accentColor, "#ffffff");
   const year = new Date().getFullYear();
 
@@ -541,7 +570,7 @@ export default async function StorePage({
     return (
       <div className="mt-7 flex flex-wrap items-center gap-3">
         <a
-          href="#shop"
+          href={shopHref}
           className="inline-flex items-center justify-center text-sm font-semibold px-6 py-3 rounded-xl transition-all active:scale-[0.98] hover:brightness-105"
           style={{ background: accentColor, color: ctaTextColor }}
         >
@@ -567,17 +596,31 @@ export default async function StorePage({
   function renderHero() {
     const image = heroImage;
     const minHeight =
-      s?.banner_height === "short" ? "min-h-[320px] sm:min-h-[380px]" : "min-h-[420px] sm:min-h-[500px]";
+      s?.banner_height === "short"
+        ? "min-h-[320px] sm:min-h-[380px]"
+        : s?.banner_height === "tall"
+          ? "min-h-[500px] sm:min-h-[600px]"
+          : "min-h-[420px] sm:min-h-[500px]";
+    const boutiqueHeight =
+      s?.banner_height === "short"
+        ? "min-h-[380px] sm:min-h-[440px]"
+        : s?.banner_height === "tall"
+          ? "min-h-[500px] sm:min-h-[600px]"
+          : "min-h-[440px] sm:min-h-[540px]";
+    const overlayTint = s?.banner_overlay && image ? (
+      <div className="absolute inset-0 bg-black/25" aria-hidden="true" />
+    ) : null;
 
     if (vibe === "street") {
       return (
         <section className="relative w-full overflow-hidden" style={{ background: primaryColor }}>
           {image ? (
-            <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+            <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }} />
           )}
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 62%, rgba(0,0,0,0.82) 100%)" }} />
+          {overlayTint}
           <div className={`relative ${containerMax} mx-auto px-4 sm:px-6 pt-24 pb-12 sm:pt-32 sm:pb-16 flex flex-col justify-end ${minHeight}`}>
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-white/70">
               {profile.username} <span className="mx-2">/</span> {productLabel}
@@ -598,9 +641,14 @@ export default async function StorePage({
     if (vibe === "editorial") {
       return (
         <section className="w-full grid lg:grid-cols-12 overflow-hidden" style={{ background: cardBg }}>
-          <div className="relative lg:col-span-7 order-1 min-h-[280px] lg:min-h-[540px] overflow-hidden" style={{ background: `${primaryColor}18` }}>
+          <div
+            className={`relative lg:col-span-7 order-1 min-h-[280px] overflow-hidden ${
+              s?.banner_height === "short" ? "lg:min-h-[440px]" : s?.banner_height === "tall" ? "lg:min-h-[620px]" : "lg:min-h-[540px]"
+            }`}
+            style={{ background: `${primaryColor}18` }}
+          >
             {image ? (
-              <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0" style={{ background: `linear-gradient(140deg, ${primaryColor}, ${accentColor})` }}>
                 <span className="absolute -bottom-14 right-4 text-[15rem] font-black leading-none text-white/10 select-none">{profile.username.charAt(0)}</span>
@@ -628,9 +676,9 @@ export default async function StorePage({
     if (vibe === "boutique") {
       return (
         <div className={`${containerMax} mx-auto px-4 sm:px-6 pt-6 sm:pt-10`}>
-          <div className="relative overflow-hidden rounded-[2.5rem] flex items-end min-h-[440px] sm:min-h-[540px]" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}>
+          <div className={`relative overflow-hidden rounded-[2.5rem] flex items-end ${boutiqueHeight}`} style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}>
             {image && (
-              <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
             )}
             {!image && (
               <span className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-[18rem] font-black leading-none text-white/10 select-none">
@@ -638,6 +686,7 @@ export default async function StorePage({
               </span>
             )}
             <div className="absolute inset-0" style={{ background: image ? "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.78) 100%)" : "linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.28))" }} />
+            {overlayTint}
             <div className="relative w-full px-7 py-10 sm:p-14 text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/75">{profile.username}</p>
               <h1 className="mt-4 mx-auto max-w-2xl text-4xl sm:text-6xl font-bold leading-[1.04] text-white break-words" style={{ fontFamily }}>
@@ -666,9 +715,14 @@ export default async function StorePage({
             </p>
             <div className="flex justify-center">{heroActions(false)}</div>
           </div>
-          <div className="relative w-full h-44 sm:h-64 overflow-hidden" style={{ background: `linear-gradient(120deg, ${primaryColor}, ${accentColor})` }}>
+          <div
+            className={`relative w-full overflow-hidden ${
+              s?.banner_height === "short" ? "h-36 sm:h-48" : s?.banner_height === "tall" ? "h-56 sm:h-80" : "h-44 sm:h-64"
+            }`}
+            style={{ background: `linear-gradient(120deg, ${primaryColor}, ${accentColor})` }}
+          >
             {image ? (
-              <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <>
                 <span className="absolute inset-0 opacity-25" style={{ backgroundImage: "repeating-linear-gradient(90deg, transparent 0 58px, #ffffff22 58px 59px)" }} />
@@ -696,9 +750,14 @@ export default async function StorePage({
               <p className="mt-5 max-w-lg text-sm leading-relaxed" style={{ color: `${slabText}75` }}>{heroSub}</p>
               {heroActions(true)}
             </div>
-            <div className="lg:col-span-5 relative min-h-[220px] sm:min-h-[280px] overflow-hidden rounded-lg" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}>
+            <div
+              className={`lg:col-span-5 relative overflow-hidden rounded-lg ${
+                s?.banner_height === "short" ? "min-h-[200px] sm:min-h-[240px]" : s?.banner_height === "tall" ? "min-h-[280px] sm:min-h-[360px]" : "min-h-[220px] sm:min-h-[280px]"
+              }`}
+              style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}
+            >
               {image ? (
-                <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <span className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-linear-gradient(135deg, transparent 0 22px, #00000033 22px 24px)" }} />
               )}
@@ -716,7 +775,17 @@ export default async function StorePage({
     return (
       <div className={`${containerMax} mx-auto px-4 sm:px-6 pt-5 sm:pt-8`}>
         <div
-          className={`relative overflow-hidden rounded-3xl border grid lg:grid-cols-2 ${compact ? "min-h-[320px] sm:min-h-[380px]" : "min-h-[420px] sm:min-h-[480px]"}`}
+          className={`relative overflow-hidden rounded-3xl border grid lg:grid-cols-2 ${
+            compact
+              ? s?.banner_height === "tall"
+                ? "min-h-[380px] sm:min-h-[440px]"
+                : "min-h-[320px] sm:min-h-[380px]"
+              : s?.banner_height === "tall"
+                ? "min-h-[480px] sm:min-h-[560px]"
+                : s?.banner_height === "short"
+                  ? "min-h-[380px] sm:min-h-[420px]"
+                  : "min-h-[420px] sm:min-h-[480px]"
+          }`}
           style={{ borderColor: `${cardText}14`, background: cardBg }}
         >
           <div className={`relative z-10 flex flex-col justify-center ${compact ? "p-6 sm:p-9" : "p-7 sm:p-11 lg:p-14"}`}>
@@ -738,13 +807,29 @@ export default async function StorePage({
           </div>
           <div className="relative min-h-[260px] lg:min-h-full overflow-hidden" style={{ background: `${primaryColor}14` }}>
             {image ? (
-              <img src={image} alt={`${profile.username} store banner`} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+              <HeroImage src={image} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0" style={{ background: `linear-gradient(140deg, ${primaryColor}, ${accentColor})` }}>
                 <span className="absolute -bottom-12 right-2 text-[14rem] font-black leading-none text-white/10 select-none">{profile.username.charAt(0)}</span>
               </div>
             )}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderBannerBand() {
+    const ratio =
+      s?.banner_height === "short" ? "aspect-[2/1] sm:aspect-[16/6]" : s?.banner_height === "tall" ? "aspect-[16/10]" : "aspect-[16/7]";
+    return (
+      <div className={`${containerMax} mx-auto px-4 sm:px-6 ${sectionPadding}`}>
+        <div
+          className={`relative overflow-hidden ${s ? cardRadius : "rounded-2xl"} ${ratio}`}
+          style={{ background: `linear-gradient(135deg, ${primaryColor}, ${accentColor})` }}
+        >
+          <HeroImage src={heroImage} alt={`${profile.username} store banner`} className="absolute inset-0 w-full h-full object-cover" />
+          {s?.banner_overlay && heroImage && <div className="absolute inset-0 bg-black/25" aria-hidden="true" />}
         </div>
       </div>
     );
@@ -766,7 +851,7 @@ export default async function StorePage({
         ) : null;
 
       case "banner":
-        return <div key={sec.id}>{renderHero()}</div>;
+        return <div key={sec.id}>{heroActive ? renderHero() : renderBannerBand()}</div>;
 
       case "header":
         if (heroActive) return null;
@@ -882,6 +967,7 @@ export default async function StorePage({
                   isMasonry,
                   themed: !!s,
                   showStockBadge: !!s?.show_stock_badge,
+                  textAlign: cardTextAlign,
                 }}
                 modalTheme={
                   s
@@ -908,17 +994,29 @@ export default async function StorePage({
         const heading = String(sec.settings.heading || "");
         const body = String(sec.settings.body || "");
         if (!heading && !body) return null;
+        const sameAsHero = (value: string) =>
+          value.trim().toLowerCase().replace(/\s+/g, " ") === heroTitle.trim().toLowerCase().replace(/\s+/g, " ");
+        // The hero already carries the tagline; repeating it as a statement
+        // looks like a copy-paste mistake.
+        if (heroActive && heading && sameAsHero(heading)) return null;
+        const align =
+          sec.settings.align === "left" ? "text-left" : sec.settings.align === "right" ? "text-right" : "text-center";
+        const rule =
+          sec.settings.align === "left" ? "mr-auto" : sec.settings.align === "right" ? "ml-auto" : "mx-auto";
         return (
           <section key={sec.id} className={`${containerMax} mx-auto px-4 sm:px-6 ${sectionPadding}`}>
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="mx-auto mb-6 block h-px w-10" style={{ background: accentColor }} />
+            <div className={`mx-auto max-w-3xl ${align}`}>
+              <span className={`${rule} mb-6 block h-px w-10`} style={{ background: accentColor }} />
               {heading && (
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold break-words tracking-tight leading-[1.08]" style={{ color: textColor, fontFamily }}>
                   {heading}
                 </h2>
               )}
               {body && (
-                <p className="mx-auto mt-4 max-w-xl text-sm sm:text-base leading-relaxed break-words" style={{ color: `${textColor}70` }}>
+                <p
+                  className={`${align === "text-center" ? "mx-auto" : ""} mt-4 max-w-xl text-sm sm:text-base leading-relaxed break-words`}
+                  style={{ color: `${textColor}70` }}
+                >
                   {body}
                 </p>
               )}
@@ -1002,7 +1100,7 @@ export default async function StorePage({
                   className={socialClasses}
                   style={s?.social_style === "minimal" ? { color: `${textColor}80` } : { color: textColor, borderColor: `${textColor}20` }}
                 >
-                  {social.type === "facebook" ? "Facebook" : social.type === "whatsapp" ? "WhatsApp" : social.type === "phone" || social.type === "email" ? social.value : social.value}
+                  {SOCIAL_LABEL[social.type] || social.value}
                 </a>
               ))}
             </div>
@@ -1028,8 +1126,8 @@ export default async function StorePage({
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: `${textColor}45` }}>Shop</p>
                   <div className="mt-3 space-y-2 text-sm font-medium" style={{ color: textColor }}>
-                    <a href="#shop" className="block hover:opacity-70 transition-opacity">All products</a>
-                    {featured && <a href="#featured" className="block hover:opacity-70 transition-opacity">Featured</a>}
+                    {productsVisible && <a href="#shop" className="block hover:opacity-70 transition-opacity">All products</a>}
+                    {featuredVisible && <a href="#featured" className="block hover:opacity-70 transition-opacity">Featured</a>}
                     <a href="#top" className="block hover:opacity-70 transition-opacity">Back to top</a>
                   </div>
                 </div>
@@ -1042,7 +1140,12 @@ export default async function StorePage({
                         Chat on WhatsApp
                       </a>
                     )}
-                    <a href="#shop" className="block hover:opacity-70 transition-opacity">Contact store</a>
+                    {s?.email && (
+                      <a href={`mailto:${s.email}`} className="block hover:opacity-70 transition-opacity">Email the store</a>
+                    )}
+                    {s?.phone && (
+                      <a href={`tel:${String(s.phone).replace(/\s+/g, "")}`} className="block hover:opacity-70 transition-opacity">Call the store</a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1078,8 +1181,10 @@ export default async function StorePage({
             {profile.username}
           </a>
           <div className="hidden md:flex items-center gap-1">
-            <a href="#shop" className="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-70" style={{ color: `${textColor}85` }}>Shop</a>
-            {featured && (
+            {productsVisible && (
+              <a href="#shop" className="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-70" style={{ color: `${textColor}85` }}>Shop</a>
+            )}
+            {featuredVisible && (
               <a href="#featured" className="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-70" style={{ color: `${textColor}85` }}>Featured</a>
             )}
             <a href="#contact" className="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-70" style={{ color: `${textColor}85` }}>Contact</a>

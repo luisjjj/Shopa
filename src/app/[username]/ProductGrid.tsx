@@ -5,6 +5,7 @@ import { PackageIcon } from "@/components/Icons";
 import { ProductRating } from "./ProductRating";
 import { CardStepper } from "@/components/CartButtons";
 import ProductQuickView from "@/components/ProductQuickView";
+import { readableTextOn } from "@/lib/contrast";
 
 export type GridProduct = {
   id: string;
@@ -45,6 +46,7 @@ export type GridTheme = {
   isMasonry: boolean;
   themed: boolean;
   showStockBadge: boolean;
+  textAlign?: "left" | "center" | "right";
 };
 
 export type ModalTheme = {
@@ -128,7 +130,7 @@ export default function ProductGrid({
   }, [t.gridCols, visible.length]);
 
   return (
-    <div id="shop" className="scroll-mt-24">
+    <div>
       {categories.length >= 2 && (
         <div className="flex gap-2 overflow-x-auto pb-1 mb-6 -mx-1 px-1">
           {["All", ...categories].map((c) => {
@@ -139,11 +141,11 @@ export default function ProductGrid({
                 type="button"
                 onClick={() => setActiveCat(c === "All" ? null : c)}
                 className={`shrink-0 text-xs font-semibold px-4 py-2 border transition-all active:scale-95 ${chipClass} ${
-                  active ? "text-white border-transparent" : ""
+                  active ? "border-transparent" : ""
                 }`}
                 style={
                   active
-                    ? { background: t.accentColor }
+                    ? { background: t.accentColor, color: readableTextOn(t.accentColor, "#ffffff") }
                     : { color: `${t.textColor}85`, borderColor: `${t.textColor}20` }
                 }
               >
@@ -221,8 +223,8 @@ export default function ProductGrid({
                     />
                     {t.showStockBadge && p.stock != null && p.stock > 0 && p.stock <= 5 && (
                       <span
-                        className="absolute z-20 top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
-                        style={{ background: t.accentColor }}
+                        className="absolute z-20 top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full shadow"
+                        style={{ background: t.accentColor, color: readableTextOn(t.accentColor, "#ffffff") }}
                       >
                         Only {p.stock} left
                       </span>
@@ -234,7 +236,10 @@ export default function ProductGrid({
             );
 
             const info = (
-              <div className={`min-w-0 ${t.isList ? "flex-1" : ""}`}>
+              <div
+                className={`min-w-0 ${t.isList ? "flex-1" : ""}`}
+                style={t.textAlign ? { textAlign: t.textAlign } : undefined}
+              >
                 <div className={t.isList ? "flex items-start justify-between gap-3" : ""}>
                   <h3
                     className={`${t.nameWeight} ${t.nameSize} leading-snug ${t.isList ? "" : "line-clamp-2"} ${
@@ -270,6 +275,7 @@ export default function ProductGrid({
                 aria-label={`View ${p.name}`}
                 onClick={() => setQuickViewId(p.id)}
                 onKeyDown={(e) => {
+                  if (e.target !== e.currentTarget) return;
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     setQuickViewId(p.id);

@@ -20,6 +20,23 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+// Storefront fonts. Sellers pick these by name in Customize Store; they load
+// from Google Fonts at runtime because next/font's build-time downloader
+// chokes on the legacy `/l/font?kit=` URLs Google sometimes serves.
+// Keep this in sync with getFontFamily() in the storefront, cart, checkout and confirmation pages.
+const STOREFRONT_FONTS =
+  "https://fonts.googleapis.com/css2" +
+  "?family=Playfair+Display:wght@400..900" +
+  "&family=Lato:wght@400;700" +
+  "&family=Oswald:wght@400..700" +
+  "&family=Raleway:wght@400..700" +
+  "&family=Nunito:wght@400..800" +
+  "&family=Inter:wght@100..900" +
+  "&family=Merriweather:wght@400;700" +
+  "&family=Space+Grotesk:wght@300..700" +
+  "&family=DM+Sans:wght@100..1000" +
+  "&display=swap";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://myshopa.shop"),
   title: "Shopa | Your Storefront Link",
@@ -90,7 +107,12 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={initialTheme === "dark" ? "dark" : ""}>
-      {supabaseUrl ? <link rel="preconnect" href={supabaseUrl} crossOrigin="anonymous" /> : null}
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={STOREFRONT_FONTS} />
+        {supabaseUrl ? <link rel="preconnect" href={supabaseUrl} crossOrigin="anonymous" /> : null}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

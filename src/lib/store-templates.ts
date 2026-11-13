@@ -21,7 +21,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "essentials",
     name: "Essentials",
-    blurb: "Clean, warm and friendly, great for any store.",
+    blurb: "Clean, warm and friendly. Works for almost any kind of store.",
     industry: "General",
     swatches: { primary: "#ed7712", bg: "#faf9f7", text: "#1a1a1a" },
     settings: {
@@ -71,7 +71,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "midnight",
     name: "Midnight Boutique",
-    blurb: "Dark, elegant and premium, fashion, beauty, jewelry.",
+    blurb: "Dark, elegant and premium. Made for fashion, beauty and jewelry.",
     industry: "Fashion",
     swatches: { primary: "#818cf8", bg: "#0f172a", text: "#f1f5f9" },
     settings: {
@@ -103,7 +103,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "portrait",
       show_announcement: true,
-      announcement_text: "Complimentary delivery on orders over ₦50,000",
+      announcement_text: "New arrivals every week, shop the edit",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -123,7 +123,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "forest",
     name: "Forest Fresh",
-    blurb: "Calm greens, food, skincare, natural products.",
+    blurb: "Calm greens for food, skincare and natural products.",
     industry: "Food & Drink",
     swatches: { primary: "#16a34a", bg: "#f0fdf4", text: "#14532d" },
     settings: {
@@ -132,7 +132,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#14532d",
       accent_color: "#16a34a",
       card_background: "#ffffff",
-      banner_url: "/landing/sell-stall.jpg",
+      banner_url: "/templates/forest-produce.jpg",
       font_style: "friendly",
       font_size: "medium",
       layout: "grid3",
@@ -173,7 +173,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "sunset",
     name: "Sunset Bold",
-    blurb: "Loud and energetic, sneakers, streetwear, thrift.",
+    blurb: "Loud and energetic. Built for sneakers, streetwear and thrift drops.",
     industry: "Clothing",
     swatches: { primary: "#ea580c", bg: "#fff7ed", text: "#7c2d12" },
     settings: {
@@ -225,7 +225,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "opulence",
     name: "Lagos Opulence",
-    blurb: "Royal purple and gold, perfumes, jewelry, luxury.",
+    blurb: "Royal purple and gold for perfumes, jewelry and luxury goods.",
     industry: "Jewelry",
     swatches: { primary: "#c026d3", bg: "#1a0b2e", text: "#fae8ff" },
     settings: {
@@ -257,7 +257,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "portrait",
       show_announcement: true,
-      announcement_text: "Private shopping on WhatsApp, message us anytime",
+      announcement_text: "Personal styling on request",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -277,7 +277,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "mono",
     name: "Mono Market",
-    blurb: "Stark black and white, thrift, books, minimal goods.",
+    blurb: "Stark black and white for thrift, books and minimal goods.",
     industry: "General",
     swatches: { primary: "#171717", bg: "#ffffff", text: "#171717" },
     settings: {
@@ -309,7 +309,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "narrow",
       product_image_ratio: "square",
       show_announcement: true,
-      announcement_text: "New thrift bales every Monday",
+      announcement_text: "Fresh thrift bales every week",
       show_socials: false,
       whatsapp_cta: true,
       show_stock_badge: true,
@@ -328,7 +328,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "ocean",
     name: "Ocean Drift",
-    blurb: "Cool blues, swimwear, drinks, fresh everyday goods.",
+    blurb: "Cool blues with a swipeable rail for swimwear, drinks and fresh goods.",
     industry: "Sports",
     swatches: { primary: "#0ea5e9", bg: "#f0f9ff", text: "#0c4a6e" },
     settings: {
@@ -337,7 +337,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#0c4a6e",
       accent_color: "#0284c7",
       card_background: "#ffffff",
-      banner_url: "/landing/showcase-2.jpg",
+      banner_url: "/templates/ocean-swim.jpg",
       font_style: "clean",
       font_size: "medium",
       layout: "horizontal",
@@ -360,7 +360,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "portrait",
       show_announcement: true,
-      announcement_text: "Free delivery in Lagos on orders over ₦30,000",
+      announcement_text: "New swim and beach drops just landed",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -380,7 +380,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "rose",
     name: "Rose Glow",
-    blurb: "Soft pinks, beauty, skincare, hair, fragrances.",
+    blurb: "Soft pinks for beauty, skincare, hair and fragrances.",
     industry: "Beauty",
     swatches: { primary: "#e11d48", bg: "#fff1f2", text: "#4c0519" },
     settings: {
@@ -412,7 +412,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "normal",
       product_image_ratio: "portrait",
       show_announcement: true,
-      announcement_text: "Buy 2 get 1 free on all glosses this week",
+      announcement_text: "New gloss shades just landed",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -432,7 +432,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "savanna",
     name: "Savanna Gold",
-    blurb: "Warm ambers, crafts, accessories, home goods.",
+    blurb: "Warm ambers for crafts, accessories and home goods.",
     industry: "Crafts",
     swatches: { primary: "#b45309", bg: "#fffbeb", text: "#451a03" },
     settings: {
@@ -482,7 +482,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "emerald-night",
     name: "Emerald Night",
-    blurb: "Deep green and gold, premium dark store, watches.",
+    blurb: "Deep green and gold for a premium dark store, watches and gifts.",
     industry: "Fashion",
     swatches: { primary: "#10b981", bg: "#052e16", text: "#d1fae5" },
     settings: {
@@ -514,7 +514,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "square",
       show_announcement: true,
-      announcement_text: "Midnight deals, up to 20% off till Sunday",
+      announcement_text: "Late-night drops every Friday",
       show_socials: true,
       social_style: "boxed",
       whatsapp_cta: true,
@@ -534,7 +534,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "lilac",
     name: "Lilac Dream",
-    blurb: "Soft purples, stationery, gifts, baby and kids.",
+    blurb: "Soft purples for stationery, gifts and baby or kids items.",
     industry: "Kids",
     swatches: { primary: "#7c3aed", bg: "#f5f3ff", text: "#2e1065" },
     settings: {
@@ -585,7 +585,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "pepper",
     name: "Pepper Red",
-    blurb: "Fiery red, food, spices, party supplies, drinks.",
+    blurb: "Fiery red for food, spices, party supplies and drinks.",
     industry: "Food & Drink",
     swatches: { primary: "#dc2626", bg: "#fef2f2", text: "#450a0a" },
     settings: {
@@ -594,7 +594,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#450a0a",
       accent_color: "#f97316",
       card_background: "#ffffff",
-      banner_url: "/landing/sell-chat.jpg",
+      banner_url: "/templates/pepper-food.jpg",
       font_style: "clean",
       font_size: "large",
       layout: "list",
@@ -637,7 +637,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "ankara",
     name: "Ankara & Threads",
-    blurb: "Rich indigo prints, native wear, tailors, fabrics.",
+    blurb: "Rich indigo prints for native wear, tailors and fabrics.",
     industry: "Clothing",
     swatches: { primary: "#312e81", bg: "#eef2ff", text: "#1e1b4b" },
     settings: {
@@ -646,7 +646,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#1e1b4b",
       accent_color: "#c026d3",
       card_background: "#ffffff",
-      banner_url: "/landing/showcase-1.jpg",
+      banner_url: "/templates/ankara-rack.jpg",
       font_style: "bold",
       font_size: "large",
       layout: "grid3",
@@ -689,7 +689,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "circuit",
     name: "Circuit Hub",
-    blurb: "Gadgets, phones, accessories, electronics plug.",
+    blurb: "Cool cyan on dark for gadgets, phones and electronics.",
     industry: "Electronics",
     swatches: { primary: "#06b6d4", bg: "#082f49", text: "#e0f2fe" },
     settings: {
@@ -721,7 +721,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "square",
       show_announcement: true,
-      announcement_text: "Free screen guard on every phone this month",
+      announcement_text: "New phone stock just landed",
       show_socials: true,
       social_style: "boxed",
       whatsapp_cta: true,
@@ -741,7 +741,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "hearth",
     name: "Hearth & Home",
-    blurb: "Furniture, decor, kitchenware, home essentials.",
+    blurb: "Warm neutrals for furniture, decor and kitchenware.",
     industry: "Home",
     swatches: { primary: "#78716c", bg: "#faf9f7", text: "#292524" },
     settings: {
@@ -750,7 +750,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#292524",
       accent_color: "#b45309",
       card_background: "#ffffff",
-      banner_url: "/landing/showcase-3.jpg",
+      banner_url: "/templates/hearth-interior.jpg",
       font_style: "serif",
       font_size: "large",
       layout: "masonry",
@@ -792,7 +792,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "gold-standard",
     name: "Gold Standard",
-    blurb: "Jewelry, wristwatches, luxe accessories.",
+    blurb: "Gold accents for jewelry, wristwatches and luxe accessories.",
     industry: "Jewelry",
     swatches: { primary: "#a16207", bg: "#fffdf5", text: "#422006" },
     settings: {
@@ -801,7 +801,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#422006",
       accent_color: "#ca8a04",
       card_background: "#ffffff",
-      banner_url: "/templates/noir-parfum.jpg",
+      banner_url: "/templates/gold-jewelry.jpg",
       font_style: "elegant",
       font_size: "large",
       layout: "grid4",
@@ -824,7 +824,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "normal",
       product_image_ratio: "portrait",
       show_announcement: true,
-      announcement_text: "Free gift box on every order",
+      announcement_text: "New pieces added weekly",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -844,7 +844,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "little-stars",
     name: "Little Stars",
-    blurb: "Kids wear, toys, baby essentials, school needs.",
+    blurb: "Bright yellow for kids wear, toys, baby essentials and school needs.",
     industry: "Kids",
     swatches: { primary: "#eab308", bg: "#fefce8", text: "#422006" },
     settings: {
@@ -853,7 +853,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#422006",
       accent_color: "#f97316",
       card_background: "#ffffff",
-      banner_url: "/landing/showcase-2.jpg",
+      banner_url: "/templates/kids-toys.jpg",
       font_style: "rounded",
       font_size: "medium",
       layout: "grid3",
@@ -876,7 +876,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "square",
       show_announcement: true,
-      announcement_text: "Back-to-school sale, up to 25% off",
+      announcement_text: "Back-to-school picks are in",
       show_socials: true,
       social_style: "pills",
       whatsapp_cta: true,
@@ -896,7 +896,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "pulse",
     name: "Pulse Fitness",
-    blurb: "Gym gear, supplements, sportswear, sneakers.",
+    blurb: "High-energy lime on black for gym gear, supplements and sportswear.",
     industry: "Sports",
     swatches: { primary: "#84cc16", bg: "#0a0a0a", text: "#f7fee7" },
     settings: {
@@ -948,7 +948,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "torque",
     name: "Torque Auto",
-    blurb: "Car parts, accessories, detailing, auto care.",
+    blurb: "Red, white and slate for car parts, accessories and auto care.",
     industry: "Auto",
     swatches: { primary: "#dc2626", bg: "#f8fafc", text: "#0f172a" },
     settings: {
@@ -980,7 +980,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       container_width: "wide",
       product_image_ratio: "landscape",
       show_announcement: true,
-      announcement_text: "Genuine parts only, fitting advice on WhatsApp",
+      announcement_text: "Genuine parts, fitting advice on request",
       show_socials: false,
       whatsapp_cta: true,
       show_stock_badge: true,
@@ -999,7 +999,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "verde",
     name: "Verde Garden",
-    blurb: "Plants, seedlings, garden tools, green living.",
+    blurb: "Fresh greens for plants, seedlings, garden tools and green living.",
     industry: "Garden",
     swatches: { primary: "#4d7c0f", bg: "#f7fee7", text: "#1a2e05" },
     settings: {
@@ -1008,7 +1008,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       text_color: "#1a2e05",
       accent_color: "#65a30d",
       card_background: "#ffffff",
-      banner_url: "/landing/sell-stall.jpg",
+      banner_url: "/templates/verde-plants.jpg",
       font_style: "editorial",
       font_size: "medium",
       layout: "grid4",
@@ -1050,7 +1050,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "sole-style",
     name: "Sole & Style",
-    blurb: "Sneakers, slippers, footwear plug.",
+    blurb: "Bold blue and orange for sneakers, slippers and footwear plugs.",
     industry: "Footwear",
     swatches: { primary: "#1e3a8a", bg: "#eff6ff", text: "#172554" },
     settings: {
@@ -1060,34 +1060,34 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
       accent_color: "#f97316",
       card_background: "#ffffff",
       banner_url: "/templates/sole-wall.jpg",
-      font_style: "bold",
-      font_size: "large",
-      layout: "grid3",
+      font_style: "modern",
+      font_size: "medium",
+      layout: "grid4",
       image_shape: "rounded",
       spacing: "normal",
-      card_style: "shadow",
-      card_border_radius: "xl",
+      card_style: "bordered",
+      card_border_radius: "md",
       product_name_weight: "bold",
-      text_align: "left",
-      banner_height: "tall",
+      text_align: "center",
+      banner_height: "medium",
       banner_overlay: true,
-      header_style: "left",
+      header_style: "centered",
       tagline: "Step correct, every day",
       show_store_name: true,
-      product_name_size: "large",
-      price_style: "accent",
+      product_name_size: "medium",
+      price_style: "bold",
       card_padding: "normal",
-      card_border: "none",
-      card_shadow: "md",
-      container_width: "wide",
-      product_image_ratio: "portrait",
+      card_border: "light",
+      card_shadow: "sm",
+      container_width: "normal",
+      product_image_ratio: "square",
       show_announcement: true,
-      announcement_text: "Original pairs only, no stories",
+      announcement_text: "Authentic pairs only, always",
       show_socials: true,
-      social_style: "boxed",
+      social_style: "pills",
       whatsapp_cta: true,
       show_stock_badge: true,
-      footer_text: "Cop or cry.",
+      footer_text: "Lace up and step out.",
     },
     sections: [
       { type: "announcement", visible: true },
@@ -1102,7 +1102,7 @@ export const STORE_TEMPLATES: StoreTemplate[] = [
   {
     id: "bag-lady",
     name: "Bag Lady",
-    blurb: "Handbags, ankara bags, purses, luggage.",
+    blurb: "Teal and amber for handbags, ankara bags, purses and luggage.",
     industry: "Bags",
     swatches: { primary: "#0f766e", bg: "#f0fdfa", text: "#134e4a" },
     settings: {

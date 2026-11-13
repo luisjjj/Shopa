@@ -86,6 +86,17 @@ interface StorefrontSettings {
   footer_text: string | null;
 }
 
+// Copy that ships with every template. If stored settings still match one of
+// these strings the seller never edited it, so switching templates may replace
+// it; anything else is the seller's own words and is kept.
+const TEMPLATE_COPY = new Set(
+  STORE_TEMPLATES.flatMap((t) => [
+    t.settings.tagline,
+    t.settings.announcement_text,
+    t.settings.footer_text,
+  ]).filter((v): v is string => typeof v === "string")
+);
+
 const DEFAULTS: StorefrontSettings = {
   primary_color: "#ed7712",
   background_color: "#faf9f7",
@@ -349,9 +360,40 @@ export default function CustomizeClient({
   };
 
   const applyTemplate = (tpl: StoreTemplate) => {
-    setSettings({ ...DEFAULTS, ...tpl.settings } as StorefrontSettings);
+    // A template restyles the shop; it must never erase the seller's own
+    // words or contact handles with demo copy.
+    const sellerCopy: (keyof StorefrontSettings)[] = [
+      "instagram",
+      "twitter",
+      "tiktok",
+      "facebook",
+      "whatsapp_store",
+      "phone",
+      "email",
+      "featured_product_id",
+    ];
+    const sellerWords: (keyof StorefrontSettings)[] = [
+      "tagline",
+      "announcement_text",
+      "footer_text",
+    ];
+    setSettings((prev) => {
+      const next = { ...DEFAULTS, ...tpl.settings } as StorefrontSettings;
+      for (const key of sellerCopy) {
+        if (prev[key]) Object.assign(next, { [key]: prev[key] });
+      }
+      for (const key of sellerWords) {
+        const current = prev[key];
+        if (typeof current === "string" && current.trim() && !TEMPLATE_COPY.has(current)) {
+          Object.assign(next, { [key]: current });
+        }
+      }
+      return next;
+    });
     setSections((prev) => {
-      const texts = (prev || []).filter((s) => s.type === "text");
+      const custom = (prev || []).filter(
+        (s) => s.type === "text" || s.type === "statement" || s.type === "reviews"
+      );
       const built: StoreSection[] = tpl.sections.map((t, i) => ({
         id: `tpl-${tpl.id}-${t.type}-${Date.now()}-${i}`,
         type: t.type,
@@ -359,24 +401,7 @@ export default function CustomizeClient({
         visible: t.visible,
         settings: { ...(t.settings || {}) },
       }));
-      // Every theme gets the editorial rhythm automatically: a style
-      // statement after the hero (from the theme tagline) and buyer
-      // reviews before the footer. Sellers can hide either with the eye.
-      if (!built.some((s) => s.type === "statement")) {
-        const tagline = (tpl.settings.tagline as string | null) || null;
-        const anchor = Math.max(
-          built.findIndex((s) => s.type === "banner"),
-          built.findIndex((s) => s.type === "header")
-        );
-        built.splice(anchor >= 0 ? anchor + 1 : built.length, 0, {
-          id: `tpl-${tpl.id}-statement-${Date.now()}`,
-          type: "statement",
-          position: 0,
-          visible: !!tagline,
-          settings: { heading: tagline || "", body: "", align: "center" },
-        });
-      }
-      if (!built.some((s) => s.type === "reviews")) {
+      if (!built.some((s) => s.type === "reviews") && !custom.some((s) => s.type === "reviews")) {
         const footerAt = built.findIndex((s) => s.type === "footer");
         built.splice(footerAt >= 0 ? footerAt : built.length, 0, {
           id: `tpl-${tpl.id}-reviews-${Date.now()}`,
@@ -389,7 +414,7 @@ export default function CustomizeClient({
       const anchor = built.findIndex((s) => s.type === "products");
       const footerAt = built.findIndex((s) => s.type === "footer");
       const at = anchor >= 0 ? anchor + 1 : footerAt >= 0 ? footerAt : built.length;
-      built.splice(at, 0, ...texts);
+      built.splice(at, 0, ...custom);
       return built.map((s, i) => ({ ...s, position: i }));
     });
     setExpandedSection(null);
@@ -699,7 +724,7 @@ export default function CustomizeClient({
                 {/* Templates, one-tap themes */}
                 <Section icon={<SparkleIcon size={16} />} title="Templates">
                   <p className="text-xs text-gray-400 dark:text-gray-500 -mt-1">
-                    Start from a professionally designed look. Applies theme + layout, your products and text blocks stay.
+                    Start from a professionally designed look. Applies a full theme and section layout; your products, text blocks and contact details stay.
                   </p>
                   <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
                     {TEMPLATE_INDUSTRIES.map((ind) => (
@@ -774,7 +799,7 @@ export default function CustomizeClient({
                               <p className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: tPrimary }}>
                                 {tpl.industry}
                               </p>
-                              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 truncate">
+                              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-snug mt-0.5 line-clamp-2">
                                 {tpl.blurb}
                               </p>
                             </div>
@@ -958,7 +983,7 @@ export default function CustomizeClient({
                       <p className="text-sm text-gray-500">
                         {uploading ? "Uploading..." : "Click to upload banner"}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">1200x400 recommended</p>
+                      <p className="text-xs text-gray-400 mt-1">1600x900 works best</p>
                     </label>
                   )}
                   {uploadError && (
@@ -1070,10 +1095,10 @@ export default function CustomizeClient({
                     label="Container width"
                     value={settings.container_width}
                     options={[
-                      { value: "narrow", label: "Narrow (480px)" },
-                      { value: "normal", label: "Normal (640px)" },
-                      { value: "wide", label: "Wide (768px)" },
-                      { value: "full", label: "Full width" },
+                      { value: "narrow", label: "Narrow (768px)" },
+                      { value: "normal", label: "Normal (1024px)" },
+                      { value: "wide", label: "Wide (1152px)" },
+                      { value: "full", label: "Full width (1280px)" },
                     ]}
                     onChange={(v) => update("container_width", v)}
                   />
