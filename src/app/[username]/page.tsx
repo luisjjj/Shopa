@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getStoreUrl } from "@/lib/store-url";
 import { PackageIcon, LockIcon, WhatsappIcon, TruckIcon } from "@/components/Icons";
 import { EmptyIllustration } from "@/components/EmptyIllustration";
 import { CartBar, CartNavButton } from "@/components/CartButtons";
@@ -64,22 +62,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!profile) return { title: "Store not found | Shopa" };
 
-  const canonical = getStoreUrl(profile.username);
-
   return {
     title: `${profile.username}'s Store | Shopa`,
     description: `Shop ${profile.username}'s products on Shopa`,
-    alternates: { canonical },
     openGraph: {
       title: `${profile.username}'s Store | Shopa`,
       description: `Shop ${profile.username}'s products on Shopa`,
-      url: canonical,
-      images: [{ url: `${canonical}/opengraph-image` }],
+      images: [{ url: `/${profile.username}/opengraph-image` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${profile.username}'s Store | Shopa`,
-      images: [`${canonical}/opengraph-image`],
+      images: [`/${profile.username}/opengraph-image`],
     },
   };
 }
@@ -162,15 +156,6 @@ export default async function StorePage({
     .single();
 
   if (!profileRaw) notFound();
-  const h = headers();
-  const host = (h.get("x-forwarded-host") || h.get("host") || "").split(":")[0].toLowerCase();
-  const onSubdomain = !!h.get("x-shopa-subdomain");
-  const isApex =
-    !onSubdomain &&
-    !host.includes("localhost") &&
-    !host.includes("127.0.0.1") &&
-    (host === "myshopa.shop" || host === "www.myshopa.shop" || host === "myshopa.com.ng" || host === "www.myshopa.com.ng");
-  if (isApex) redirect(getStoreUrl(profileRaw.username));
   const profile = { ...profileRaw, is_premium: isPremiumActive(profileRaw as never) };
 
   const { data: settings } = await supabase
