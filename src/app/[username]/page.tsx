@@ -404,21 +404,17 @@ export default async function StorePage({
         : "rounded-xl";
 
   const imageAspect = (() => {
-    if (!s) return "";
-    switch (s.product_image_ratio) {
+    switch (s?.product_image_ratio) {
       case "portrait":
         return "aspect-[3/4]";
       case "landscape":
         return "aspect-[4/3]";
       case "wide":
         return "aspect-video";
-      case "auto":
-        return "";
       default:
         return "aspect-square";
     }
   })();
-  const useDynamicImage = !s || s.product_image_ratio === "auto" || !s.product_image_ratio;
 
   const cardRadius = (() => {
     switch (s?.card_border_radius) {
@@ -950,7 +946,6 @@ export default async function StorePage({
                   cardClasses,
                   cardBgStyle,
                   cardInlineStyle,
-                  useDynamicImage,
                   imageAspect,
                   imageRadius,
                   textColor,

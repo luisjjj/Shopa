@@ -29,7 +29,6 @@ export type GridTheme = {
   cardClasses: string;
   cardBgStyle: React.CSSProperties;
   cardInlineStyle: React.CSSProperties;
-  useDynamicImage: boolean;
   imageAspect: string;
   imageRadius: string;
   textColor: string;
@@ -180,14 +179,13 @@ export default function ProductGrid({
                 : null;
             const masonryAspect =
               index % 3 === 0 ? "aspect-[3/4]" : index % 3 === 1 ? "aspect-square" : "aspect-[4/3]";
-            const aspect = t.isMasonry ? masonryAspect : t.useDynamicImage ? "" : t.imageAspect;
+            const aspect = t.isMasonry ? masonryAspect : t.imageAspect;
 
             const media = (
               <div
                 className={`relative overflow-hidden ${t.imageRadius} flex items-center justify-center ${
                   t.isList ? "w-24 sm:w-28 shrink-0" : "mb-3"
-                } ${aspect} ${aspect ? "bg-gray-50 dark:bg-white/[0.04]" : "min-h-[180px]"}`}
-                style={t.themed ? { background: `${t.textColor}08` } : undefined}
+                } ${aspect} ${aspect ? "bg-gray-50 dark:bg-white/[0.04]" : "min-h-[180px]"}`}                style={t.themed ? { background: `${t.textColor}08` } : undefined}
               >
                 <span
                   className="absolute inset-0 flex items-center justify-center"
@@ -214,11 +212,7 @@ export default function ProductGrid({
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
-                      className={
-                        t.useDynamicImage && !t.isMasonry
-                          ? "relative z-10 w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-500"
-                          : "relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                      }
+                      className="relative z-10 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       style={{ background: t.themed ? `${t.textColor}08` : "#ffffff" }}
                     />
                     {t.showStockBadge && p.stock != null && p.stock > 0 && p.stock <= 5 && (

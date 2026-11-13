@@ -2,8 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
-import { compressImage } from "@/lib/image";
+import { useState, useEffect } from "react";
+import ProductImageField from "@/components/ProductImageField";
 
 type Variant = {
   id: string;
@@ -25,7 +25,6 @@ export default function EditProductPage({
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [isActive, setIsActive] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,7 +41,6 @@ export default function EditProductPage({
       })
       .catch(() => {});
   }, []);
-  const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -87,43 +85,6 @@ export default function EditProductPage({
     };
     load();
   }, [params.id, supabase]);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-
-    setUploading(true);
-    setError("");
-    try {
-      const { blob, ext } = await compressImage(file);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const path = `${user.id}/${Date.now()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(path, blob, { contentType: blob.type || "image/jpeg" });
-
-      if (uploadError) {
-        setError("Image upload failed. Try again.");
-        return;
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("products").getPublicUrl(path);
-
-      setImageUrl(publicUrl);
-    } catch {
-      setError("Could not process that image. Try another.");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const addVariant = () => {
     setVariants([
@@ -265,52 +226,7 @@ export default function EditProductPage({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Product image
             </label>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="sr-only"
-              id="product-image-picker"
-            />
-            {imageUrl ? (
-              <div className="relative">
-                <img
-                  src={imageUrl}
-                  alt="Product"
-                  className="w-full h-auto max-h-64 object-contain rounded-xl bg-gray-50 dark:bg-white/[0.02]"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setImageUrl("");
-                    if (fileRef.current) fileRef.current.value = "";
-                  }}
-                  className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 text-red-500 text-xs px-2.5 py-1.5 rounded-lg hover:bg-white dark:hover:bg-black"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <label
-                htmlFor="product-image-picker"
-                onClick={(e) => {
-                  if (uploading) e.preventDefault();
-                }}
-                className="w-full h-48 border-2 border-dashed border-gray-200 dark:border-white/[0.1] bg-gray-50/60 dark:bg-white/[0.02] rounded-2xl flex flex-col items-center justify-center text-gray-400 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-500 hover:bg-brand-50/40 dark:hover:bg-brand-950/10 transition-all cursor-pointer"
-              >
-                {uploading ? (
-                  <span className="text-sm font-medium">Uploading...</span>
-                ) : (
-                  <>
-                    <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-sm font-medium">Tap to upload image</span>
-                  </>
-                )}
-              </label>
-            )}
+            <ProductImageField value={imageUrl} onChange={setImageUrl} />
           </div>
 
           {/* Name */}

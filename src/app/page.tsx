@@ -123,10 +123,10 @@ export default function HomePage() {
 
           <div className="lg:col-span-6 relative animate-slide-up">
             <div className="rounded-[1.75rem] overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] aspect-[4/3] lg:aspect-[5/4]">
-              <img src="/landing/hero-seller.jpg" alt="Nigerian seller holding sneakers in her boutique" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-center" />
+              <img src="/landing/hero-seller.jpg" alt="Smiling Nigerian seller at her handmade bag stall" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-center" />
             </div>
             <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
-              <img src="/landing/hero-whatsapp.jpg" alt="New order chat on a phone" className="w-11 h-11 rounded-xl object-cover shrink-0" />
+              <img src="/landing/hero-whatsapp.jpg" alt="Phone showing a shop post for local buyers" className="w-11 h-11 rounded-xl object-cover shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">New order received</p>
                 <p className="text-xs text-brand-600 font-bold">₦15,000</p>
@@ -202,9 +202,9 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-3 gap-3 items-start">
                 {[
-                  { name: "Tote Bag", price: "₦15,000", image: "/landing/showcase-1.jpg" },
+                  { name: "Weekender", price: "₦18,000", image: "/landing/showcase-1.jpg" },
                   { name: "Crossbody", price: "₦12,000", image: "/landing/showcase-2.jpg" },
-                  { name: "Clutch", price: "₦8,000", image: "/landing/showcase-3.jpg" },
+                  { name: "Tassel bag", price: "₦9,000", image: "/landing/showcase-3.jpg" },
                 ].map((item) => (
                   <div key={item.name} className="text-center group">
                     <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03] aspect-square">
@@ -264,7 +264,7 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="sm:w-1/2 min-h-[220px] sm:min-h-0 overflow-hidden">
-                <img src="/landing/sell-ig.jpg" alt="Nigerian boutique owner showing her shop link" loading="lazy" decoding="async" className="w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-500" />
+                <img src="/landing/sell-ig.jpg" alt="Shopper browsing a boutique in Abuja" loading="lazy" decoding="async" className="w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-500" />
               </div>
             </div>
 
@@ -407,7 +407,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="lg:col-span-5 min-h-[220px] lg:min-h-0">
-            <img src="/landing/sell-stall.jpg" alt="Nigerian market stall with bags and fabrics" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            <img src="/landing/cta-market.jpg" alt="Handmade leather bags at a market stall" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
