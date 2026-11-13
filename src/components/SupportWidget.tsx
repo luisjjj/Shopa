@@ -102,9 +102,8 @@ export default function SupportWidget() {
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">Shopa support</p>
-                <p className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Online, replies instantly
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5">
+                  Replies in minutes
                 </p>
               </div>
             </div>

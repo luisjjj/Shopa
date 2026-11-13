@@ -122,7 +122,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
       <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-2.5 py-2 -ml-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
@@ -136,7 +136,7 @@ export default function PayoutsClient({ username, payout }: { username: string; 
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="mb-6">
           <p className="eyebrow mb-2">Payments</p>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Payout setup</h1>
@@ -144,8 +144,11 @@ export default function PayoutsClient({ username, payout }: { username: string; 
             Shopa takes 1% per sale, you keep the rest.
           </p>
         </div>
+
+        <div className="grid lg:grid-cols-5 gap-5 items-start">
+          <div className="lg:col-span-3 min-w-0 space-y-4">
         {(payout.bank_name || payout.account_number) && (
-          <div className="rounded-2xl px-4 py-3.5 mb-5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/30">
+          <div className="rounded-2xl px-4 py-3.5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/30">
             <p className="text-sm text-amber-800 dark:text-amber-400 leading-relaxed">
               We have your saved details{payout.bank_name ? ` (${payout.bank_name}, ${payout.account_number || ""})` : ""} but payouts aren&apos;t active yet. Verify below to activate.
             </p>
@@ -296,6 +299,46 @@ export default function PayoutsClient({ username, payout }: { username: string; 
             ) : null}
           </form>
         )}
+          </div>
+
+          <aside className="space-y-4 lg:sticky lg:top-24">
+            <div className="card p-5">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">How payouts work</h2>
+              <ol className="mt-4 space-y-4">
+                {[
+                  ["Verify your account", "Paystack confirms the account name matches yours."],
+                  ["Get paid automatically", "Buyer payments settle straight into this bank account."],
+                  ["Keep 99% of every sale", "Shopa keeps a flat 1% per sale."],
+                ].map(([title, desc], i) => (
+                  <li key={title} className="flex gap-3">
+                    <span className="w-6 h-6 rounded-lg bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="rounded-2xl border border-brand-200/70 dark:border-brand-900/40 bg-brand-50/70 dark:bg-brand-950/20 p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">You keep</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">99%</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                of every sale, settled in naira to your Nigerian bank account.
+              </p>
+            </div>
+
+            <div className="card p-5">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">Need a hand?</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                Use the chat bubble in the corner and we&apos;ll sort out your payout details.
+              </p>
+            </div>
+          </aside>
+        </div>
       </main>
     </div>
   );

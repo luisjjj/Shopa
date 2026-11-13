@@ -136,7 +136,7 @@ export default function ProfileClient({
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
       {/* Header */}
       <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <Link
               href="/dashboard"
@@ -157,8 +157,8 @@ export default function ProfileClient({
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-4 sm:space-y-5">
-        <div className="mb-2">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="mb-6">
           <p className="eyebrow mb-2">Settings</p>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Your profile</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -166,6 +166,8 @@ export default function ProfileClient({
           </p>
         </div>
 
+        <div className="grid lg:grid-cols-3 gap-5 items-start">
+          <div className="lg:col-span-2 min-w-0 space-y-4">
         {/* Account Info */}
         <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
           <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
@@ -267,6 +269,7 @@ export default function ProfileClient({
           </div>
         </section>
 
+        <div className="grid sm:grid-cols-2 gap-4 items-start">
         {/* Order alerts */}
         <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
           <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
@@ -340,6 +343,7 @@ export default function ProfileClient({
             </div>
           </div>
         </section>
+        </div>
 
         {/* Save Button */}
         <div className="flex flex-wrap items-center gap-3">
@@ -363,7 +367,9 @@ export default function ProfileClient({
           {error && <p className="text-sm text-red-500 basis-full sm:basis-auto">{error}</p>}
           {payoutNote && <p className="text-sm text-amber-600 dark:text-amber-400 basis-full sm:basis-auto">{payoutNote}</p>}
         </div>
+          </div>
 
+          <aside className="space-y-4">
         {/* Plan */}
         <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-card dark:shadow-card-dark">
           <div className="px-5 pt-4 pb-3.5 border-b border-gray-100 dark:border-white/[0.06]">
@@ -447,6 +453,8 @@ export default function ProfileClient({
         </p>
 
         <DeleteAccountSection />
+          </aside>
+        </div>
       </main>
     </div>
   );

@@ -115,24 +115,8 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {promos.length > 0 ? `Your codes (${promos.length})` : "Your codes"}
-        </h2>
-        {isProPlus && !showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98]"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Create promo
-          </button>
-        )}
-      </div>
-
+    <div className="grid lg:grid-cols-5 gap-5 items-start">
+      <div className="lg:col-span-2 min-w-0 space-y-4">
       {!isProPlus && (
         <a
           href="/dashboard/upgrade"
@@ -150,8 +134,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
         </a>
       )}
 
-      {showForm && (
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-4 shadow-card dark:shadow-card-dark">
+        <div className={`bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark ${showForm ? "block" : "hidden lg:block"}`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">New Promo Code</h3>
             <button
@@ -259,7 +242,34 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
             </button>
           </form>
         </div>
-      )}
+
+        <div className="hidden lg:block card p-5">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">How codes work</p>
+          <ul className="mt-3 space-y-2.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+            <li className="flex gap-2"><span className="text-brand-500">•</span>Buyers type the code at checkout.</li>
+            <li className="flex gap-2"><span className="text-brand-500">•</span>Discount is a percentage or a flat naira amount.</li>
+            <li className="flex gap-2"><span className="text-brand-500">•</span>Set a usage limit or an expiry date, or leave both open.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="lg:col-span-3 min-w-0">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+          {promos.length > 0 ? `Your codes (${promos.length})` : "Your codes"}
+        </h2>
+        {isProPlus && !showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="lg:hidden inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-brand active:scale-[0.98]"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create promo
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <div className="space-y-2">
@@ -321,6 +331,7 @@ export function PromoCodesSection({ isProPlus }: { isProPlus: boolean }) {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

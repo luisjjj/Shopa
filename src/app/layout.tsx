@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import FloatingIcons from "@/components/FloatingIcons";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { PwaMode } from "@/components/PwaMode";
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
@@ -96,7 +95,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider initialTheme={initialTheme}>
-          <FloatingIcons />
           <ServiceWorkerRegistration />
           <PwaMode />
           {children}

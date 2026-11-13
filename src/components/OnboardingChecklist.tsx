@@ -56,7 +56,7 @@ export default function OnboardingChecklist({ username, hasProduct, hasPayouts, 
   };
 
   return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-6 shadow-card dark:shadow-card-dark">
+    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
           <p className="text-sm font-semibold text-gray-900 dark:text-white">

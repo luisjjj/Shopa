@@ -1341,7 +1341,7 @@ export default function CustomizeClient({
           <div className="hidden md:flex flex-1 items-start justify-center p-6 overflow-auto bg-gray-100 dark:bg-[#0a0a0a]">
             <div className="w-full max-w-md">
               <p className="text-xs text-gray-400 mb-3 text-center font-medium uppercase tracking-wide">
-                Live Preview
+                Preview
               </p>
               <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#141414]">
                 <iframe

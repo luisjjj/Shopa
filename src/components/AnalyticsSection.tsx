@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WalletIcon, PackageIcon, CheckIcon } from "@/components/Icons";
 
 interface Analytics {
   totalRevenue: number;
@@ -32,133 +31,135 @@ export function AnalyticsSection() {
   if (!data) return null;
 
   const maxRevenue = Math.max(...data.dailyRevenue.map((d) => d.revenue), 1);
+  const topRevenue = data.topProducts.reduce((sum, p) => sum + p.revenue, 0) || 1;
 
   return (
-    <div className="mb-6 sm:mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Analytics</h2>
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-400 dark:text-gray-500">
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500" aria-hidden="true" />
-          Live
+    <section className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-3xl overflow-hidden shadow-card dark:shadow-card-dark">
+      <div className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/[0.06]">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Performance</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">How your store is doing right now</p>
+        </div>
+        <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.06] rounded-lg px-2.5 py-1.5">
+          Last 7 days
         </span>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-        <StatCard
-          icon={<WalletIcon size={16} />}
-          label="This week"
-          value={`₦${data.weekRevenue.toLocaleString()}`}
-        />
-        <StatCard
-          icon={<WalletIcon size={16} />}
-          label="This month"
-          value={`₦${data.monthRevenue.toLocaleString()}`}
-        />
-        <StatCard
-          icon={<PackageIcon size={16} />}
-          label="Total orders"
-          value={String(data.totalOrders)}
-          sub={`${data.totalPaid} paid, ${data.totalPending} pending`}
-        />
-        <StatCard
-          icon={<CheckIcon size={16} />}
-          label="Fulfilled"
-          value={String(data.totalFulfilled)}
-          sub={`of ${data.totalPaid} paid`}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
-        <StatCard
-          icon={<WalletIcon size={16} />}
-          label="Avg. order"
-          value={`₦${data.avgOrderValue.toLocaleString()}`}
-        />
-        <StatCard
-          icon={<PackageIcon size={16} />}
-          label="Orders this week"
-          value={String(data.weekOrderCount)}
-          sub={`of ${data.totalOrders} total`}
-        />
-        <StatCard
-          icon={<PackageIcon size={16} />}
-          label="Orders this month"
-          value={String(data.monthOrderCount)}
-          sub={`of ${data.totalOrders} total`}
-        />
-      </div>
-
-      {/* Revenue Chart */}
-      <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.07] rounded-2xl p-4 sm:p-5 mb-3 shadow-card dark:shadow-card-dark">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">Revenue</p>
-          <p className="text-[11px] font-medium text-gray-400 dark:text-gray-500">Last 7 days</p>
-        </div>
-        <div className="flex items-end gap-2 h-24">
-          {data.dailyRevenue.map((day, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-              <div className="w-full h-full flex items-end">
-                <div
-                  className="w-full rounded-md bg-brand-500/15 dark:bg-brand-500/10 group-hover:bg-brand-500/25 dark:group-hover:bg-brand-500/15 transition-colors relative"
-                  style={{
-                    height: `${day.revenue > 0 ? Math.max((day.revenue / maxRevenue) * 100, 8) : 4}%`,
-                  }}
-                >
-                  {day.revenue > 0 && (
-                    <div className="absolute inset-x-0 bottom-0 top-0 rounded-md bg-gradient-to-t from-brand-600 to-brand-400" />
-                  )}
-                </div>
-              </div>
-              <span className="text-[10px] text-gray-400 dark:text-gray-500">{day.date}</span>
+      <div className="grid lg:grid-cols-5">
+        <div className="lg:col-span-3 p-5 sm:p-6 border-b lg:border-b-0 lg:border-r border-gray-100 dark:border-white/[0.06]">
+          <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Revenue this week</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight tnum mt-1">
+                ₦{data.weekRevenue.toLocaleString()}
+              </p>
             </div>
-          ))}
-        </div>
-      </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="font-semibold text-gray-900 dark:text-white tnum">{data.weekOrderCount}</span> orders
+            </p>
+          </div>
 
-      {/* Top Products */}
-      {data.topProducts.length > 0 && (
-        <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.07] rounded-2xl p-4 sm:p-5 shadow-card dark:shadow-card-dark">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Top products</p>
-          <div className="space-y-1">
-            {data.topProducts.map((p, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm py-1.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/[0.06] text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                  {i + 1}
-                </span>
-                <span className="text-gray-900 dark:text-white truncate mr-2">{p.name}</span>
-                <span className="text-gray-500 dark:text-gray-400 shrink-0 text-xs tnum">
-                  {p.count} orders · ₦{p.revenue.toLocaleString()}
-                </span>
+          <div className="flex items-end gap-1.5 sm:gap-2 h-32" role="img" aria-label="Revenue for the last 7 days">
+            {data.dailyRevenue.map((day, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
+                <div className="relative w-full h-full flex items-end">
+                  <div
+                    className="w-full rounded-t-lg bg-brand-500/15 dark:bg-brand-500/10 group-hover:bg-brand-500/25 dark:group-hover:bg-brand-500/20 transition-colors relative"
+                    style={{ height: `${day.revenue > 0 ? Math.max((day.revenue / maxRevenue) * 100, 8) : 4}%` }}
+                  >
+                    {day.revenue > 0 && (
+                      <>
+                        <div className="absolute inset-0 rounded-t-lg bg-gradient-to-t from-brand-600 to-brand-400" />
+                        <span className="absolute -top-7 left-1/2 -translate-x-1/2 hidden group-hover:block whitespace-nowrap rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-semibold px-1.5 py-0.5 tnum">
+                          ₦{day.revenue.toLocaleString()}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500">{day.date}</span>
               </div>
             ))}
           </div>
+
+          <dl className="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06]">
+            <div>
+              <dt className="text-[11px] text-gray-500 dark:text-gray-400">This month</dt>
+              <dd className="text-sm font-semibold text-gray-900 dark:text-white tnum mt-0.5">₦{data.monthRevenue.toLocaleString()}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] text-gray-500 dark:text-gray-400">Avg. order</dt>
+              <dd className="text-sm font-semibold text-gray-900 dark:text-white tnum mt-0.5">₦{data.avgOrderValue.toLocaleString()}</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] text-gray-500 dark:text-gray-400">Orders this month</dt>
+              <dd className="text-sm font-semibold text-gray-900 dark:text-white tnum mt-0.5">{data.monthOrderCount}</dd>
+            </div>
+          </dl>
         </div>
-      )}
-    </div>
+
+        <div className="lg:col-span-2 p-5 sm:p-6 flex flex-col">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top products</h3>
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">Share of revenue</span>
+          </div>
+
+          {data.topProducts.length > 0 ? (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
+                  <th className="font-semibold pb-2">Product</th>
+                  <th className="font-semibold pb-2 text-right">Units</th>
+                  <th className="font-semibold pb-2 text-right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-white/[0.06]">
+                {data.topProducts.map((p) => (
+                  <tr key={p.name} className="align-top">
+                    <td className="py-2.5 pr-2 min-w-0">
+                      <p className="text-sm text-gray-900 dark:text-white truncate max-w-[9rem]">{p.name}</p>
+                      <div className="mt-1.5 h-1 w-full rounded-full bg-gray-100 dark:bg-white/[0.06] overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600"
+                          style={{ width: `${Math.max((p.revenue / topRevenue) * 100, 4)}%` }}
+                        />
+                      </div>
+                    </td>
+                    <td className="py-2.5 text-right text-xs text-gray-500 dark:text-gray-400 tnum">{p.count}</td>
+                    <td className="py-2.5 pl-2 text-right text-xs font-semibold text-gray-900 dark:text-white tnum whitespace-nowrap">
+                      ₦{p.revenue.toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed py-6 text-center">
+              No products sold yet. Top sellers show up here after your first order.
+            </p>
+          )}
+
+          <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/[0.06]">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-2">Orders</p>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {[
+                { label: "Paid", value: data.totalPaid },
+                { label: "Pending", value: data.totalPending },
+                { label: "Fulfilled", value: data.totalFulfilled },
+              ].map((o) => (
+                <div key={o.label} className="rounded-xl bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.05] px-2 py-2">
+                  <p className="text-sm font-bold text-gray-900 dark:text-white tnum">{o.value}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{o.label}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-3">
+              {data.totalOrders} orders total · {data.productCount} active products · ₦{data.totalRevenue.toLocaleString()} lifetime
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  sub,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.07] rounded-2xl p-3.5 min-w-0 shadow-card dark:shadow-card-dark">
-      <div className="flex items-center gap-2 mb-1.5 min-w-0">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400">
-          {icon}
-        </span>
-        <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400 truncate">{label}</span>
-      </div>
-      <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate tnum">{value}</p>
-      {sub && <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">{sub}</p>}
-    </div>
-  );
-}

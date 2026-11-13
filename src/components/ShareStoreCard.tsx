@@ -34,7 +34,7 @@ export function ShareStoreCard({ username, storeUrl, isPremium }: ShareStoreCard
     a.click();
   }
   return (
-    <div className="card p-5 sm:p-6 mt-4">
+    <div className="card p-5 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center gap-5">
         <div className="relative mx-auto sm:mx-0 shrink-0">
           <div className={`rounded-2xl border border-gray-100 dark:border-white/[0.06] bg-white p-2.5 ${isPremium ? "" : "blur-md select-none pointer-events-none"}`}>

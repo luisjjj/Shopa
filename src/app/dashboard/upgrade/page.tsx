@@ -56,7 +56,7 @@ export default function UpgradePage() {
   return (
     <div className="min-h-screen bg-gray-50/80 dark:bg-[#0a0a0a]">
       <header className="bg-white/80 dark:bg-[#0e0e0e]/80 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/[0.06] sticky top-0 z-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center">
           <button
             onClick={() => router.back()}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-2.5 py-2 -ml-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06]"
@@ -69,18 +69,20 @@ export default function UpgradePage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <div className="relative mb-8 overflow-hidden rounded-3xl border border-gray-200/60 dark:border-white/[0.08] shadow-card dark:shadow-card-dark">
-          <img src="/landing/step-style.jpg" alt="Customized storefront" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/15" />
-          <div className="relative p-8 sm:p-10 text-center">
-            <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white">
-              <SparkleIcon size={24} />
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="grid lg:grid-cols-12 gap-5 items-start">
+          <div className="lg:col-span-5 space-y-4">
+        <div className="relative overflow-hidden rounded-3xl border border-gray-200/60 dark:border-white/[0.08] shadow-card dark:shadow-card-dark min-h-[240px] flex items-end">
+          <img src="/landing/step-style.jpg" alt="Nigerian seller customising her storefront" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
+          <div className="relative p-6 sm:p-7">
+            <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white">
+              <SparkleIcon size={22} />
             </span>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60 mb-2">
               Plans
             </p>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1.5 tracking-tight">
               Upgrade your store
             </h1>
             <p className="text-white/75 text-sm">
@@ -90,7 +92,7 @@ export default function UpgradePage() {
         </div>
 
         {status && (status.isProPlus || status.isPremium) && (
-          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 mb-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between shadow-card dark:shadow-card-dark">
+          <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between shadow-card dark:shadow-card-dark">
             <div>
               <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-[0.14em] font-semibold">
                 Current plan
@@ -121,6 +123,17 @@ export default function UpgradePage() {
           </div>
         )}
 
+        <div className="card p-5">
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">What you unlock</p>
+          <ul className="mt-3 space-y-2.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+            <li className="flex gap-2"><CheckIcon size={12} className="text-brand-500 mt-0.5 shrink-0" /> Unlimited product listings instead of 3.</li>
+            <li className="flex gap-2"><CheckIcon size={12} className="text-brand-500 mt-0.5 shrink-0" /> No &quot;Powered by Shopa&quot; badge on your store.</li>
+            <li className="flex gap-2"><CheckIcon size={12} className="text-brand-500 mt-0.5 shrink-0" /> Priority support when an order goes sideways.</li>
+          </ul>
+        </div>
+          </div>
+
+          <div className="lg:col-span-7 min-w-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           {/* Premium */}
           <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.07] rounded-2xl p-6 flex flex-col shadow-card dark:shadow-card-dark">
@@ -185,6 +198,8 @@ export default function UpgradePage() {
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-6 leading-relaxed">
           Secure recurring payment powered by Bachs · billed in USD at live FX rate
         </p>
+          </div>
+        </div>
       </main>
     </div>
   );

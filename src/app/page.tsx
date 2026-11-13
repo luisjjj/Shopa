@@ -3,7 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
-import { SunIcon, MoonIcon, CheckIcon, XIcon } from "@/components/Icons";
+import {
+  SunIcon,
+  MoonIcon,
+  CheckIcon,
+  XIcon,
+  TruckIcon,
+  WhatsappIcon,
+  StoreIcon,
+  LinkIcon,
+  CreditCardIcon,
+  HeadsetIcon,
+} from "@/components/Icons";
 import { ShopaLogo, ShopaMark } from "@/components/ShopaLogo";
 import { RotatingHeadline } from "@/components/RotatingHeadline";
 
@@ -67,54 +78,65 @@ export default function HomePage() {
         </div>
       </nav>
 
-      <section className="relative z-10 max-w-6xl mx-auto px-6 pt-12 sm:pt-20 pb-16 grid lg:grid-cols-2 gap-10 items-center">
-        <div className="text-center lg:text-left">
-          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.18] mb-6 animate-slide-up">
-            Be the next
-            <br />
-            <RotatingHeadline />
-            <br />
-            they line up for.
-          </h1>
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pt-12 sm:pt-16 pb-10">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="lg:col-span-6 text-center lg:text-left">
+            <p className="eyebrow mb-4">For Nigerian sellers</p>
+            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white tracking-tight leading-[1.12] mb-6 animate-slide-up">
+              Be the next
+              <br />
+              <RotatingHeadline />
+              <br />
+              they line up for.
+            </h1>
 
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 animate-slide-up text-balance leading-relaxed">
-            Turn your Instagram bio into a real storefront. Add products, get paid through Paystack, and let buyers self-serve.
-          </p>
+            <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 mb-8 animate-slide-up text-balance leading-relaxed">
+              Turn your Instagram bio into a real storefront. Add products, get paid through Paystack, and let buyers self-serve.
+            </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0 animate-slide-up">
-            <Link
-              href="/signup"
-              className="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all text-center whitespace-nowrap shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 active:scale-[0.98]"
-            >
-              Create your store
-            </Link>
-            <Link
-              href="/login"
-              className="flex-1 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-medium px-8 py-3.5 rounded-xl transition-all text-center hover:bg-gray-50 dark:hover:bg-white/[0.03] active:scale-[0.98]"
-            >
-              Sign in
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0 animate-slide-up">
+              <Link href="/signup" className="flex-1 btn-primary px-8 py-3.5 text-center whitespace-nowrap">
+                Create your store
+              </Link>
+              <Link href="/login" className="flex-1 btn-secondary px-8 py-3.5 text-center whitespace-nowrap">
+                Sign in
+              </Link>
+            </div>
+
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-5">
+              Free to start. 3 product slots. No card needed.
+            </p>
           </div>
 
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-5">
-            Built for Nigerian sellers. Free to start, 3 product slots.
-          </p>
-        </div>
-
-        <div className="relative animate-slide-up">
-          <div className="rounded-2xl overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] aspect-[4/3]">
-            <img src="/landing/hero-seller.jpg" alt="Sneakers on sale" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-top" />
-          </div>
-          <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
-            <img src="/landing/hero-whatsapp.jpg" alt="Buyer chat" className="w-11 h-11 rounded-xl object-cover shrink-0" />
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">New order received</p>
-              <p className="text-xs text-brand-600 font-bold">₦15,000</p>
+          <div className="lg:col-span-6 relative animate-slide-up">
+            <div className="rounded-[1.75rem] overflow-hidden shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] aspect-[4/3] lg:aspect-[5/4]">
+              <img src="/landing/hero-seller.jpg" alt="Nigerian seller holding sneakers in her boutique" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-center" />
+            </div>
+            <div className="hero-float absolute -left-3 sm:-left-6 bottom-8 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-2xl shadow-lg p-3 flex items-center gap-3 w-[220px]">
+              <img src="/landing/hero-whatsapp.jpg" alt="New order chat on a phone" className="w-11 h-11 rounded-xl object-cover shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">New order received</p>
+                <p className="text-xs text-brand-600 font-bold">₦15,000</p>
+              </div>
+            </div>
+            <div className="hero-float-delayed absolute -right-2 sm:-right-4 top-6 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-xl shadow-lg px-4 py-2">
+              <p className="text-xs font-mono text-gray-500 dark:text-gray-400 truncate">myshopa.shop/amakabags</p>
             </div>
           </div>
-          <div className="hero-float-delayed absolute -right-2 sm:-right-4 top-6 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.08] rounded-full shadow-lg px-4 py-2">
-            <p className="text-xs font-mono text-gray-500 dark:text-gray-400 truncate">myshopa.shop/amakabags</p>
-          </div>
+        </div>
+
+        <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-white/[0.06] rounded-2xl border border-gray-100 dark:border-white/[0.06] bg-white/70 dark:bg-white/[0.02] backdrop-blur-sm overflow-hidden">
+          {[
+            { label: "To open your store", value: "₦0" },
+            { label: "Shopa takes per sale", value: "1%" },
+            { label: "To go live", value: "5 min" },
+            { label: "Code to write", value: "None" },
+          ].map((s) => (
+            <div key={s.label} className="px-5 py-5 text-center lg:text-left">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight tnum">{s.value}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -133,42 +155,113 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative z-10 max-w-4xl mx-auto px-6 py-20">
-        <div className="bg-white dark:bg-[#141414] rounded-2xl shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] overflow-hidden animate-slide-up">
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.06]">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-              <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+      <section className="relative z-10 max-w-6xl mx-auto px-6 py-16 sm:py-20">
+        <div className="grid lg:grid-cols-12 gap-5 items-stretch">
+          <div className="lg:col-span-8 bg-white dark:bg-[#141414] rounded-3xl shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-gray-200/60 dark:border-white/[0.06] overflow-hidden animate-slide-up">
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.06]">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+              </div>
+              <div className="flex-1 bg-white dark:bg-white/[0.06] border border-gray-200/80 dark:border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-gray-400 mx-4 font-mono truncate">
+                myshopa.shop/amakabags
+              </div>
             </div>
-            <div className="flex-1 bg-white dark:bg-white/[0.06] border border-gray-200/80 dark:border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-gray-400 mx-4 font-mono">
-              myshopa.shop/amakabags
+
+            <div className="grid sm:grid-cols-2 gap-6 p-6 sm:p-8 items-center">
+              <div className="text-center sm:text-left">
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">amakabags</h3>
+                <p className="text-sm text-gray-400 mt-0.5 mb-5">Handmade leather bags</p>
+                <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-400 text-left w-fit mx-auto sm:mx-0">
+                  <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Open in minutes, no code</li>
+                  <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Paystack checkout</li>
+                  <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> WhatsApp order alerts</li>
+                </ul>
+                <Link href="/signup" className="inline-block mt-6 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all active:scale-[0.98]">Open yours free</Link>
+              </div>
+              <div className="grid grid-cols-3 gap-3 items-start">
+                {[
+                  { name: "Tote Bag", price: "₦15,000", image: "/landing/showcase-1.jpg" },
+                  { name: "Crossbody", price: "₦12,000", image: "/landing/showcase-2.jpg" },
+                  { name: "Clutch", price: "₦8,000", image: "/landing/showcase-3.jpg" },
+                ].map((item) => (
+                  <div key={item.name} className="text-center group">
+                    <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03] aspect-square">
+                      <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <p className="text-xs font-medium text-gray-900 dark:text-white">{item.name}</p>
+                    <p className="text-xs font-semibold text-brand-600">{item.price}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 p-8 items-center">
-            <div className="text-center sm:text-left">
-              <h3 className="font-bold text-xl text-gray-900 dark:text-white">amakabags</h3>
-              <p className="text-sm text-gray-400 mt-0.5 mb-5">Premium leather bags</p>
-              <ul className="space-y-2.5 text-sm text-gray-600 dark:text-gray-400 text-left w-fit mx-auto sm:mx-0">
-                <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Live in minutes, no code</li>
-                <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> Paystack checkout</li>
-                <li className="flex items-center gap-2.5"><CheckIcon className="text-brand-500 shrink-0" size={14} /> WhatsApp order alerts</li>
-              </ul>
-              <Link href="/signup" className="inline-block mt-6 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all">Open yours free</Link>
+          <div className="lg:col-span-4 grid sm:grid-cols-3 lg:grid-cols-1 gap-3">
+            {[
+              { icon: <CreditCardIcon size={18} />, title: "Self-serve checkout", desc: "Buyers pay with card, transfer or USSD. No DMs to close a sale." },
+              { icon: <WhatsappIcon size={18} />, title: "Instant order alerts", desc: "A WhatsApp ping the moment payment lands." },
+              { icon: <TruckIcon size={18} />, title: "Delivery tracking", desc: "Buyers follow Paid to Fulfilled at /track." },
+            ].map((f) => (
+              <div key={f.title} className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 shadow-card dark:shadow-card-dark flex flex-col justify-center gap-2.5">
+                <span className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center">
+                  {f.icon}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{f.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="relative z-10 bg-gray-50/80 dark:bg-[#111] py-20 sm:py-24 scroll-mt-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-10">
+            <div>
+              <p className="eyebrow mb-3">Sell everywhere</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                Where your customers already are
+              </h2>
             </div>
-            <div className="grid grid-cols-3 gap-3 items-start">
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs sm:text-right">
+              One link for your bio, your broadcasts and your market customers.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-5">
+            <div className="lg:col-span-7 group bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-3xl overflow-hidden flex flex-col sm:flex-row transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover">
+              <div className="sm:w-1/2 p-7 sm:p-8 flex flex-col justify-center">
+                <span className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-5">
+                  <LinkIcon size={18} />
+                </span>
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">Instagram bio link</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  One link turns followers into buyers with self-serve checkout. No more &quot;DM to order&quot;.
+                </p>
+              </div>
+              <div className="sm:w-1/2 min-h-[220px] sm:min-h-0 overflow-hidden">
+                <img src="/landing/sell-ig.jpg" alt="Nigerian boutique owner showing her shop link" loading="lazy" decoding="async" className="w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-500" />
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 grid sm:grid-cols-2 lg:grid-cols-1 gap-5">
               {[
-                { name: "Tote Bag", price: "₦15,000", image: "/landing/showcase-1.jpg" },
-                { name: "Crossbody", price: "₦12,000", image: "/landing/showcase-2.jpg" },
-                { name: "Clutch", price: "₦8,000", image: "/landing/showcase-3.jpg" },
-              ].map((item, i) => (
-                <div key={i} className="text-center group">
-                  <div className="rounded-xl mb-2 overflow-hidden bg-gray-50 dark:bg-white/[0.03] aspect-square">
-                    <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
+                { title: "WhatsApp orders", desc: "Buyers pay securely, you get notified, all tracked.", image: "/landing/sell-chat.jpg", icon: <WhatsappIcon size={18} /> },
+                { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg", icon: <StoreIcon size={18} /> },
+              ].map((item) => (
+                <div key={item.title} className="group bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-3xl overflow-hidden flex transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover">
+                  <div className="w-[38%] min-h-[150px] overflow-hidden shrink-0">
+                    <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
                   </div>
-                  <p className="text-xs font-medium text-gray-900 dark:text-white">{item.name}</p>
-                  <p className="text-xs font-semibold text-brand-600">{item.price}</p>
+                  <div className="p-5 flex flex-col justify-center">
+                    <span className="text-brand-600 dark:text-brand-400 mb-2">{item.icon}</span>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.title}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -176,27 +269,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="features" className="relative z-10 bg-gray-50/80 dark:bg-[#111] py-24 scroll-mt-20">
+      <section id="how" className="relative z-10 py-20 sm:py-24 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Sell everywhere</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-              Where your customers already are
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-10">
+            <div>
+              <p className="eyebrow mb-3">How it works</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                Three steps to your first sale
+              </h2>
+            </div>
+            <Link
+              href="/signup"
+              className="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all active:scale-[0.98] shadow-brand whitespace-nowrap"
+            >
+              Take your shot, it&apos;s free
+            </Link>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6 items-start">
+          <div className="grid sm:grid-cols-3 gap-5">
             {[
-              { title: "Instagram bio link", desc: "One link turns followers into buyers with self-serve checkout.", image: "/landing/sell-ig.jpg" },
-              { title: "WhatsApp orders", desc: "Buyers pay securely, you get notified, all tracked.", image: "/landing/sell-chat.jpg" },
-              { title: "Market stall to online", desc: "Snap your goods, add prices, share your store tonight.", image: "/landing/sell-stall.jpg" },
-            ].map((item, i) => (
-              <div key={i} className="bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1 group">
-                <div className="overflow-hidden aspect-[4/3]">
-                  <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
+              { step: "01", title: "Add your first product", desc: "Photo, price, stock, done in a minute.", image: "/landing/step-add.jpg" },
+              { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
+              { step: "03", title: "Get paid", desc: "Money lands in your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
+            ].map((item) => (
+              <div key={item.step} className="group bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-card-hover dark:hover:shadow-card-dark-hover hover:-translate-y-1">
+                <div className="relative overflow-hidden aspect-[16/10]">
+                  <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+                  <span className="absolute top-3 left-3 bg-white/90 dark:bg-black/70 backdrop-blur-sm text-gray-900 dark:text-white text-xs font-bold px-3 py-1 rounded-full tnum">{item.step}</span>
                 </div>
                 <div className="p-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1.5">{item.title}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
@@ -205,181 +307,68 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="how" className="relative z-10 py-24 scroll-mt-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">How it works</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-              Three steps to your first sale
-            </h2>
-          </div>
-
-          <div className="grid sm:grid-cols-3 gap-6 items-start">
-            {[
-              { step: "01", title: "Add your first product", desc: "Photo, price, stock, done in a minute.", image: "/landing/step-add.jpg" },
-              { step: "02", title: "Customize your store", desc: "Colors, banner, layout. Premium unlocks it all.", image: "/landing/step-style.jpg" },
-              { step: "03", title: "Get paid", desc: "Get paid straight to your bank. Just mark fulfilled.", image: "/landing/step-paid.jpg" },
-            ].map((item, i) => (
-              <div key={i} className="relative group">
-                <div className="rounded-2xl overflow-hidden border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-[#1a1a1a] transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-1">
-                  <div className="relative overflow-hidden aspect-[4/3]">
-                    <img src={item.image} alt={item.title} loading="lazy" decoding="async" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
-                    <span className="absolute top-3 left-3 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full">{item.step}</span>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <Link href="/signup" className="inline-block bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-brand-500/20 active:scale-[0.98]">
-              Take your shot, it&apos;s free
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="relative z-10 py-24 bg-gray-50/80 dark:bg-[#111] scroll-mt-20">
+      <section id="pricing" className="relative z-10 py-20 sm:py-24 bg-gray-50/80 dark:bg-[#111] scroll-mt-20">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold text-brand-600 dark:text-brand-400 mb-3 uppercase tracking-wider">Pricing</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center mb-10">
+            <p className="eyebrow mb-3">Pricing</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
               Start free, scale as you grow
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">New: early sellers lock launch pricing.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Early sellers lock launch pricing.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-[#141414] border border-gray-200/80 dark:border-white/[0.06] rounded-2xl p-8 transition-all hover:shadow-card dark:hover:shadow-card-dark">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
+            <div className="bg-white dark:bg-[#141414] border border-gray-200/80 dark:border-white/[0.06] rounded-3xl p-7 transition-all hover:shadow-card dark:hover:shadow-card-dark">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Free</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">₦0</span>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-4xl font-bold text-gray-900 dark:text-white tnum">₦0</span>
               </div>
-              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-gray-400 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  3 product slots
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Paystack checkout
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Order analytics
-                </li>
-                <li className="flex items-center gap-3 text-gray-400 dark:text-gray-500">
-                  <div className="w-5 h-5 rounded-full bg-gray-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0">
-                    <XIcon className="text-gray-400 dark:text-gray-600" size={12} />
-                  </div>
-                  &quot;Powered by Shopa&quot; branding
-                </li>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400 mb-7">
+                <PricingItem text="3 product slots" />
+                <PricingItem text="Paystack checkout" />
+                <PricingItem text="Order analytics" />
+                <PricingItem text="Shopa branding" muted />
               </ul>
-              <Link
-                href="/signup"
-                className="block text-center border border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl transition-all active:scale-[0.98]"
-              >
+              <Link href="/signup" className="block text-center btn-secondary py-3">
                 Get started
               </Link>
             </div>
 
-            <div className="bg-white dark:bg-[#141414] border-2 border-brand-500 rounded-2xl p-8 relative transition-all hover:shadow-lg hover:shadow-brand-500/10">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">
+            <div className="bg-white dark:bg-[#141414] border-2 border-brand-500 rounded-3xl p-7 relative transition-all hover:shadow-lg hover:shadow-brand-500/10">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-[0.12em]">
                 Popular
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Premium</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-brand-600">₦5,000</span>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-4xl font-bold text-brand-600 tnum">₦5,000</span>
                 <span className="text-sm text-gray-400">/mo</span>
               </div>
-              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-gray-400 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Unlimited products
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Paystack checkout
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Store customization
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  No branding
-                </li>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400 mb-7">
+                <PricingItem text="Unlimited products" />
+                <PricingItem text="Paystack checkout" />
+                <PricingItem text="Store customization" />
+                <PricingItem text="No Shopa branding" />
               </ul>
-              <Link
-                href="/signup?trial=1"
-                className="block text-center bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 active:scale-[0.98]"
-              >
+              <Link href="/signup?trial=1" className="block text-center btn-primary py-3">
                 Start free trial
               </Link>
-              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">
-                7 days of Premium free, no card required
-              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-3">7 days free, no card required</p>
             </div>
 
-            <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8 relative transition-all hover:shadow-lg hover:shadow-brand-500/10">
+            <div className="bg-white dark:bg-[#141414] border border-gray-200 dark:border-white/[0.08] rounded-3xl p-7 transition-all hover:shadow-lg hover:shadow-brand-500/10 sm:col-span-2 lg:col-span-1">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Pro+</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">₦10,000</span>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-4xl font-bold text-gray-900 dark:text-white tnum">₦10,000</span>
                 <span className="text-sm text-gray-400">/mo</span>
               </div>
-              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-gray-400 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Everything in Premium
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Multiple stores
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Promo / discount codes
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Product variants (size, color)
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-                    <CheckIcon className="text-green-600 dark:text-green-400" size={12} />
-                  </div>
-                  Advanced analytics
-                </li>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400 mb-7">
+                <PricingItem text="Everything in Premium" />
+                <PricingItem text="Multiple stores" />
+                <PricingItem text="Promo / discount codes" />
+                <PricingItem text="Product variants" />
+                <PricingItem text="Advanced analytics" />
               </ul>
-              <Link
-                href="/signup"
-                className="block text-center border border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15] text-gray-700 dark:text-gray-300 font-semibold py-3 rounded-xl transition-all active:scale-[0.98]"
-              >
+              <Link href="/signup" className="block text-center btn-secondary py-3">
                 Get started
               </Link>
             </div>
@@ -387,27 +376,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative z-10 max-w-6xl mx-auto px-6 py-20">
-        <div className="relative rounded-2xl overflow-hidden bg-brand-500">
-          <img src="/landing/sell-stall.jpg" alt="" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover opacity-20" />
-          <div className="relative px-8 py-14 sm:px-14 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Your store could be live tonight.</h2>
-            <p className="text-white/85 mb-8">Free to start. Share one link everywhere you sell.</p>
-            <Link href="/signup" className="inline-block bg-white text-brand-600 font-semibold px-8 py-3.5 rounded-xl transition-all hover:bg-brand-50 active:scale-[0.98]">
+      <section className="relative z-10 max-w-6xl mx-auto px-6 py-16 sm:py-20">
+        <div className="grid lg:grid-cols-12 gap-0 rounded-3xl overflow-hidden bg-brand-500 shadow-brand-lg">
+          <div className="lg:col-span-7 px-7 py-10 sm:px-12 sm:py-14 flex flex-col justify-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 mb-3">Ready when you are</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">Your store could be live tonight.</h2>
+            <p className="text-white/85 mb-7 max-w-md leading-relaxed">Free to start. Share one link everywhere you sell.</p>
+            <Link href="/signup" className="inline-flex w-fit bg-white text-brand-600 font-semibold px-7 py-3.5 rounded-xl transition-all hover:bg-brand-50 active:scale-[0.98]">
               Create your store
             </Link>
+          </div>
+          <div className="lg:col-span-5 min-h-[220px] lg:min-h-0">
+            <img src="/landing/sell-stall.jpg" alt="Nigerian market stall with bags and fabrics" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 max-w-3xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
-          Questions, answered
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8">
-          Everything sellers usually ask before starting.
-        </p>
-        <FaqAccordion />
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-20">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          <div className="lg:col-span-4 lg:sticky lg:top-24">
+            <p className="eyebrow mb-3">Support</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+              Questions, answered
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">
+              Everything sellers usually ask before starting. Still stuck? Open the support chat inside your dashboard.
+            </p>
+            <div className="mt-6 flex items-center gap-3 bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-4 shadow-card dark:shadow-card-dark">
+              <span className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
+                <HeadsetIcon size={17} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Shopa support</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">In-dashboard chat, replies in minutes</p>
+              </div>
+            </div>
+          </div>
+          <div className="lg:col-span-8">
+            <FaqAccordion />
+          </div>
+        </div>
       </section>
 
       <footer className="relative z-10 border-t border-gray-100 dark:border-white/[0.06] py-12">
@@ -449,6 +457,17 @@ export default function HomePage() {
   );
 }
 
+function PricingItem({ text, muted }: { text: string; muted?: boolean }) {
+  return (
+    <li className={`flex items-center gap-3 ${muted ? "text-gray-400 dark:text-gray-500" : ""}`}>
+      <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${muted ? "bg-gray-100 dark:bg-white/[0.05]" : "bg-green-100 dark:bg-green-900/30"}`}>
+        {muted ? <XIcon className="text-gray-400 dark:text-gray-600" size={12} /> : <CheckIcon className="text-green-600 dark:text-green-400" size={12} />}
+      </span>
+      {text}
+    </li>
+  );
+}
+
 const FAQS = [
   {
     q: "How do I get paid?",
@@ -483,7 +502,7 @@ const FAQS = [
 function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="space-y-2">
+    <div className="grid sm:grid-cols-2 gap-2.5 items-start">
       {FAQS.map((f, i) => {
         const isOpen = open === i;
         return (
