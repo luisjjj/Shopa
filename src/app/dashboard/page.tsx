@@ -8,7 +8,6 @@ import { isPremiumActive } from "@/lib/premium";
 import DashboardShell from "@/components/DashboardShell";
 import OnboardingChecklist from "@/components/OnboardingChecklist";
 import { ShareStoreCard } from "@/components/ShareStoreCard";
-import { getStoreUrl } from "@/lib/store-url";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -56,12 +55,12 @@ export default async function DashboardPage() {
             <div className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 px-3 py-1.5 max-w-full">
               <span className="h-1.5 w-1.5 rounded-full bg-green-400 shrink-0" aria-hidden="true" />
               <span className="text-xs text-white/85 font-medium truncate">
-                {profile.username}.myshopa.shop
+                myshopa.shop/{profile.username}
               </span>
             </div>
           </div>
           <Link
-            href={getStoreUrl(profile.username)}
+            href={`/${profile.username}`}
             target="_blank"
             className="shrink-0 inline-flex items-center gap-1.5 bg-white/95 hover:bg-white text-gray-900 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.98]"
           >
@@ -219,7 +218,7 @@ export default async function DashboardPage() {
       </div>
       <ShareStoreCard
         username={profile.username}
-        storeUrl={getStoreUrl(profile.username)}
+        storeUrl={`https://myshopa.shop/${profile.username}`}
         isPremium={isPremium}
       />
     </DashboardShell>
