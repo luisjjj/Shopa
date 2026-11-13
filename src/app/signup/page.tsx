@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { SunIcon, MoonIcon } from "@/components/Icons";
 import { ShopaMark } from "@/components/ShopaLogo";
@@ -10,18 +10,50 @@ import { AuthSidePanel } from "@/components/AuthSidePanel";
 import { setTrialIntent } from "@/components/TrialClaimer";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 
+const RESERVED_USERNAMES = [
+  "www", "api", "admin", "dashboard", "onboarding", "login", "signup", "auth",
+  "cart", "checkout", "track", "confirm", "support", "help", "blog", "docs",
+  "status", "static", "assets", "cdn", "app", "mail", "smtp",
+];
+
+type CheckState = "idle" | "invalid" | "reserved" | "checking" | "available" | "taken" | "error";
+
+function normalizeUsername(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "")
+    .replace(/_+/g, "_")
+    .replace(/^_+/, "")
+    .slice(0, 30);
+}
+
+function usernameIssue(value: string): string | null {
+  if (value.length < 3) return "Use at least 3 characters.";
+  if (value.endsWith("_")) return "The link can't end with an underscore.";
+  if (RESERVED_USERNAMES.includes(value)) return "That link is reserved.";
+  return null;
+}
+
 export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [checking, setChecking] = useState(false);
-  const [available, setAvailable] = useState<boolean | null>(null);
+  const [checkState, setCheckState] = useState<CheckState>("idle");
+  const [checkMessage, setCheckMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const supabase = createClient();
   const [isTrial, setIsTrial] = useState(false);
+  const checkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const checkSeq = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (checkTimer.current) clearTimeout(checkTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("trial") === "1") {
@@ -50,30 +82,74 @@ export default function SignupPage() {
     }
   };
 
-  const checkUsername = async (value: string) => {
+  const checkUsername = (raw: string) => {
+    const value = normalizeUsername(raw);
     setUsername(value);
-    setAvailable(null);
-    if (value.length < 3) return;
-    const reserved = ["www", "api", "admin", "dashboard", "onboarding", "login", "signup", "auth", "cart", "checkout", "track", "confirm"];
-    if (reserved.includes(value)) {
-      setAvailable(false);
+
+    if (checkTimer.current) clearTimeout(checkTimer.current);
+    const seq = ++checkSeq.current;
+
+    if (!value) {
+      setCheckState("idle");
+      setCheckMessage("");
       return;
     }
-    setChecking(true);
-    const { data } = await supabase
-      .from("users")
-      .select("username")
-      .eq("username", value)
-      .single();
-    setAvailable(!data);
-    setChecking(false);
+
+    const issue = usernameIssue(value);
+    if (issue) {
+      setCheckState(RESERVED_USERNAMES.includes(value) ? "reserved" : "invalid");
+      setCheckMessage(issue);
+      return;
+    }
+
+    setCheckState("checking");
+    setCheckMessage("");
+    checkTimer.current = setTimeout(async () => {
+      const { data, error: checkError } = await supabase
+        .from("users")
+        .select("username")
+        .eq("username", value)
+        .maybeSingle();
+      if (seq !== checkSeq.current) return;
+      if (checkError) {
+        setCheckState("error");
+        setCheckMessage("Couldn't check availability. Check your connection and try again.");
+        return;
+      }
+      setCheckState(data ? "taken" : "available");
+      setCheckMessage(data ? "That store link is already taken." : "This link is available.");
+    }, 350);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!available || username.length < 3 || password.length < 6) return;
+    const issue = usernameIssue(username);
+    if (issue) {
+      setError(issue);
+      return;
+    }
+    if (password.length < 6) return;
     setLoading(true);
     setError("");
+
+    // Re-check right before creating the account so two people can't
+    // claim the same link from stale availability state.
+    const { data: existing, error: checkError } = await supabase
+      .from("users")
+      .select("username")
+      .eq("username", username)
+      .maybeSingle();
+    if (checkError) {
+      setError("Couldn't verify your store link. Please try again.");
+      setLoading(false);
+      return;
+    }
+    if (existing) {
+      setCheckState("taken");
+      setCheckMessage("That store link is already taken.");
+      setLoading(false);
+      return;
+    }
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -149,49 +225,73 @@ export default function SignupPage() {
           onSubmit={handleSubmit}
           className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-white/[0.06] rounded-3xl p-7 sm:p-8 shadow-card dark:shadow-card-dark"
         >
-          {/* Username */}
+          {/* Store name / link */}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Store username
-            </label>
-            <div className="flex items-center input-base !px-0 overflow-hidden">
+            <div className="flex items-baseline justify-between gap-2 mb-2">
+              <label htmlFor="store-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Store name
+              </label>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">Free link included</span>
+            </div>
+            <div
+              className={`flex items-center input-base !px-0 overflow-hidden ${
+                checkState === "taken" || checkState === "invalid" || checkState === "reserved"
+                  ? "!border-red-300 dark:!border-red-900/70"
+                  : checkState === "available"
+                    ? "!border-green-300 dark:!border-green-900/70"
+                    : ""
+              }`}
+            >
               <input
+                id="store-name"
                 type="text"
                 value={username}
-                onChange={(e) =>
-                  checkUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
-                }
-                className="flex-1 min-w-0 bg-transparent border-none outline-none py-3 pl-4 pr-0 font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-right"
+                onChange={(e) => checkUsername(e.target.value)}
+                className="flex-1 min-w-0 bg-transparent border-none outline-none py-3 pl-4 pr-0 font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="yourstore"
                 required
                 minLength={3}
+                maxLength={30}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-invalid={checkState === "taken" || checkState === "invalid" || checkState === "reserved"}
+                aria-describedby="store-name-status"
               />
               <span className="shrink-0 text-sm text-gray-400 dark:text-gray-500 pr-4 pl-1">.myshopa.shop</span>
             </div>
-            <div className="mt-1.5 h-4">
-              {checking && (
+            <div id="store-name-status" className="mt-1.5 min-h-[1.25rem]" aria-live="polite">
+              {checkState === "checking" && (
                 <p className="text-xs text-gray-400 flex items-center gap-1.5">
                   <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Checking...
+                  Checking availability...
                 </p>
               )}
-              {available === true && (
+              {checkState === "available" && (
                 <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
-                  Available
+                  {checkMessage}
                 </p>
               )}
-              {available === false && (
+              {(checkState === "taken" || checkState === "invalid" || checkState === "reserved") && (
                 <p className="text-xs text-red-500 flex items-center gap-1.5">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  Already taken
+                  {checkMessage}
+                </p>
+              )}
+              {checkState === "error" && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">{checkMessage}</p>
+              )}
+              {checkState === "idle" && (
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Letters, numbers and underscores. This becomes your store link.
                 </p>
               )}
             </div>
@@ -244,7 +344,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            disabled={!available || loading || password.length < 6}
+            disabled={(checkState !== "available" && checkState !== "error") || loading || password.length < 6}
             className="btn-primary"
           >
             {loading ? (
